@@ -951,7 +951,7 @@ img { display: block; max-width: 100%; }
     padding: 0 48px;
   }
   .team-card { min-height: clamp(166px, calc((100svh - 260px) / 2), 204px); }
-  .team-card-copy { width: 66%; padding: 22px 20px 18px; }
+  .team-card-copy { width: 66%; padding: 22px 20px 62px; } /* bottom clears the absolutely-positioned .team-card-link */
   .team-card-index { margin-bottom: 42px; }
   .team-card-name { font-size: clamp(34px, 3.25vw, 54px); }
   .team-card-tag { font-size: 10.5px; }
