@@ -1,0 +1,27 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//MVL//Metarice Volleyball League 2026//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:MVL 2026
+BEGIN:VEVENT
+UID:mvl2026-weekend1@mvl-site.vercel.app
+DTSTAMP:20260713T000000Z
+DTSTART;VALUE=DATE:20260829
+DTEND;VALUE=DATE:20260901
+SUMMARY:MVL 2026 · Metarice Volleyball League (Weekend 1)
+LOCATION:Gameville Ball Park
+DESCRIPTION:Metarice Volleyball League 2026 — game days 1-3.\nVenue: https://maps.app.goo.gl/sK1HuKBVwRSZPpHz9
+URL:https://maps.app.goo.gl/sK1HuKBVwRSZPpHz9
+END:VEVENT
+BEGIN:VEVENT
+UID:mvl2026-weekend2@mvl-site.vercel.app
+DTSTAMP:20260713T000000Z
+DTSTART;VALUE=DATE:20260906
+DTEND;VALUE=DATE:20260908
+SUMMARY:MVL 2026 · Metarice Volleyball League (Weekend 2)
+LOCATION:Gameville Ball Park
+DESCRIPTION:Metarice Volleyball League 2026 — game days 4-5.\nVenue: https://maps.app.goo.gl/sK1HuKBVwRSZPpHz9
+URL:https://maps.app.goo.gl/sK1HuKBVwRSZPpHz9
+END:VEVENT
+END:VCALENDAR

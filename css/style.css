@@ -615,15 +615,29 @@ img { display: block; max-width: 100%; }
   color: var(--mint);
   font-size: 18px;
 }
+.footer-logo-img {
+  height: 44px;
+  width: auto;
+  display: block;
+}
 .footer-social {
+  display: flex;
+  align-items: center;
+  gap: 20px;
   font-weight: 700;
   font-size: 11px;
   letter-spacing: 1.6px;
   text-transform: uppercase;
   color: var(--ink-soft);
 }
-.footer-social a:hover { color: var(--mint); }
+.footer-social a {
+  display: flex;
+  color: var(--ink-soft);
+  transition: color .15s ease, transform .15s ease;
+}
+.footer-social a:hover { color: var(--mint); transform: translateY(-1px); }
 .footer-social .sep { color: var(--indigo); margin: 0 8px; }
+.social-icon { width: 21px; height: 21px; }
 
 /* ==========================================================================
    Schedule & standings page
@@ -1056,17 +1070,18 @@ img { display: block; max-width: 100%; }
 }
 
 /* ==========================================================================
-   Teaser (Phase 1) page
+   Teaser (Phase 1) page — single fold: logo + dates + venue + CTAs
    ========================================================================== */
 .teaser-hero {
   position: relative;
-  height: 100svh;
-  min-height: 640px;
+  min-height: 100svh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   text-align: center;
+  padding: 24px 16px 22px;
 }
 .teaser-hero-bg {
   position: absolute;
@@ -1082,60 +1097,337 @@ img { display: block; max-width: 100%; }
   /* placeholder KV has phase-2 dates baked into the pixels below ~50% —
      stays heavily obscured until a dedicated teaser asset replaces it */
   background: linear-gradient(180deg,
-    rgba(16, 10, 50, .55) 0%,
-    rgba(16, 10, 50, .7) 42%,
-    rgba(16, 10, 50, .97) 68%,
+    rgba(16, 10, 50, .6) 0%,
+    rgba(16, 10, 50, .82) 38%,
+    rgba(16, 10, 50, .97) 64%,
     rgba(16, 10, 50, .99) 100%);
 }
 .teaser-hero-content {
   position: relative;
-  padding: 0 24px;
-}
-.teaser-logo {
-  font-family: var(--display);
-  font-style: italic;
-  text-transform: uppercase;
-  line-height: .92;
-  font-size: 64px;
+  flex: 1;
   display: flex;
-  align-items: baseline;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  gap: 10px;
-  text-shadow: 0 6px 40px rgba(4, 2, 20, .55);
+  min-height: 0;
 }
-.teaser-logo .hero-logo-mark { color: #fff; }
+.teaser-logo-wrap { line-height: 0; }
+.teaser-logo-img {
+  width: min(58vw, 240px);
+  height: auto;
+  filter: drop-shadow(0 10px 34px rgba(4, 2, 20, .6));
+}
 .teaser-dates {
-  margin-top: 22px;
+  margin-top: 14px;
   font-weight: 800;
   font-size: 19px;
   letter-spacing: 1.4px;
   text-transform: uppercase;
   color: #fff;
   line-height: 1.5;
+  text-shadow: 0 3px 18px rgba(4, 2, 20, .6);
+}
+.teaser-dates-amp { color: var(--mint); padding: 0 4px; }
+.teaser-icon {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
 }
 .teaser-venue {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   margin-top: 10px;
   font-weight: 700;
   font-size: 11px;
   letter-spacing: 2.6px;
   text-transform: uppercase;
   color: var(--mint);
+  padding: 6px 10px;
+  border-bottom: 1px solid transparent;
+  transition: border-color .15s ease;
+}
+.teaser-venue:hover { border-bottom-color: var(--mint); }
+.teaser-save-dates {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 16px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(255, 255, 255, .55);
+  background: rgba(11, 7, 48, .35);
+  color: #fff;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  transition: background .15s ease, border-color .15s ease;
+}
+.teaser-save-dates:hover {
+  border-color: var(--mint);
+  background: rgba(124, 245, 180, .12);
+  color: var(--mint);
 }
 
-.teaser-ctas {
-  padding: 36px 16px 44px;
-  background: var(--navy);
-}
-.teaser-ctas .hero-ctas {
-  margin-top: 0;
+.teaser-hero-ctas {
+  position: relative;
+  width: 100%;
   max-width: 560px;
-  margin-left: auto;
-  margin-right: auto;
+  margin-top: 20px;
+  justify-content: center; /* keep the CTA row centered when it doesn't fill the box */
 }
 
 @media (min-width: 960px) {
-  .teaser-logo { font-size: 128px; }
-  .teaser-dates { font-size: 27px; letter-spacing: 2px; }
+  .teaser-hero { padding: 40px 48px 44px; }
+  .teaser-logo-img { width: min(30vw, 340px); }
+  .teaser-dates { font-size: 26px; letter-spacing: 2px; margin-top: 20px; }
   .teaser-venue { font-size: 13px; }
-  .teaser-ctas { padding: 56px 48px 64px; }
+  .teaser-icon { width: 17px; height: 17px; }
+  .teaser-save-dates { font-size: 13px; padding: 13px 26px; margin-top: 20px; }
+  .teaser-hero-ctas { max-width: 900px; margin-top: 34px; }
+}
+
+/* ==========================================================================
+   Save-the-Dates action sheet — bottom sheet on mobile, centered on desktop
+   ========================================================================== */
+.sheet {
+  border: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 480px;
+  margin: auto auto 0; /* bottom sheet */
+  background: #0E0936;
+  color: #fff;
+  border: 1px solid rgba(124, 245, 180, .22);
+  border-bottom: 0;
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 -18px 60px rgba(4, 2, 20, .6);
+}
+.sheet::backdrop {
+  background: rgba(8, 5, 34, .72);
+}
+.sheet-head { padding: 22px 22px 14px; }
+.sheet-title {
+  font-family: var(--display);
+  font-style: italic;
+  text-transform: uppercase;
+  font-size: 24px;
+  color: var(--mint);
+}
+.sheet-sub {
+  margin-top: 5px;
+  font-size: 12.5px;
+  color: var(--ink-muted);
+}
+.sheet-option {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 15px 22px;
+  border-top: 1px solid rgba(255, 255, 255, .09);
+  transition: background .15s ease;
+}
+.sheet-option:hover { background: rgba(124, 245, 180, .08); }
+.sheet-icon {
+  width: 21px;
+  height: 21px;
+  flex: 0 0 auto;
+  color: var(--mint);
+}
+.sheet-option strong {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 800;
+  letter-spacing: .3px;
+}
+.sheet-option small {
+  display: block;
+  margin-top: 2px;
+  font-size: 11.5px;
+  color: var(--ink-muted);
+}
+.sheet-cancel {
+  width: 100%;
+  padding: 15px;
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, .09);
+  background: rgba(255, 255, 255, .05);
+  color: var(--ink-soft);
+  font-family: var(--ui);
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .15s ease;
+}
+.sheet-cancel:hover { background: rgba(255, 255, 255, .1); }
+
+@media (min-width: 960px) {
+  .sheet {
+    margin: auto; /* centered card */
+    border-bottom: 1px solid rgba(124, 245, 180, .22);
+    border-radius: 16px;
+  }
+  .sheet-cancel { border-radius: 0 0 15px 15px; }
+}
+
+/* ==========================================================================
+   Rules page
+   ========================================================================== */
+.rules-page main {
+  padding: calc(var(--nav-h) + 26px) 16px 56px;
+  max-width: 860px;
+  margin: 0 auto;
+}
+.rules-hero .section-title { font-size: 42px; }
+.rules-hero p {
+  margin-top: 10px;
+  color: var(--ink-muted);
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+/* FAQ — the quick version */
+.faq-panel {
+  margin-top: 30px;
+  border: 1px solid rgba(124, 245, 180, .28);
+  background: rgba(11, 7, 48, .55);
+  border-radius: 14px;
+  padding: 20px 18px 8px;
+}
+.faq-panel > h2 {
+  font-family: var(--display);
+  font-style: italic;
+  text-transform: uppercase;
+  font-size: 22px;
+  color: var(--mint);
+  margin-bottom: 6px;
+}
+.faq-panel > p {
+  color: var(--ink-muted);
+  font-size: 12.5px;
+  margin-bottom: 10px;
+}
+.faq-item { border-bottom: 1px solid rgba(255, 255, 255, .1); }
+.faq-item:last-of-type { border-bottom: 0; }
+.faq-item summary {
+  cursor: pointer;
+  list-style: none;
+  position: relative;
+  padding: 14px 34px 14px 0;
+  font-weight: 800;
+  font-size: 13.5px;
+  letter-spacing: .3px;
+  color: #fff;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after {
+  content: '+';
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--mint);
+  font-size: 20px;
+  font-weight: 400;
+}
+.faq-item[open] summary::after { content: '\2212'; }
+.faq-item p,
+.faq-item ul {
+  color: var(--ink-muted);
+  font-size: 13.5px;
+  line-height: 1.65;
+  padding: 0 0 16px;
+}
+.faq-item ul { padding-left: 18px; padding-bottom: 16px; }
+.faq-item a { color: var(--teal); }
+.faq-item a:hover { color: var(--mint); }
+
+/* Full rulebook body */
+.rules-body { margin-top: 20px; }
+.rules-body section { margin-top: 40px; }
+.rules-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 2.4px;
+  color: var(--teal);
+  display: block;
+  margin-bottom: 4px;
+}
+.rules-body h2 {
+  font-family: var(--display);
+  font-style: italic;
+  text-transform: uppercase;
+  font-size: 27px;
+  color: #fff;
+  line-height: 1.05;
+}
+.rules-body h3 {
+  margin: 24px 0 8px;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--mint);
+}
+.rules-body p,
+.rules-body li {
+  color: rgba(237, 235, 255, .88);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.rules-body p { margin-top: 8px; }
+.rules-body ul, .rules-body ol { margin: 8px 0 0 18px; }
+.rules-body li { margin-top: 5px; }
+.rules-body li > ul { margin-top: 4px; }
+.rules-body a { color: var(--teal); }
+.rules-body a:hover { color: var(--mint); }
+
+.rules-table-wrap { overflow-x: auto; margin-top: 12px; }
+.rules-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  background: rgba(11, 7, 48, .45);
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.rules-table th {
+  text-align: left;
+  font-size: 10.5px;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--teal);
+  padding: 11px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, .14);
+  white-space: nowrap;
+}
+.rules-table td {
+  padding: 11px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, .07);
+  color: rgba(237, 235, 255, .88);
+  vertical-align: top;
+}
+.rules-table tr:last-child td { border-bottom: 0; }
+
+.rules-note {
+  margin-top: 14px;
+  padding: 12px 16px;
+  border-left: 3px solid var(--mint);
+  background: rgba(124, 245, 180, .07);
+  border-radius: 0 8px 8px 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+@media (min-width: 960px) {
+  .rules-page main { padding-top: calc(var(--nav-h) + 44px); }
+  .rules-hero .section-title { font-size: 62px; }
+  .faq-panel { padding: 26px 26px 12px; }
+  .faq-item summary { font-size: 14.5px; }
+  .rules-body h2 { font-size: 32px; }
 }
