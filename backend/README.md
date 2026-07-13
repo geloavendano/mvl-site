@@ -23,6 +23,7 @@ supabase db query --linked --file supabase/migrations/20260713000100_create_mvl_
 supabase db query --linked --file supabase/seed.sql
 supabase db query --linked --file supabase/migrations/20260713000200_drop_public_mvl_prefixed_tables.sql
 supabase db query --linked --file supabase/migrations/20260713000300_add_mvl_standings.sql
+supabase db query --linked --file supabase/migrations/20260714000100_update_mvl_event_dates.sql
 ```
 
 ## Schema

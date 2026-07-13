@@ -5,10 +5,10 @@
 ## What this is
 Immersive site for a volleyball league (MVL 2026, "3rd Annual Invitational", Gameville Ball Park + Double Play). Client's peg is https://www.idl.pro/ — maximal, energetic, everything about the competition laid out excitingly. Mobile-first, responsive.
 
-**⚠️ Unresolved date conflict, needs client sign-off:** Phase 1's real dates are client-confirmed as **Aug 29, 30, 31 & Sep 6, 7** (`teaser.html`). Phase 2 (`index.html`, `schedule.html`, `js/league-data.js`) still uses **Aug 15–16, 21–23** — inherited from the `assets/mvl-kv.png` key visual, never reconciled against the confirmed real dates. Since both phases describe the same event, one of these is wrong. Likely fix: Phase 2's hero kicker text and every `GAMES[].startsAt` in `league-data.js` need updating to the confirmed dates (the schedule already has 5 match days, which lines up with 5 confirmed dates: Aug 29/30/31 + Sep 6/7). Don't change this without asking the client to confirm first — flag it prominently.
+**Confirmed event dates:** August 29, 30, 31, September 5, and September 6, 2026.
 
 Two audience phases:
-- **Phase 1 (teaser, pre-event)**: players signing up. `teaser.html` — single-fold full-bleed video hero (no top nav, per wireframe): MVL logo image, dates, venue link (Google Maps: https://maps.app.goo.gl/sK1HuKBVwRSZPpHz9), "Save the Dates" pill (downloads `assets/mvl-2026-dates.ics` — 2 all-day span VEVENTs, works across Apple/Google/Outlook; client chose ICS over per-service buttons), and all three CTAs (waiver / 2025 highlights / 2026 rules) within the first viewport at both breakpoints. IG|TT footer.
+- **Phase 1 (teaser, pre-event)**: players signing up. `teaser.html` — single-fold full-bleed video hero (no top nav, per wireframe): MVL logo image, dates, venue link (Google Maps: https://maps.app.goo.gl/sK1HuKBVwRSZPpHz9), "Save the Dates" pill (downloads `assets/mvl-2026-dates.ics` — 2 all-day span VEVENTs for Aug 29–31 and Sep 5–6, works across Apple/Google/Outlook; client chose ICS over per-service buttons), and all three CTAs (waiver / 2025 highlights / 2026 rules) within the first viewport at both breakpoints. IG|TT footer.
 - **Phase 2 (live)**: players in the tournament. `index.html` + `schedule.html`.
 
 ## Stack & files (no build step, static, deliberate choice — do not introduce a framework without asking)
@@ -20,7 +20,7 @@ Two audience phases:
 - `js/main.js` — landing page rendering + IntersectionObservers.
 - `js/schedule.js` — computes standings from `league-data.js`, renders tabs and games. Ranking order is wins, set ratio, points ratio, head-to-head wins, head-to-head set ratio, head-to-head points ratio, then team name.
 - `js/teaser.js` — reveal-on-scroll + the Save-the-Dates `<dialog>` action sheet (device-calendar .ics / Google Calendar Weekend 1 / Weekend 2; trigger href falls back to the .ics without JS). The 2025-highlights CTA is a plain link to the Instagram reel — an embedded lightbox was built and then REMOVED at client request (IG embeds don't play natively in-page), don't rebuild it.
-- `rules.html` — static rules page: FAQ accordion ("The Quick Version") at top, then the full 10-section rulebook (client-provided text) with tables for the bracket, schedule, and scoring. No JS. NOTE: the client's source text said "Battle for Gold: **Loser** of SF1 vs Loser of SF2" — an obvious copy-paste typo, rendered as Winner vs Winner; and its schedule (prelims Aug 29–31 & **Sep 5**, QF Sep 5, SF+finals Sep 6) doesn't mention Sep 7 while the teaser dates say "Sep 6 · 7" — unconfirmed, ask client.
+- `rules.html` — static rules page: FAQ accordion ("The Quick Version") at top, then the full 10-section rulebook (client-provided text) with tables for the bracket, schedule, and scoring. No JS. NOTE: the client's source text said "Battle for Gold: **Loser** of SF1 vs Loser of SF2" — an obvious copy-paste typo, rendered as Winner vs Winner.
 - `waiver.html` — participant registration + waiver form. Uses `js/league-data.js` to populate teams and `js/waiver.js` for client validation / relationship "Other" behavior. Submit calls Supabase RPC `public.mvl_submit_waiver(...)`, which writes to `mvl.waiver_submissions`.
 - `js/supabase-config.js` — public Supabase URL + anon key for the existing `sansayaw` project. The anon key is intentionally public; RLS protects writes.
 - **Footers (all pages)**: MVL logo image + Instagram/TikTok/YouTube icon links (instagram.com/metaricevolley, tiktok.com/@metaricevolley, youtube.com/@metaricevolley). Icon SVGs are duplicated inline per page — keep them in sync.
@@ -28,13 +28,14 @@ Two audience phases:
 - `supabase/seed.sql` — applied to the linked Supabase project; seeds venues, current teams, placeholder games, and set scores.
 - `supabase/migrations/20260713000200_drop_public_mvl_prefixed_tables.sql` — applied after the schema migration to remove the initial `public.mvl_*` tables.
 - `supabase/migrations/20260713000300_add_mvl_standings.sql` — adds `public.mvl_get_standings()`, which mirrors the frontend standings ranking from `mvl.games` and `mvl.game_sets`.
+- `supabase/migrations/20260714000100_update_mvl_event_dates.sql` — applied to align seeded Supabase game dates to Aug 29, Aug 30, Aug 31, Sep 5, and Sep 6.
 - `backend/schema.sql` — older unprefixed draft; historical reference only.
 - `backend/README.md` — actual Supabase setup notes for the existing `sansayaw` project.
 - `assets/team-stock.png` — temporary local stock/comp image used inside the Teams cards to preview the eventual player-photo/cutout treatment.
 - `assets/mvl-video-1-web-10s.mp4` — optimized 10s teaser hero background video. The larger source video files are ignored by git.
 - `assets/mvl-kv.png` — 2026 key visual poster (portrait 1024×1280). Used as video poster/fallback for teaser, Phase 2 hero bg, and blurred drifting bg in games fold.
 - `assets/mvl-logo.png` — **2025** logo (client-provided placeholder, downscaled to 800px from a 4500px source in `~/Downloads/MVL 2025 Logo.png`). Used in the teaser hero. Swap for the 2026 mark when it exists — it will still say 2025 until then.
-- `assets/mvl-2026-dates.ics` — hand-built calendar file for the teaser's Save the Dates button (2 all-day span events, CRLF line endings, literal `\n` escapes in DESCRIPTION — regenerate carefully if dates change).
+- `assets/mvl-2026-dates.ics` — hand-built calendar file for the teaser's Save the Dates button (2 all-day span events: Aug 29–31 and Sep 5–6, literal `\n` escapes in DESCRIPTION — regenerate carefully if dates change).
 - `.claude/launch.json` — dev server: `python3 -m http.server 8742` (name `mvl-site`).
 - Design handoff source (Claude Design bundle w/ README spec + prototype) extracted at scratchpad `mvl-mock/design_handoff_mvl_phase2_landing/` — session-specific path; the client can re-share the zip (`~/Downloads/Metarice Volleyball League website.zip`) if needed.
 
@@ -73,10 +74,9 @@ Two audience phases:
 8. Real MVL logo mark to replace the Anton-italic "MVL" text in nav/hero/footer.
 
 ## Next tasks (client priority order)
-1. **Resolve the Phase 1/2 date conflict** (see top of doc) before going further — it affects hero copy and schedule data on the live site.
-2. **Raffle page + backend endpoint** — form asks for team, name, and detected GPS. Server must compute venue-radius eligibility and timestamp the entry; users should not manually adjust the pin.
-3. Rules page, team detail pages (team-card ↗ arrows), video pages/modal — all TBD with client.
-4. Decide how the two phases swap in production (single domain redirect, manual deploy swap, etc.) — not yet decided.
+1. **Raffle page + backend endpoint** — form asks for team, name, and detected GPS. Server must compute venue-radius eligibility and timestamp the entry; users should not manually adjust the pin.
+2. Rules page, team detail pages (team-card ↗ arrows), video pages/modal — all TBD with client.
+3. Decide how the two phases swap in production (single domain redirect, manual deploy swap, etc.) — not yet decided.
 
 ## Verification
 Run the `mvl-site` launch config.
