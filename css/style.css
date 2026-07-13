@@ -111,6 +111,11 @@ img { display: block; max-width: 100%; }
   color: #fff;
   opacity: .85;
 }
+.nav-logo-img {
+  display: block;
+  width: auto;
+  height: 38px;
+}
 .nav--stuck .nav-logo {
   opacity: 1;
   transform: none;
