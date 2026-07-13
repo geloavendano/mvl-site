@@ -8,7 +8,7 @@ Immersive site for a volleyball league (MVL 2026, "3rd Annual Invitational", Gam
 **⚠️ Unresolved date conflict, needs client sign-off:** Phase 1's real dates are client-confirmed as **Aug 29, 30, 31 & Sep 6, 7** (`teaser.html`). Phase 2 (`index.html`, `schedule.html`, `js/league-data.js`) still uses **Aug 15–16, 21–23** — inherited from the `assets/mvl-kv.png` key visual, never reconciled against the confirmed real dates. Since both phases describe the same event, one of these is wrong. Likely fix: Phase 2's hero kicker text and every `GAMES[].startsAt` in `league-data.js` need updating to the confirmed dates (the schedule already has 5 match days, which lines up with 5 confirmed dates: Aug 29/30/31 + Sep 6/7). Don't change this without asking the client to confirm first — flag it prominently.
 
 Two audience phases:
-- **Phase 1 (teaser, pre-event)**: players signing up. `teaser.html` — single-fold full-bleed hero (no top nav, per wireframe): MVL logo image, dates, venue link (Google Maps: https://maps.app.goo.gl/sK1HuKBVwRSZPpHz9), "Save the Dates" pill (downloads `assets/mvl-2026-dates.ics` — 2 all-day span VEVENTs, works across Apple/Google/Outlook; client chose ICS over per-service buttons), and all three CTAs (waiver / 2025 highlights / 2026 rules) within the first viewport at both breakpoints. IG|TT footer.
+- **Phase 1 (teaser, pre-event)**: players signing up. `teaser.html` — single-fold full-bleed video hero (no top nav, per wireframe): MVL logo image, dates, venue link (Google Maps: https://maps.app.goo.gl/sK1HuKBVwRSZPpHz9), "Save the Dates" pill (downloads `assets/mvl-2026-dates.ics` — 2 all-day span VEVENTs, works across Apple/Google/Outlook; client chose ICS over per-service buttons), and all three CTAs (waiver / 2025 highlights / 2026 rules) within the first viewport at both breakpoints. IG|TT footer.
 - **Phase 2 (live)**: players in the tournament. `index.html` + `schedule.html`.
 
 ## Stack & files (no build step, static, deliberate choice — do not introduce a framework without asking)
@@ -30,7 +30,8 @@ Two audience phases:
 - `backend/schema.sql` — older unprefixed draft; historical reference only.
 - `backend/README.md` — actual Supabase setup notes for the existing `sansayaw` project.
 - `assets/team-stock.png` — temporary local stock/comp image used inside the Teams cards to preview the eventual player-photo/cutout treatment.
-- `assets/mvl-kv.png` — 2026 key visual poster (portrait 1024×1280). Used as hero bg, and blurred drifting bg in games fold.
+- `assets/mvl-video-1-web-10s.mp4` — optimized 10s teaser hero background video. The larger source video files are ignored by git.
+- `assets/mvl-kv.png` — 2026 key visual poster (portrait 1024×1280). Used as video poster/fallback for teaser, Phase 2 hero bg, and blurred drifting bg in games fold.
 - `assets/mvl-logo.png` — **2025** logo (client-provided placeholder, downscaled to 800px from a 4500px source in `~/Downloads/MVL 2025 Logo.png`). Used in the teaser hero. Swap for the 2026 mark when it exists — it will still say 2025 until then.
 - `assets/mvl-2026-dates.ics` — hand-built calendar file for the teaser's Save the Dates button (2 all-day span events, CRLF line endings, literal `\n` escapes in DESCRIPTION — regenerate carefully if dates change).
 - `.claude/launch.json` — dev server: `python3 -m http.server 8742` (name `mvl-site`).
@@ -61,7 +62,7 @@ Two audience phases:
 - The Browser pane's `<link>` stylesheet caches aggressively — editing `style.css` and reloading (even with `location.reload(true)` or a `?cachebust=` query on the *page* URL) can serve stale CSS while a raw `fetch(..., {cache:'no-store'})` of the same file shows the edit is actually on disk. If computed styles don't reflect a CSS edit, bump the stylesheet's own query string directly: `document.querySelector('link[href*="style.css"]').href = 'css/style.css?v=' + Date.now()`. Confirmed twice now (once on `.team-card-copy`, once on `.teaser-hero`) — check this before assuming an edit didn't take or a selector is wrong.
 
 ## Placeholders awaiting real assets (striped blocks = placeholder convention)
-1. Hero: portrait KV crops at desktop — client intends a landscape photo or muted autoplay video (`object-fit: cover`).
+1. Phase 2 hero: portrait KV crops at desktop — client intends a landscape photo or muted autoplay video (`object-fit: cover`).
 2. Real team/captain imagery ×8 — replace the temporary `assets/team-stock.png` treatment with team-specific player photos or transparent cutouts inside `.team-card-photo`.
 3. Roster figures ×7/team — optional if the team cards expand into detail pages or a larger team section.
 4. Livestream: swap `.live-frame` for a YouTube iframe (client confirmed YouTube). `isLive` flag at top of `main.js` gates the pulsing red dots (currently `true`; ideally wire to YouTube API later).
@@ -73,10 +74,10 @@ Two audience phases:
 ## Next tasks (client priority order)
 1. **Resolve the Phase 1/2 date conflict** (see top of doc) before going further — it affects hero copy and schedule data on the live site.
 2. **Raffle page + backend endpoint** — form asks for team, name, and detected GPS. Server must compute venue-radius eligibility and timestamp the entry; users should not manually adjust the pin.
-3. Rules page, team detail pages (team-card ↗ arrows), video pages/modal, dedicated teaser poster asset (currently reusing `mvl-kv.png` with a heavy scrim to bury its baked-in Phase-2 dates — see teaser hero note above) — all TBD with client.
+3. Rules page, team detail pages (team-card ↗ arrows), video pages/modal — all TBD with client.
 4. Decide how the two phases swap in production (single domain redirect, manual deploy swap, etc.) — not yet decided.
 
 ## Verification
 Run the `mvl-site` launch config.
 - **index.html / schedule.html**: check at 375px and ≥960px. Teams: 8 compact cards, all visible in one desktop fold, no horizontal scroll, names distinct (no more duplicate "Metarice"). Nav: logo absent at top, joins on scroll past hero. Reveals fire once per element. Marquees loop seamlessly.
-- **teaser.html**: hero fills full viewport height (100svh) with centered dates/venue over a heavily-scrimmed KV background; 3 CTAs stack on mobile, row on desktop; no top nav present (intentional, matches wireframe).
+- **teaser.html**: hero fills full viewport height (100svh) with centered dates/venue over autoplay muted video; 3 CTAs stack on mobile, row on desktop; no top nav present (intentional, matches wireframe).

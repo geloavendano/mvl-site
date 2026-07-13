@@ -1090,16 +1090,15 @@ img { display: block; max-width: 100%; }
   height: 100%;
   object-fit: cover;
   object-position: center 22%;
+  background: var(--navy-deep);
 }
 .teaser-hero-scrim {
   position: absolute;
   inset: 0;
-  /* placeholder KV has phase-2 dates baked into the pixels below ~50% —
-     stays heavily obscured until a dedicated teaser asset replaces it */
   background: linear-gradient(180deg,
-    rgba(16, 10, 50, .6) 0%,
-    rgba(16, 10, 50, .82) 38%,
-    rgba(16, 10, 50, .97) 64%,
+    rgba(16, 10, 50, .42) 0%,
+    rgba(16, 10, 50, .72) 42%,
+    rgba(16, 10, 50, .94) 68%,
     rgba(16, 10, 50, .99) 100%);
 }
 .teaser-hero-content {

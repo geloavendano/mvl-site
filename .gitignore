@@ -2,3 +2,5 @@
 .env
 .env.local
 .env.*.local
+assets/*.mov
+assets/mvl-video-1-web.mp4
