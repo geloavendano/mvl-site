@@ -1610,3 +1610,65 @@ img { display: block; max-width: 100%; }
   }
   .form-actions .cta { min-width: 240px; }
 }
+
+/* ==========================================================================
+   Waiver confirmation page
+   ========================================================================== */
+.confirmation-page {
+  min-height: 100svh;
+  background:
+    radial-gradient(circle at 78% 22%, rgba(124, 245, 180, .2), transparent 28%),
+    radial-gradient(circle at 16% 78%, rgba(45, 212, 191, .14), transparent 24%),
+    linear-gradient(180deg, var(--navy) 0%, #050911 60%, var(--navy-deep) 100%);
+}
+.confirmation-main {
+  min-height: calc(100svh - var(--nav-h));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--nav-h) + 34px) 16px 56px;
+}
+.confirmation-card {
+  width: min(100%, 860px);
+  border: 1px solid rgba(124, 245, 180, .24);
+  background:
+    linear-gradient(115deg, rgba(255, 255, 255, .08), transparent 44%),
+    rgba(4, 9, 15, .72);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .32);
+  padding: 28px 20px;
+}
+.confirmation-card .section-title {
+  margin-top: 8px;
+  font-size: 46px;
+}
+.confirmation-lede {
+  margin-top: 18px;
+  max-width: 680px;
+  color: #fff;
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 1.45;
+}
+.confirmation-copy {
+  margin-top: 12px;
+  max-width: 640px;
+  color: var(--ink-muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.confirmation-actions {
+  display: grid;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+@media (min-width: 960px) {
+  .confirmation-main { padding: calc(var(--nav-h) + 56px) 48px 72px; }
+  .confirmation-card { padding: 48px; }
+  .confirmation-card .section-title { font-size: 76px; }
+  .confirmation-lede { font-size: 22px; }
+  .confirmation-actions {
+    display: flex;
+    align-items: center;
+  }
+}

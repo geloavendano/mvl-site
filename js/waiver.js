@@ -85,10 +85,7 @@ form.addEventListener('submit', async (event) => {
 
   try {
     await submitWaiver(payload);
-    form.reset();
-    syncRelationshipOther();
-    formStatus.textContent = 'Waiver submitted. Thank you, see you on the court.';
-    formStatus.classList.add('is-success');
+    window.location.assign('waiver-confirmation.html');
   } catch (error) {
     formStatus.textContent = error.message;
     formStatus.classList.add('is-error');
