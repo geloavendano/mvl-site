@@ -52,7 +52,11 @@ from public.mvl_record_game_result(
   p_video_is_featured := true
 );
 
--- 4) Attach or update a YouTube recording only.
+-- 4) Refresh standings after score entry.
+select *
+from public.mvl_get_standings();
+
+-- 5) Attach or update a YouTube recording only.
 insert into mvl.game_videos (
   game_id,
   youtube_id,
@@ -75,13 +79,13 @@ on conflict (game_id, youtube_id) do update set
   is_featured = excluded.is_featured
 returning *;
 
--- 5) Update only Player of the Game.
+-- 6) Update only Player of the Game.
 update mvl.games
 set player_of_game_id = 'PLAYER_UUID_HERE'
 where id = 'g1'
 returning id, player_of_game_id;
 
--- 6) Revert a game back to pending and clear scores/videos if needed.
+-- 7) Revert a game back to pending and clear scores/videos if needed.
 update mvl.games
 set status = 'pending',
     winner_team_id = null,
@@ -91,7 +95,7 @@ where id = 'g1';
 delete from mvl.game_sets where game_id = 'g1';
 delete from mvl.game_videos where game_id = 'g1';
 
--- 7) Read a game result with set scores, POG, and videos.
+-- 8) Read a game result with set scores, POG, and videos.
 select
   g.id as game_id,
   g.status,

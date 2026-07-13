@@ -18,7 +18,7 @@ Two audience phases:
 - `css/style.css` — all styles for every page (index/schedule/teaser share one file). Mobile-first, ONE breakpoint at `min-width: 960px`. Design tokens as CSS vars in `:root`. Teaser-specific rules live in the `Teaser (Phase 1) page` block at the end of the file.
 - `js/league-data.js` — shared static data source for livestream, teams, sponsors, and games. Still used for front-end rendering; the same starter data has been seeded into Supabase.
 - `js/main.js` — landing page rendering + IntersectionObservers.
-- `js/schedule.js` — computes standings from `league-data.js`, renders tabs and games.
+- `js/schedule.js` — computes standings from `league-data.js`, renders tabs and games. Ranking order is wins, set ratio, points ratio, head-to-head wins, head-to-head set ratio, head-to-head points ratio, then team name.
 - `js/teaser.js` — reveal-on-scroll + the Save-the-Dates `<dialog>` action sheet (device-calendar .ics / Google Calendar Weekend 1 / Weekend 2; trigger href falls back to the .ics without JS). The 2025-highlights CTA is a plain link to the Instagram reel — an embedded lightbox was built and then REMOVED at client request (IG embeds don't play natively in-page), don't rebuild it.
 - `rules.html` — static rules page: FAQ accordion ("The Quick Version") at top, then the full 10-section rulebook (client-provided text) with tables for the bracket, schedule, and scoring. No JS. NOTE: the client's source text said "Battle for Gold: **Loser** of SF1 vs Loser of SF2" — an obvious copy-paste typo, rendered as Winner vs Winner; and its schedule (prelims Aug 29–31 & **Sep 5**, QF Sep 5, SF+finals Sep 6) doesn't mention Sep 7 while the teaser dates say "Sep 6 · 7" — unconfirmed, ask client.
 - `waiver.html` — participant registration + waiver form. Uses `js/league-data.js` to populate teams and `js/waiver.js` for client validation / relationship "Other" behavior. Submit calls Supabase RPC `public.mvl_submit_waiver(...)`, which writes to `mvl.waiver_submissions`.
@@ -27,6 +27,7 @@ Two audience phases:
 - `supabase/migrations/20260713000100_create_mvl_schema.sql` — applied to existing Supabase project `sansayaw` (`ljebzcgfydaknyekwlqv`) via `supabase db query --linked --file ...`. Creates dedicated Postgres schema `mvl` with tables like `mvl.teams`, `mvl.games`, and `mvl.waiver_submissions`.
 - `supabase/seed.sql` — applied to the linked Supabase project; seeds venues, current teams, placeholder games, and set scores.
 - `supabase/migrations/20260713000200_drop_public_mvl_prefixed_tables.sql` — applied after the schema migration to remove the initial `public.mvl_*` tables.
+- `supabase/migrations/20260713000300_add_mvl_standings.sql` — adds `public.mvl_get_standings()`, which mirrors the frontend standings ranking from `mvl.games` and `mvl.game_sets`.
 - `backend/schema.sql` — older unprefixed draft; historical reference only.
 - `backend/README.md` — actual Supabase setup notes for the existing `sansayaw` project.
 - `assets/team-stock.png` — temporary local stock/comp image used inside the Teams cards to preview the eventual player-photo/cutout treatment.

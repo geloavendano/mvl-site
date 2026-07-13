@@ -12,6 +12,17 @@ const setWinsFor = (game, teamId) => game.sets
   .filter((set) => (teamId === game.teamA ? set.a > set.b : set.b > set.a))
   .length;
 
+const pointsFor = (game, teamId) => game.sets.reduce((sum, set) =>
+  sum + (teamId === game.teamA ? set.a : set.b), 0);
+
+const pointsAgainst = (game, teamId) => game.sets.reduce((sum, set) =>
+  sum + (teamId === game.teamA ? set.b : set.a), 0);
+
+const ratioValue = (forValue, againstValue) => {
+  if (againstValue === 0) return forValue > 0 ? Number.POSITIVE_INFINITY : 0;
+  return forValue / againstValue;
+};
+
 const buildStandings = () => {
   const rows = teams.map((team) => ({
     team,
@@ -19,10 +30,16 @@ const buildStandings = () => {
     losses: 0,
     setsWon: 0,
     setsLost: 0,
+    pointsFor: 0,
+    pointsAgainst: 0,
+    headToHeadWins: 0,
+    headToHeadSetRatio: 0,
+    headToHeadPointRatio: 0,
   }));
   const rowByTeam = Object.fromEntries(rows.map((row) => [row.team.id, row]));
+  const finalGames = games.filter((game) => game.status === 'final');
 
-  games.filter((game) => game.status === 'final').forEach((game) => {
+  finalGames.forEach((game) => {
     const a = rowByTeam[game.teamA];
     const b = rowByTeam[game.teamB];
     const aSetWins = setWinsFor(game, game.teamA);
@@ -32,6 +49,10 @@ const buildStandings = () => {
     a.setsLost += bSetWins;
     b.setsWon += bSetWins;
     b.setsLost += aSetWins;
+    a.pointsFor += pointsFor(game, game.teamA);
+    a.pointsAgainst += pointsAgainst(game, game.teamA);
+    b.pointsFor += pointsFor(game, game.teamB);
+    b.pointsAgainst += pointsAgainst(game, game.teamB);
 
     if (game.winner === game.teamA) {
       a.wins += 1;
@@ -42,18 +63,57 @@ const buildStandings = () => {
     }
   });
 
+  rows.forEach((row) => {
+    row.setRatio = ratioValue(row.setsWon, row.setsLost);
+    row.pointRatio = ratioValue(row.pointsFor, row.pointsAgainst);
+  });
+
+  rows.forEach((row) => {
+    const tiedTeams = rows
+      .filter((other) =>
+        other.team.id !== row.team.id &&
+        other.wins === row.wins &&
+        other.setRatio === row.setRatio &&
+        other.pointRatio === row.pointRatio)
+      .map((other) => other.team.id);
+
+    if (!tiedTeams.length) return;
+
+    let h2hSetsWon = 0;
+    let h2hSetsLost = 0;
+    let h2hPointsFor = 0;
+    let h2hPointsAgainst = 0;
+
+    finalGames
+      .filter((game) =>
+        [game.teamA, game.teamB].includes(row.team.id) &&
+        tiedTeams.some((teamId) => [game.teamA, game.teamB].includes(teamId)))
+      .forEach((game) => {
+        if (game.winner === row.team.id) row.headToHeadWins += 1;
+        h2hSetsWon += setWinsFor(game, row.team.id);
+        h2hSetsLost += game.sets.length - setWinsFor(game, row.team.id);
+        h2hPointsFor += pointsFor(game, row.team.id);
+        h2hPointsAgainst += pointsAgainst(game, row.team.id);
+      });
+
+    row.headToHeadSetRatio = ratioValue(h2hSetsWon, h2hSetsLost);
+    row.headToHeadPointRatio = ratioValue(h2hPointsFor, h2hPointsAgainst);
+  });
+
   return rows.sort((a, b) => {
-    const aRatio = a.setsLost ? a.setsWon / a.setsLost : a.setsWon;
-    const bRatio = b.setsLost ? b.setsWon / b.setsLost : b.setsWon;
-    const aDiff = a.setsWon - a.setsLost;
-    const bDiff = b.setsWon - b.setsLost;
-    return b.wins - a.wins || bRatio - aRatio || bDiff - aDiff || a.team.name.localeCompare(b.team.name);
+    return b.wins - a.wins ||
+      b.setRatio - a.setRatio ||
+      b.pointRatio - a.pointRatio ||
+      b.headToHeadWins - a.headToHeadWins ||
+      b.headToHeadSetRatio - a.headToHeadSetRatio ||
+      b.headToHeadPointRatio - a.headToHeadPointRatio ||
+      a.team.name.localeCompare(b.team.name);
   });
 };
 
 const standingsBody = document.getElementById('standingsBody');
 standingsBody.innerHTML = buildStandings().map((row, i) => {
-  const ratio = row.setsLost ? (row.setsWon / row.setsLost).toFixed(2) : (row.setsWon ? 'MAX' : '-');
+  const ratio = row.setsLost ? row.setRatio.toFixed(2) : (row.setsWon ? 'MAX' : '-');
   return `
     <tr>
       <td>${i + 1}</td>

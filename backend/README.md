@@ -22,6 +22,7 @@ For MVL changes, apply SQL directly to the linked project:
 supabase db query --linked --file supabase/migrations/20260713000100_create_mvl_schema.sql
 supabase db query --linked --file supabase/seed.sql
 supabase db query --linked --file supabase/migrations/20260713000200_drop_public_mvl_prefixed_tables.sql
+supabase db query --linked --file supabase/migrations/20260713000300_add_mvl_standings.sql
 ```
 
 ## Schema
@@ -73,6 +74,26 @@ public.mvl_record_game_result(...)
 ```
 
 It updates the game winner/status, replaces set scores, assigns Player of the Game, and upserts a YouTube recording link in one transaction.
+
+## Standings Ranking
+
+The standings helper is:
+
+```sql
+public.mvl_get_standings()
+```
+
+It ranks teams from completed games using this order:
+
+1. Wins
+2. Set ratio
+3. Points ratio
+4. Head-to-head wins among still-tied teams
+5. Head-to-head set ratio
+6. Head-to-head points ratio
+7. Team name
+
+The current static `schedule.html` renderer mirrors this logic from `js/league-data.js` until the page is wired directly to Supabase.
 
 ## RLS
 
