@@ -1,4 +1,4 @@
-insert into public.mvl_venues (id, name, address, location, checkin_radius_m)
+insert into mvl.venues (id, name, address, location, checkin_radius_m)
 values
   (
     '11111111-1111-4111-8111-111111111111',
@@ -19,7 +19,7 @@ on conflict (id) do update set
   address = excluded.address,
   checkin_radius_m = excluded.checkin_radius_m;
 
-insert into public.mvl_teams (id, name, division_label, color_a, color_b, sort_order)
+insert into mvl.teams (id, name, division_label, color_a, color_b, sort_order)
 values
   ('metarice-x', 'Metarice X', 'Violet Division', '#7C3BFF', '#2E00A8', 1),
   ('metarice-y', 'Metarice Y', 'Green Division', '#00B453', '#067B45', 2),
@@ -36,7 +36,7 @@ on conflict (id) do update set
   color_b = excluded.color_b,
   sort_order = excluded.sort_order;
 
-insert into public.mvl_games (
+insert into mvl.games (
   id,
   day,
   venue_id,
@@ -64,7 +64,7 @@ on conflict (id) do update set
   status = excluded.status,
   winner_team_id = excluded.winner_team_id;
 
-insert into public.mvl_game_sets (game_id, set_number, team_a_score, team_b_score, winner_team_id)
+insert into mvl.game_sets (game_id, set_number, team_a_score, team_b_score, winner_team_id)
 values
   ('g1', 1, 25, 21, 'metarice-x'),
   ('g1', 2, 24, 26, 'metarice-y'),

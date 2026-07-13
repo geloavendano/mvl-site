@@ -1,10 +1,12 @@
--- MVL tables for the existing "sansayaw" Supabase project.
--- Table names are prefixed with mvl_ to avoid collisions with other apps.
+-- MVL schema for the existing "sansayaw" Supabase project.
+-- MVL objects live under mvl.*; browser writes go through public RPCs.
 
 create extension if not exists pgcrypto;
 create extension if not exists postgis;
 
-create table if not exists public.mvl_venues (
+create schema if not exists mvl;
+
+create table if not exists mvl.venues (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   address text,
@@ -13,7 +15,7 @@ create table if not exists public.mvl_venues (
   created_at timestamptz not null default now()
 );
 
-create table if not exists public.mvl_teams (
+create table if not exists mvl.teams (
   id text primary key,
   name text not null,
   division_label text,
@@ -24,9 +26,9 @@ create table if not exists public.mvl_teams (
   created_at timestamptz not null default now()
 );
 
-create table if not exists public.mvl_players (
+create table if not exists mvl.players (
   id uuid primary key default gen_random_uuid(),
-  team_id text not null references public.mvl_teams(id) on delete cascade,
+  team_id text not null references mvl.teams(id) on delete cascade,
   display_name text not null,
   jersey_number text,
   role text,
@@ -35,35 +37,35 @@ create table if not exists public.mvl_players (
   created_at timestamptz not null default now()
 );
 
-create table if not exists public.mvl_games (
+create table if not exists mvl.games (
   id text primary key,
   day integer not null,
-  venue_id uuid references public.mvl_venues(id),
+  venue_id uuid references mvl.venues(id),
   starts_at timestamptz not null,
-  team_a_id text not null references public.mvl_teams(id),
-  team_b_id text not null references public.mvl_teams(id),
+  team_a_id text not null references mvl.teams(id),
+  team_b_id text not null references mvl.teams(id),
   status text not null default 'pending' check (status in ('pending', 'live', 'final', 'cancelled')),
-  winner_team_id text references public.mvl_teams(id),
-  player_of_game_id uuid references public.mvl_players(id),
+  winner_team_id text references mvl.teams(id),
+  player_of_game_id uuid references mvl.players(id),
   created_at timestamptz not null default now(),
-  constraint mvl_winner_is_participant check (
+  constraint winner_is_participant check (
     winner_team_id is null or winner_team_id in (team_a_id, team_b_id)
   )
 );
 
-create table if not exists public.mvl_game_sets (
+create table if not exists mvl.game_sets (
   id uuid primary key default gen_random_uuid(),
-  game_id text not null references public.mvl_games(id) on delete cascade,
+  game_id text not null references mvl.games(id) on delete cascade,
   set_number integer not null check (set_number > 0),
   team_a_score integer not null check (team_a_score >= 0),
   team_b_score integer not null check (team_b_score >= 0),
-  winner_team_id text references public.mvl_teams(id),
+  winner_team_id text references mvl.teams(id),
   unique (game_id, set_number)
 );
 
-create table if not exists public.mvl_game_videos (
+create table if not exists mvl.game_videos (
   id uuid primary key default gen_random_uuid(),
-  game_id text not null references public.mvl_games(id) on delete cascade,
+  game_id text not null references mvl.games(id) on delete cascade,
   youtube_id text not null,
   title text,
   duration_seconds integer,
@@ -72,7 +74,7 @@ create table if not exists public.mvl_game_videos (
   created_at timestamptz not null default now()
 );
 
-create table if not exists public.mvl_sponsors (
+create table if not exists mvl.sponsors (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   logo_url text,
@@ -83,11 +85,11 @@ create table if not exists public.mvl_sponsors (
   created_at timestamptz not null default now()
 );
 
-create table if not exists public.mvl_raffle_checkins (
+create table if not exists mvl.raffle_checkins (
   id uuid primary key default gen_random_uuid(),
-  team_id text not null references public.mvl_teams(id),
+  team_id text not null references mvl.teams(id),
   entrant_name text not null,
-  venue_id uuid not null references public.mvl_venues(id),
+  venue_id uuid not null references mvl.venues(id),
   detected_location geography(point, 4326) not null,
   accuracy_m numeric,
   inside_radius boolean not null,
@@ -96,9 +98,9 @@ create table if not exists public.mvl_raffle_checkins (
   created_at timestamptz not null default now()
 );
 
-create table if not exists public.mvl_waiver_submissions (
+create table if not exists mvl.waiver_submissions (
   id uuid primary key default gen_random_uuid(),
-  team_id text not null references public.mvl_teams(id),
+  team_id text not null references mvl.teams(id),
   first_name text not null,
   last_name text not null,
   contact_number text not null,
@@ -111,67 +113,136 @@ create table if not exists public.mvl_waiver_submissions (
   submitted_at timestamptz not null default now(),
   user_agent text,
   created_at timestamptz not null default now(),
-  constraint mvl_waiver_acknowledged_required check (waiver_acknowledged is true)
+  constraint waiver_acknowledged_required check (waiver_acknowledged is true)
 );
 
-create index if not exists mvl_raffle_checkins_team_created_idx on public.mvl_raffle_checkins (team_id, created_at desc);
-create index if not exists mvl_raffle_checkins_location_idx on public.mvl_raffle_checkins using gist (detected_location);
-create index if not exists mvl_waiver_submissions_team_created_idx on public.mvl_waiver_submissions (team_id, created_at desc);
-create index if not exists mvl_waiver_submissions_email_idx on public.mvl_waiver_submissions (lower(email));
-create index if not exists mvl_games_team_a_idx on public.mvl_games (team_a_id);
-create index if not exists mvl_games_team_b_idx on public.mvl_games (team_b_id);
-create index if not exists mvl_games_starts_at_idx on public.mvl_games (starts_at);
-create index if not exists mvl_game_videos_published_idx on public.mvl_game_videos (published_at desc);
+create index if not exists raffle_checkins_team_created_idx on mvl.raffle_checkins (team_id, created_at desc);
+create index if not exists raffle_checkins_location_idx on mvl.raffle_checkins using gist (detected_location);
+create index if not exists waiver_submissions_team_created_idx on mvl.waiver_submissions (team_id, created_at desc);
+create index if not exists waiver_submissions_email_idx on mvl.waiver_submissions (lower(email));
+create index if not exists games_team_a_idx on mvl.games (team_a_id);
+create index if not exists games_team_b_idx on mvl.games (team_b_id);
+create index if not exists games_starts_at_idx on mvl.games (starts_at);
+create index if not exists game_videos_published_idx on mvl.game_videos (published_at desc);
 
-alter table public.mvl_venues enable row level security;
-alter table public.mvl_teams enable row level security;
-alter table public.mvl_players enable row level security;
-alter table public.mvl_games enable row level security;
-alter table public.mvl_game_sets enable row level security;
-alter table public.mvl_game_videos enable row level security;
-alter table public.mvl_sponsors enable row level security;
-alter table public.mvl_raffle_checkins enable row level security;
-alter table public.mvl_waiver_submissions enable row level security;
+alter table mvl.venues enable row level security;
+alter table mvl.teams enable row level security;
+alter table mvl.players enable row level security;
+alter table mvl.games enable row level security;
+alter table mvl.game_sets enable row level security;
+alter table mvl.game_videos enable row level security;
+alter table mvl.sponsors enable row level security;
+alter table mvl.raffle_checkins enable row level security;
+alter table mvl.waiver_submissions enable row level security;
 
-drop policy if exists "Public can read MVL venues" on public.mvl_venues;
-create policy "Public can read MVL venues" on public.mvl_venues for select using (true);
+drop policy if exists "Public can read venues" on mvl.venues;
+create policy "Public can read venues" on mvl.venues for select using (true);
 
-drop policy if exists "Public can read MVL teams" on public.mvl_teams;
-create policy "Public can read MVL teams" on public.mvl_teams for select using (true);
+drop policy if exists "Public can read teams" on mvl.teams;
+create policy "Public can read teams" on mvl.teams for select using (true);
 
-drop policy if exists "Public can read MVL players" on public.mvl_players;
-create policy "Public can read MVL players" on public.mvl_players for select using (true);
+drop policy if exists "Public can read players" on mvl.players;
+create policy "Public can read players" on mvl.players for select using (true);
 
-drop policy if exists "Public can read MVL games" on public.mvl_games;
-create policy "Public can read MVL games" on public.mvl_games for select using (true);
+drop policy if exists "Public can read games" on mvl.games;
+create policy "Public can read games" on mvl.games for select using (true);
 
-drop policy if exists "Public can read MVL game sets" on public.mvl_game_sets;
-create policy "Public can read MVL game sets" on public.mvl_game_sets for select using (true);
+drop policy if exists "Public can read game sets" on mvl.game_sets;
+create policy "Public can read game sets" on mvl.game_sets for select using (true);
 
-drop policy if exists "Public can read MVL game videos" on public.mvl_game_videos;
-create policy "Public can read MVL game videos" on public.mvl_game_videos for select using (true);
+drop policy if exists "Public can read game videos" on mvl.game_videos;
+create policy "Public can read game videos" on mvl.game_videos for select using (true);
 
-drop policy if exists "Public can read active MVL sponsors" on public.mvl_sponsors;
-create policy "Public can read active MVL sponsors" on public.mvl_sponsors for select using (is_active);
+drop policy if exists "Public can read active sponsors" on mvl.sponsors;
+create policy "Public can read active sponsors" on mvl.sponsors for select using (is_active);
 
-drop policy if exists "Public can submit MVL waivers" on public.mvl_waiver_submissions;
-create policy "Public can submit MVL waivers" on public.mvl_waiver_submissions
-  for insert
-  with check (waiver_acknowledged is true);
-
+grant usage on schema mvl to anon, authenticated;
 grant select on
-  public.mvl_venues,
-  public.mvl_teams,
-  public.mvl_players,
-  public.mvl_games,
-  public.mvl_game_sets,
-  public.mvl_game_videos,
-  public.mvl_sponsors
+  mvl.venues,
+  mvl.teams,
+  mvl.players,
+  mvl.games,
+  mvl.game_sets,
+  mvl.game_videos,
+  mvl.sponsors
 to anon, authenticated;
 
-grant insert on public.mvl_waiver_submissions to anon, authenticated;
+drop function if exists public.mvl_submit_waiver(text, text, text, text, text, text, text, text, text, boolean, timestamptz, text);
+create function public.mvl_submit_waiver(
+  p_team_id text,
+  p_first_name text,
+  p_last_name text,
+  p_contact_number text,
+  p_email text,
+  p_emergency_contact_name text,
+  p_emergency_contact_number text,
+  p_relationship text,
+  p_relationship_other text,
+  p_waiver_acknowledged boolean,
+  p_submitted_at timestamptz default now(),
+  p_user_agent text default null
+) returns uuid
+language plpgsql
+security definer
+set search_path = mvl, public, extensions
+as $$
+declare
+  v_submission_id uuid;
+begin
+  if p_waiver_acknowledged is not true then
+    raise exception 'Waiver acknowledgement is required';
+  end if;
 
-create or replace function public.mvl_create_raffle_checkin(
+  insert into mvl.waiver_submissions (
+    team_id,
+    first_name,
+    last_name,
+    contact_number,
+    email,
+    emergency_contact_name,
+    emergency_contact_number,
+    relationship,
+    relationship_other,
+    waiver_acknowledged,
+    submitted_at,
+    user_agent
+  ) values (
+    p_team_id,
+    p_first_name,
+    p_last_name,
+    p_contact_number,
+    lower(p_email),
+    p_emergency_contact_name,
+    p_emergency_contact_number,
+    p_relationship,
+    nullif(p_relationship_other, ''),
+    p_waiver_acknowledged,
+    coalesce(p_submitted_at, now()),
+    p_user_agent
+  )
+  returning id into v_submission_id;
+
+  return v_submission_id;
+end;
+$$;
+
+grant execute on function public.mvl_submit_waiver(
+  text,
+  text,
+  text,
+  text,
+  text,
+  text,
+  text,
+  text,
+  text,
+  boolean,
+  timestamptz,
+  text
+) to anon, authenticated;
+
+drop function if exists public.mvl_create_raffle_checkin(text, text, uuid, double precision, double precision, numeric, text);
+create function public.mvl_create_raffle_checkin(
   p_team_id text,
   p_entrant_name text,
   p_venue_id uuid,
@@ -179,26 +250,28 @@ create or replace function public.mvl_create_raffle_checkin(
   p_lng double precision,
   p_accuracy_m numeric,
   p_user_agent text default null
-) returns public.mvl_raffle_checkins
+) returns table (
+  id uuid,
+  inside_radius boolean,
+  distance_m numeric
+)
 language plpgsql
 security definer
-set search_path = public, extensions
+set search_path = mvl, public, extensions
 as $$
 declare
-  v_venue public.mvl_venues;
+  v_venue mvl.venues;
   v_point geography(point, 4326);
-  v_distance numeric;
-  v_checkin public.mvl_raffle_checkins;
 begin
-  select * into v_venue from public.mvl_venues where id = p_venue_id;
+  select * into v_venue from mvl.venues v where v.id = p_venue_id;
   if not found then
     raise exception 'Venue not found';
   end if;
 
   v_point := st_setsrid(st_makepoint(p_lng, p_lat), 4326)::geography;
-  v_distance := st_distance(v_point, v_venue.location);
 
-  insert into public.mvl_raffle_checkins (
+  return query
+  insert into mvl.raffle_checkins (
     team_id,
     entrant_name,
     venue_id,
@@ -207,19 +280,17 @@ begin
     inside_radius,
     distance_m,
     user_agent
-  ) values (
+  )
+  select
     p_team_id,
     p_entrant_name,
     p_venue_id,
     v_point,
     p_accuracy_m,
-    v_distance <= v_venue.checkin_radius_m,
-    v_distance,
+    st_distance(v_point, v_venue.location) <= v_venue.checkin_radius_m,
+    st_distance(v_point, v_venue.location),
     p_user_agent
-  )
-  returning * into v_checkin;
-
-  return v_checkin;
+  returning raffle_checkins.id, raffle_checkins.inside_radius, raffle_checkins.distance_m;
 end;
 $$;
 

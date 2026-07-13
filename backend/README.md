@@ -21,29 +21,34 @@ For MVL changes, apply SQL directly to the linked project:
 ```bash
 supabase db query --linked --file supabase/migrations/20260713000100_create_mvl_schema.sql
 supabase db query --linked --file supabase/seed.sql
+supabase db query --linked --file supabase/migrations/20260713000200_drop_public_mvl_prefixed_tables.sql
 ```
 
-## Table Naming
+## Schema
 
-All MVL tables are prefixed with `mvl_` so they can safely coexist with other Sansayaw tables:
+MVL lives in its own Postgres schema, separate from Sansayaw's existing public tables:
 
-- `mvl_venues`
-- `mvl_teams`
-- `mvl_players`
-- `mvl_games`
-- `mvl_game_sets`
-- `mvl_game_videos`
-- `mvl_sponsors`
-- `mvl_raffle_checkins`
-- `mvl_waiver_submissions`
+- `mvl.venues`
+- `mvl.teams`
+- `mvl.players`
+- `mvl.games`
+- `mvl.game_sets`
+- `mvl.game_videos`
+- `mvl.sponsors`
+- `mvl.raffle_checkins`
+- `mvl.waiver_submissions`
+
+The initial `public.mvl_*` tables were removed after the schema migration.
 
 ## Current Live Integration
 
-`waiver.html` submits directly to:
+`waiver.html` submits through this public RPC:
 
 ```text
-public.mvl_waiver_submissions
+public.mvl_submit_waiver(...)
 ```
+
+The RPC writes into `mvl.waiver_submissions`.
 
 using the public anon key in:
 

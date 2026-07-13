@@ -30,7 +30,7 @@ const submitWaiver = async (payload) => {
     throw new Error('Supabase is not configured.');
   }
 
-  const response = await fetch(`${supabase.url}/rest/v1/mvl_waiver_submissions`, {
+  const response = await fetch(`${supabase.url}/rest/v1/rpc/mvl_submit_waiver`, {
     method: 'POST',
     headers: {
       apikey: supabase.anonKey,
@@ -66,18 +66,18 @@ form.addEventListener('submit', async (event) => {
 
   const formData = Object.fromEntries(new FormData(form));
   const payload = {
-    team_id: formData.team_id,
-    first_name: formData.first_name.trim(),
-    last_name: formData.last_name.trim(),
-    contact_number: formData.contact_number.trim(),
-    email: formData.email.trim(),
-    emergency_contact_name: formData.emergency_contact_name.trim(),
-    emergency_contact_number: formData.emergency_contact_number.trim(),
-    relationship: formData.relationship,
-    relationship_other: formData.relationship === 'Other' ? formData.relationship_other.trim() : null,
-    waiver_acknowledged: formData.waiver_acknowledged === 'on',
-    submitted_at: new Date().toISOString(),
-    user_agent: navigator.userAgent,
+    p_team_id: formData.team_id,
+    p_first_name: formData.first_name.trim(),
+    p_last_name: formData.last_name.trim(),
+    p_contact_number: formData.contact_number.trim(),
+    p_email: formData.email.trim(),
+    p_emergency_contact_name: formData.emergency_contact_name.trim(),
+    p_emergency_contact_number: formData.emergency_contact_number.trim(),
+    p_relationship: formData.relationship,
+    p_relationship_other: formData.relationship === 'Other' ? formData.relationship_other.trim() : null,
+    p_waiver_acknowledged: formData.waiver_acknowledged === 'on',
+    p_submitted_at: new Date().toISOString(),
+    p_user_agent: navigator.userAgent,
   };
 
   form.querySelector('button[type="submit"]').disabled = true;

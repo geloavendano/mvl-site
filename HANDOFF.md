@@ -21,12 +21,13 @@ Two audience phases:
 - `js/schedule.js` — computes standings from `league-data.js`, renders tabs and games.
 - `js/teaser.js` — reveal-on-scroll + the Save-the-Dates `<dialog>` action sheet (device-calendar .ics / Google Calendar Weekend 1 / Weekend 2; trigger href falls back to the .ics without JS). The 2025-highlights CTA is a plain link to the Instagram reel — an embedded lightbox was built and then REMOVED at client request (IG embeds don't play natively in-page), don't rebuild it.
 - `rules.html` — static rules page: FAQ accordion ("The Quick Version") at top, then the full 10-section rulebook (client-provided text) with tables for the bracket, schedule, and scoring. No JS. NOTE: the client's source text said "Battle for Gold: **Loser** of SF1 vs Loser of SF2" — an obvious copy-paste typo, rendered as Winner vs Winner; and its schedule (prelims Aug 29–31 & **Sep 5**, QF Sep 5, SF+finals Sep 6) doesn't mention Sep 7 while the teaser dates say "Sep 6 · 7" — unconfirmed, ask client.
-- `waiver.html` — participant registration + waiver form. Uses `js/league-data.js` to populate teams and `js/waiver.js` for client validation / relationship "Other" behavior. Submit now writes to Supabase table `public.mvl_waiver_submissions`.
+- `waiver.html` — participant registration + waiver form. Uses `js/league-data.js` to populate teams and `js/waiver.js` for client validation / relationship "Other" behavior. Submit calls Supabase RPC `public.mvl_submit_waiver(...)`, which writes to `mvl.waiver_submissions`.
 - `js/supabase-config.js` — public Supabase URL + anon key for the existing `sansayaw` project. The anon key is intentionally public; RLS protects writes.
 - **Footers (all pages)**: MVL logo image + Instagram/TikTok/YouTube icon links (instagram.com/metaricevolley, tiktok.com/@metaricevolley, youtube.com/@metaricevolley). Icon SVGs are duplicated inline per page — keep them in sync.
-- `supabase/migrations/20260713000100_create_mvl_schema.sql` — applied to existing Supabase project `sansayaw` (`ljebzcgfydaknyekwlqv`) via `supabase db query --linked --file ...`. Uses `mvl_` table prefixes to avoid collisions.
+- `supabase/migrations/20260713000100_create_mvl_schema.sql` — applied to existing Supabase project `sansayaw` (`ljebzcgfydaknyekwlqv`) via `supabase db query --linked --file ...`. Creates dedicated Postgres schema `mvl` with tables like `mvl.teams`, `mvl.games`, and `mvl.waiver_submissions`.
 - `supabase/seed.sql` — applied to the linked Supabase project; seeds venues, current teams, placeholder games, and set scores.
-- `backend/schema.sql` — older unprefixed draft; keep only as historical reference unless replaced/removed later.
+- `supabase/migrations/20260713000200_drop_public_mvl_prefixed_tables.sql` — applied after the schema migration to remove the initial `public.mvl_*` tables.
+- `backend/schema.sql` — older unprefixed draft; historical reference only.
 - `backend/README.md` — actual Supabase setup notes for the existing `sansayaw` project.
 - `assets/team-stock.png` — temporary local stock/comp image used inside the Teams cards to preview the eventual player-photo/cutout treatment.
 - `assets/mvl-kv.png` — 2026 key visual poster (portrait 1024×1280). Used as hero bg, and blurred drifting bg in games fold.
