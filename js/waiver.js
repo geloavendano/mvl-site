@@ -6,6 +6,7 @@ const relationshipSelect = document.getElementById('relationshipSelect');
 const relationshipOtherField = document.getElementById('relationshipOtherField');
 const relationshipOtherInput = document.getElementById('relationshipOtherInput');
 const formStatus = document.getElementById('formStatus');
+const supabase = window.MVL_SUPABASE;
 
 teams.forEach((team) => {
   const option = document.createElement('option');
@@ -24,7 +25,35 @@ const syncRelationshipOther = () => {
 relationshipSelect.addEventListener('change', syncRelationshipOther);
 syncRelationshipOther();
 
-form.addEventListener('submit', (event) => {
+const submitWaiver = async (payload) => {
+  if (!supabase?.url || !supabase?.anonKey) {
+    throw new Error('Supabase is not configured.');
+  }
+
+  const response = await fetch(`${supabase.url}/rest/v1/mvl_waiver_submissions`, {
+    method: 'POST',
+    headers: {
+      apikey: supabase.anonKey,
+      Authorization: `Bearer ${supabase.anonKey}`,
+      'Content-Type': 'application/json',
+      Prefer: 'return=minimal',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    let message = 'Unable to submit waiver.';
+    try {
+      const error = await response.json();
+      message = error.message || error.details || message;
+    } catch (_) {
+      message = response.statusText || message;
+    }
+    throw new Error(message);
+  }
+};
+
+form.addEventListener('submit', async (event) => {
   event.preventDefault();
   formStatus.classList.remove('is-error', 'is-success');
 
@@ -35,13 +64,35 @@ form.addEventListener('submit', (event) => {
     return;
   }
 
-  const data = Object.fromEntries(new FormData(form));
-  data.submitted_at = new Date().toISOString();
-  data.source = 'static-preview';
+  const formData = Object.fromEntries(new FormData(form));
+  const payload = {
+    team_id: formData.team_id,
+    first_name: formData.first_name.trim(),
+    last_name: formData.last_name.trim(),
+    contact_number: formData.contact_number.trim(),
+    email: formData.email.trim(),
+    emergency_contact_name: formData.emergency_contact_name.trim(),
+    emergency_contact_number: formData.emergency_contact_number.trim(),
+    relationship: formData.relationship,
+    relationship_other: formData.relationship === 'Other' ? formData.relationship_other.trim() : null,
+    waiver_acknowledged: formData.waiver_acknowledged === 'on',
+    submitted_at: new Date().toISOString(),
+    user_agent: navigator.userAgent,
+  };
 
-  // TODO: send this payload to Supabase once the backend endpoint is enabled.
-  console.info('MVL waiver payload preview:', data);
+  form.querySelector('button[type="submit"]').disabled = true;
+  formStatus.textContent = 'Submitting waiver...';
 
-  formStatus.textContent = 'Form looks complete. Backend submission is not connected yet.';
-  formStatus.classList.add('is-success');
+  try {
+    await submitWaiver(payload);
+    form.reset();
+    syncRelationshipOther();
+    formStatus.textContent = 'Waiver submitted. Thank you, see you on the court.';
+    formStatus.classList.add('is-success');
+  } catch (error) {
+    formStatus.textContent = error.message;
+    formStatus.classList.add('is-error');
+  } finally {
+    form.querySelector('button[type="submit"]').disabled = false;
+  }
 });

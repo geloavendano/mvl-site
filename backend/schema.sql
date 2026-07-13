@@ -1,3 +1,9 @@
+-- HISTORICAL DRAFT ONLY.
+-- Do not apply this file to the shared "sansayaw" Supabase project.
+-- The active schema lives in:
+--   supabase/migrations/20260713000100_create_mvl_schema.sql
+-- and uses mvl_ table prefixes to avoid collisions.
+--
 -- MVL 2026 backend schema draft for Supabase/Postgres.
 -- Enable PostGIS in Supabase before using geography radius checks.
 create extension if not exists postgis;
