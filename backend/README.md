@@ -58,6 +58,22 @@ js/supabase-config.js
 
 The anon key is safe to ship in browser code; access is controlled by row-level security.
 
+## Score Entry
+
+Use this playbook for admin score entry in Supabase SQL Editor:
+
+```text
+supabase/admin-score-entry.sql
+```
+
+The main helper is:
+
+```sql
+public.mvl_record_game_result(...)
+```
+
+It updates the game winner/status, replaces set scores, assigns Player of the Game, and upserts a YouTube recording link in one transaction.
+
 ## RLS
 
 Current policies:

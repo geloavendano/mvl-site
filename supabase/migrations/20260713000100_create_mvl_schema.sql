@@ -124,6 +124,7 @@ create index if not exists games_team_a_idx on mvl.games (team_a_id);
 create index if not exists games_team_b_idx on mvl.games (team_b_id);
 create index if not exists games_starts_at_idx on mvl.games (starts_at);
 create index if not exists game_videos_published_idx on mvl.game_videos (published_at desc);
+create unique index if not exists game_videos_game_youtube_idx on mvl.game_videos (game_id, youtube_id);
 
 alter table mvl.venues enable row level security;
 alter table mvl.teams enable row level security;
@@ -295,3 +296,117 @@ end;
 $$;
 
 grant execute on function public.mvl_create_raffle_checkin(text, text, uuid, double precision, double precision, numeric, text) to anon, authenticated;
+
+drop function if exists public.mvl_record_game_result(text, text, uuid, jsonb, text, text, integer, timestamptz, boolean);
+create function public.mvl_record_game_result(
+  p_game_id text,
+  p_winner_team_id text,
+  p_player_of_game_id uuid,
+  p_sets jsonb,
+  p_youtube_id text default null,
+  p_video_title text default null,
+  p_duration_seconds integer default null,
+  p_video_published_at timestamptz default null,
+  p_video_is_featured boolean default true
+) returns table (
+  game_id text,
+  status text,
+  winner_team_id text,
+  player_of_game_id uuid,
+  set_count integer,
+  video_count integer
+)
+language plpgsql
+security definer
+set search_path = mvl, public, extensions
+as $$
+declare
+  v_game mvl.games;
+begin
+  select * into v_game from mvl.games where games.id = p_game_id for update;
+  if not found then
+    raise exception 'Game % not found', p_game_id;
+  end if;
+
+  if p_winner_team_id not in (v_game.team_a_id, v_game.team_b_id) then
+    raise exception 'Winner must be one of the game teams';
+  end if;
+
+  if p_player_of_game_id is not null and not exists (
+    select 1
+    from mvl.players p
+    where p.id = p_player_of_game_id
+      and p.team_id in (v_game.team_a_id, v_game.team_b_id)
+  ) then
+    raise exception 'Player of the game must belong to one of the game teams';
+  end if;
+
+  if p_sets is null or jsonb_typeof(p_sets) <> 'array' or jsonb_array_length(p_sets) = 0 then
+    raise exception 'At least one set score is required';
+  end if;
+
+  delete from mvl.game_sets where game_sets.game_id = p_game_id;
+
+  insert into mvl.game_sets (
+    game_id,
+    set_number,
+    team_a_score,
+    team_b_score,
+    winner_team_id
+  )
+  select
+    p_game_id,
+    row_number() over ()::integer,
+    (set_row->>'team_a_score')::integer,
+    (set_row->>'team_b_score')::integer,
+    case
+      when (set_row->>'team_a_score')::integer > (set_row->>'team_b_score')::integer then v_game.team_a_id
+      when (set_row->>'team_b_score')::integer > (set_row->>'team_a_score')::integer then v_game.team_b_id
+      else null
+    end
+  from jsonb_array_elements(p_sets) as set_row;
+
+  update mvl.games
+  set
+    status = 'final',
+    winner_team_id = p_winner_team_id,
+    player_of_game_id = p_player_of_game_id
+  where games.id = p_game_id;
+
+  if nullif(p_youtube_id, '') is not null then
+    insert into mvl.game_videos (
+      game_id,
+      youtube_id,
+      title,
+      duration_seconds,
+      published_at,
+      is_featured
+    ) values (
+      p_game_id,
+      p_youtube_id,
+      nullif(p_video_title, ''),
+      p_duration_seconds,
+      p_video_published_at,
+      p_video_is_featured
+    )
+    on conflict (game_id, youtube_id) do update set
+      title = excluded.title,
+      duration_seconds = excluded.duration_seconds,
+      published_at = excluded.published_at,
+      is_featured = excluded.is_featured;
+  end if;
+
+  return query
+  select
+    g.id,
+    g.status,
+    g.winner_team_id,
+    g.player_of_game_id,
+    (select count(*)::integer from mvl.game_sets gs where gs.game_id = g.id),
+    (select count(*)::integer from mvl.game_videos gv where gv.game_id = g.id)
+  from mvl.games g
+  where g.id = p_game_id;
+end;
+$$;
+
+grant execute on function public.mvl_record_game_result(text, text, uuid, jsonb, text, text, integer, timestamptz, boolean) to authenticated;
