@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Waiver & Registration — MVL 2026</title>
+<meta name="description" content="Metarice Volleyball League 2026 participant registration, emergency contact, and waiver release form.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="waiver-page" id="top">
+
+<header class="nav nav--stuck page-nav" id="nav">
+  <a class="nav-logo" href="index.html" aria-label="MVL 2026 home">
+    <span class="nav-logo-mark">MVL</span><span class="nav-logo-year">2026</span>
+  </a>
+  <nav class="nav-links" aria-label="Primary">
+    <a href="index.html#teams">Teams</a>
+    <a href="index.html#games">Videos</a>
+    <a href="schedule.html">Schedule</a>
+    <a href="rules.html">Rules</a>
+  </nav>
+</header>
+
+<main class="waiver-main">
+  <section class="waiver-intro">
+    <p class="section-kicker">Participant Form</p>
+    <h1 class="section-title">Waiver &amp; <em>Registration</em></h1>
+
+    <div class="waiver-copy">
+      <p>Hello Metarice friend!</p>
+      <p>We're thrilled to invite you to the second Metarice Volleyball League (MVL) this August 2025 at Gameville Ball Park/Double Play. To join, please complete the registration form below.</p>
+      <p>You may find the Tournament Rules and Guidelines in this <a href="https://drive.google.com/file/d/120dJK9pn3qJ2Y3jyf-p9bFKJRwTa2xOj/view?usp=share_link" target="_blank" rel="noopener">link</a>.</p>
+
+      <h2>Data Privacy</h2>
+      <p>Your personal information will be used solely for tournament organization and communication. We'll protect your data and won't share it with third parties unless necessary for the event (e.g., in emergencies). You can request access, correction, or deletion of your data at any time.</p>
+      <p>By submitting the form, you consent to this use of your data.</p>
+      <p>Looking forward to seeing you on the court!</p>
+    </div>
+  </section>
+
+  <form class="waiver-form" id="waiverForm" novalidate>
+    <section class="form-panel">
+      <div class="form-panel-head">
+        <p class="section-kicker section-kicker--teal">Player Details</p>
+        <h2>Registration</h2>
+      </div>
+
+      <div class="form-grid">
+        <label class="field">
+          <span>Team</span>
+          <select name="team_id" id="teamSelect" required>
+            <option value="">Select your team</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>First Name</span>
+          <input name="first_name" type="text" autocomplete="given-name" required>
+        </label>
+
+        <label class="field">
+          <span>Last Name</span>
+          <input name="last_name" type="text" autocomplete="family-name" required>
+        </label>
+
+        <label class="field">
+          <span>Contact Number</span>
+          <input name="contact_number" type="tel" inputmode="tel" autocomplete="tel" placeholder="09XXXXXXXXX" pattern="^(09|\+639)\d{9}$" required>
+        </label>
+
+        <label class="field field--wide">
+          <span>Email Address</span>
+          <input name="email" type="email" autocomplete="email" required>
+        </label>
+      </div>
+    </section>
+
+    <section class="form-panel">
+      <div class="form-panel-head">
+        <p class="section-kicker section-kicker--teal">Emergency Contact</p>
+        <h2>In Case of Emergency</h2>
+      </div>
+
+      <div class="form-grid">
+        <label class="field field--wide">
+          <span>Name of Emergency Contact</span>
+          <input name="emergency_contact_name" type="text" required>
+        </label>
+
+        <label class="field">
+          <span>Contact Number of Emergency Contact</span>
+          <input name="emergency_contact_number" type="tel" inputmode="tel" placeholder="09XXXXXXXXX" pattern="^(09|\+639)\d{9}$" required>
+        </label>
+
+        <label class="field">
+          <span>Relationship with Participant</span>
+          <select name="relationship" id="relationshipSelect" required>
+            <option value="">Select relationship</option>
+            <option>Sibling</option>
+            <option>Parent</option>
+            <option>Friend</option>
+            <option>Partner</option>
+            <option>Guardian</option>
+            <option>Other</option>
+          </select>
+        </label>
+
+        <label class="field field--wide is-hidden" id="relationshipOtherField">
+          <span>Other Relationship</span>
+          <input name="relationship_other" id="relationshipOtherInput" type="text">
+        </label>
+      </div>
+    </section>
+
+    <section class="form-panel waiver-release">
+      <div class="form-panel-head">
+        <p class="section-kicker section-kicker--teal">Required Agreement</p>
+        <h2>Waiver and Release of Liability</h2>
+      </div>
+
+      <div class="release-copy">
+        <p>In consideration of being allowed to participate in the 2026 Metarice Volleyball League, I acknowledge, appreciate, and agree to the following:</p>
+
+        <h3>Assumption of Risk</h3>
+        <p>I understand that participating in volleyball involves inherent risks, including, but not limited to, the risk of serious injury, disability, or death. I voluntarily assume all risks associated with participation in this tournament.</p>
+
+        <h3>Medical Fitness</h3>
+        <p>I certify that I am in good health and physically able to participate in this tournament. I have no medical condition that would make participation in this event inadvisable or unsafe. I acknowledge that it is my responsibility to consult with a physician prior to and regarding my participation in this tournament.</p>
+
+        <h3>Release of Liability</h3>
+        <p>I, on behalf of myself, my heirs, assigns, personal representatives, and next of kin, hereby release, discharge, and hold harmless Metarice Volleyball League, its organizers, volunteers, sponsors, affiliates, and any other parties involved in the organization of this tournament from any and all claims, demands, losses, damages, and liabilities, arising out of or in connection with any injury, disability, or death that may occur as a result of my participation in this tournament.</p>
+
+        <h3>Indemnification</h3>
+        <p>I agree to indemnify and hold harmless Metarice Volleyball League, its organizers, volunteers, sponsors, and affiliates from any claims, demands, damages, costs, and expenses, including reasonable attorney's fees, arising out of or relating to my participation in the tournament or any breach of this agreement.</p>
+
+        <h3>Photography and Media Release</h3>
+        <p>I grant Metarice Volleyball League the right to take photographs, video, and other recordings of me during the tournament. I understand that these may be used for promotional purposes, including but not limited to social media, websites, and marketing materials, without compensation or further permission.</p>
+
+        <h3>Understanding of Rules and Regulations</h3>
+        <p>I agree to follow all rules, regulations, and instructions provided by the tournament organizers. I understand that failure to do so may result in my removal from the tournament without refund or compensation.</p>
+      </div>
+
+      <label class="waiver-check">
+        <input name="waiver_acknowledged" type="checkbox" required>
+        <span>I acknowledge that I have read and fully understood this waiver and release of liability, and that by accomplishing this form, I am giving up substantial rights, including my right to sue. I understand that this waiver and release of liability shall be binding upon me, my heirs, assigns, and legal representatives.</span>
+      </label>
+    </section>
+
+    <div class="form-actions">
+      <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
+      <button class="cta cta--primary" type="submit">Submit Waiver</button>
+    </div>
+  </form>
+</main>
+
+<footer class="footer">
+  <div class="footer-bar">
+    <a class="footer-logo" href="index.html" aria-label="MVL 2026 home">
+      <img class="footer-logo-img" src="assets/mvl-logo.png" alt="Metarice Volleyball League">
+    </a>
+    <p class="footer-social">
+      <a href="https://instagram.com/metaricevolley" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.2c3.2 0 3.58.01 4.85.07 3.25.15 4.77 1.69 4.92 4.92.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.15 3.23-1.66 4.77-4.92 4.92-1.27.06-1.64.07-4.85.07s-3.58-.01-4.85-.07c-3.26-.15-4.77-1.7-4.92-4.92-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85C2.42 3.92 3.94 2.38 7.15 2.27 8.42 2.21 8.8 2.2 12 2.2Zm0 1.8c-3.15 0-3.5.01-4.74.07-2.42.11-3.56 1.26-3.67 3.67-.06 1.24-.07 1.6-.07 4.74s.01 3.51.07 4.74c.11 2.41 1.25 3.56 3.67 3.67 1.24.06 1.6.07 4.74.07 3.15 0 3.51-.01 4.74-.07 2.42-.11 3.56-1.26 3.67-3.67.06-1.24.07-1.6.07-4.74s-.01-3.5-.07-4.74c-.11-2.41-1.25-3.56-3.67-3.67-1.24-.06-1.6-.07-4.74-.07Zm0 3.06a4.94 4.94 0 1 1 0 9.88 4.94 4.94 0 0 1 0-9.88Zm0 1.8a3.14 3.14 0 1 0 0 6.28 3.14 3.14 0 0 0 0-6.28Zm5.15-3.2a1.15 1.15 0 1 1 0 2.3 1.15 1.15 0 0 1 0-2.3Z"/></svg>
+      </a>
+      <a href="https://www.tiktok.com/@metaricevolley" target="_blank" rel="noopener" aria-label="TikTok">
+        <svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.6 0-1.72 1.66-3.01 3.37-2.48V9.66c-3.45-.46-6.47 2.22-6.47 5.64 0 3.33 2.76 5.7 5.69 5.7 3.14 0 5.69-2.55 5.69-5.7V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3c-1.32 0-2.5-.56-3.24-1.48Z"/></svg>
+      </a>
+      <a href="https://www.youtube.com/@metaricevolley" target="_blank" rel="noopener" aria-label="YouTube">
+        <svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.51 3.55 12 3.55 12 3.55s-7.51 0-9.38.5A3.02 3.02 0 0 0 .5 6.19C0 8.07 0 12 0 12s0 3.93.5 5.81a3.02 3.02 0 0 0 2.12 2.14c1.87.5 9.38.5 9.38.5s7.51 0 9.38-.5a3.02 3.02 0 0 0 2.12-2.14C24 15.93 24 12 24 12s0-3.93-.5-5.81ZM9.55 15.57V8.43L15.82 12l-6.27 3.57Z"/></svg>
+      </a>
+    </p>
+  </div>
+</footer>
+
+<script src="js/league-data.js"></script>
+<script src="js/waiver.js"></script>
+</body>
+</html>

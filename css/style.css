@@ -1431,3 +1431,178 @@ img { display: block; max-width: 100%; }
   .faq-item summary { font-size: 14.5px; }
   .rules-body h2 { font-size: 32px; }
 }
+
+/* ==========================================================================
+   Waiver and registration page
+   ========================================================================== */
+.waiver-page {
+  background:
+    radial-gradient(circle at 82% 10%, rgba(124, 245, 180, .12), transparent 28%),
+    linear-gradient(180deg, var(--navy) 0%, #050911 58%, var(--navy-deep) 100%);
+}
+.waiver-main {
+  padding: calc(var(--nav-h) + 28px) 16px 54px;
+  max-width: 980px;
+  margin: 0 auto;
+}
+.waiver-intro .section-title { font-size: 40px; }
+.waiver-copy,
+.form-panel {
+  margin-top: 24px;
+  border: 1px solid rgba(124, 245, 180, .2);
+  background: rgba(4, 9, 15, .68);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .2);
+}
+.waiver-copy {
+  padding: 20px 18px;
+}
+.waiver-copy p,
+.release-copy p {
+  color: rgba(237, 235, 255, .88);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.waiver-copy p + p,
+.release-copy p + p { margin-top: 10px; }
+.waiver-copy h2 {
+  margin-top: 22px;
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 28px;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--mint);
+}
+.waiver-copy a,
+.release-copy a { color: var(--teal); }
+.waiver-copy a:hover,
+.release-copy a:hover { color: var(--mint); }
+
+.waiver-form { margin-top: 28px; }
+.form-panel {
+  padding: 0 16px 18px;
+}
+.form-panel + .form-panel { margin-top: 18px; }
+.form-panel-head {
+  padding: 20px 0 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, .08);
+}
+.form-panel-head h2 {
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 31px;
+  line-height: 1;
+  text-transform: uppercase;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  padding-top: 18px;
+}
+.field {
+  display: grid;
+  gap: 7px;
+}
+.field span {
+  font-weight: 800;
+  font-size: 10px;
+  letter-spacing: 1.7px;
+  text-transform: uppercase;
+  color: var(--teal);
+}
+.field input,
+.field select {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid rgba(255, 255, 255, .16);
+  border-radius: 0;
+  background: rgba(255, 255, 255, .06);
+  color: #fff;
+  font: 700 15px var(--ui);
+  padding: 12px 13px;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.field select { color-scheme: dark; }
+.field input:focus,
+.field select:focus {
+  border-color: var(--mint);
+  box-shadow: 0 0 0 3px rgba(124, 245, 180, .14);
+  background: rgba(255, 255, 255, .09);
+}
+.field input::placeholder { color: rgba(255, 255, 255, .38); }
+.is-hidden { display: none !important; }
+
+.release-copy {
+  padding-top: 18px;
+  max-height: 460px;
+  overflow: auto;
+  padding-right: 6px;
+}
+.release-copy h3 {
+  margin: 22px 0 7px;
+  font-weight: 900;
+  font-size: 12px;
+  letter-spacing: 1.9px;
+  text-transform: uppercase;
+  color: var(--mint);
+}
+.waiver-check {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 16px;
+  border: 1px solid rgba(124, 245, 180, .24);
+  background: rgba(124, 245, 180, .07);
+}
+.waiver-check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--mint);
+  margin-top: 2px;
+}
+.waiver-check span {
+  color: var(--ink-soft);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.form-actions {
+  display: grid;
+  gap: 14px;
+  margin-top: 20px;
+}
+.form-actions .cta {
+  border: 0;
+  cursor: pointer;
+  font-family: var(--ui);
+}
+.form-status {
+  min-height: 20px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.form-status.is-error { color: #FF9BAE; }
+.form-status.is-success { color: var(--mint); }
+
+@media (min-width: 960px) {
+  .waiver-main { padding-top: calc(var(--nav-h) + 48px); }
+  .waiver-intro .section-title { font-size: 64px; }
+  .waiver-copy { padding: 26px 28px; }
+  .form-panel { padding: 0 28px 26px; }
+  .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 20px;
+  }
+  .field--wide { grid-column: 1 / -1; }
+  .form-panel-head h2 { font-size: 40px; }
+  .form-actions {
+    grid-template-columns: 1fr auto;
+    align-items: center;
+  }
+  .form-actions .cta { min-width: 240px; }
+}

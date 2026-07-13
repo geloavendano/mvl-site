@@ -93,8 +93,28 @@ create table public.raffle_checkins (
   created_at timestamptz not null default now()
 );
 
+create table public.waiver_submissions (
+  id uuid primary key default gen_random_uuid(),
+  team_id text not null references public.teams(id),
+  first_name text not null,
+  last_name text not null,
+  contact_number text not null,
+  email text not null,
+  emergency_contact_name text not null,
+  emergency_contact_number text not null,
+  relationship text not null,
+  relationship_other text,
+  waiver_acknowledged boolean not null,
+  submitted_at timestamptz not null default now(),
+  user_agent text,
+  created_at timestamptz not null default now(),
+  constraint waiver_acknowledged_required check (waiver_acknowledged is true)
+);
+
 create index raffle_checkins_team_created_idx on public.raffle_checkins (team_id, created_at desc);
 create index raffle_checkins_location_idx on public.raffle_checkins using gist (detected_location);
+create index waiver_submissions_team_created_idx on public.waiver_submissions (team_id, created_at desc);
+create index waiver_submissions_email_idx on public.waiver_submissions (lower(email));
 create index games_team_a_idx on public.games (team_a_id);
 create index games_team_b_idx on public.games (team_b_id);
 create index games_starts_at_idx on public.games (starts_at);
