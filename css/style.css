@@ -1054,3 +1054,88 @@ img { display: block; max-width: 100%; }
     padding: 18px;
   }
 }
+
+/* ==========================================================================
+   Teaser (Phase 1) page
+   ========================================================================== */
+.teaser-hero {
+  position: relative;
+  height: 100svh;
+  min-height: 640px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  text-align: center;
+}
+.teaser-hero-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 22%;
+}
+.teaser-hero-scrim {
+  position: absolute;
+  inset: 0;
+  /* placeholder KV has phase-2 dates baked into the pixels below ~50% —
+     stays heavily obscured until a dedicated teaser asset replaces it */
+  background: linear-gradient(180deg,
+    rgba(16, 10, 50, .55) 0%,
+    rgba(16, 10, 50, .7) 42%,
+    rgba(16, 10, 50, .97) 68%,
+    rgba(16, 10, 50, .99) 100%);
+}
+.teaser-hero-content {
+  position: relative;
+  padding: 0 24px;
+}
+.teaser-logo {
+  font-family: var(--display);
+  font-style: italic;
+  text-transform: uppercase;
+  line-height: .92;
+  font-size: 64px;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 10px;
+  text-shadow: 0 6px 40px rgba(4, 2, 20, .55);
+}
+.teaser-logo .hero-logo-mark { color: #fff; }
+.teaser-dates {
+  margin-top: 22px;
+  font-weight: 800;
+  font-size: 19px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: #fff;
+  line-height: 1.5;
+}
+.teaser-venue {
+  margin-top: 10px;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 2.6px;
+  text-transform: uppercase;
+  color: var(--mint);
+}
+
+.teaser-ctas {
+  padding: 36px 16px 44px;
+  background: var(--navy);
+}
+.teaser-ctas .hero-ctas {
+  margin-top: 0;
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (min-width: 960px) {
+  .teaser-logo { font-size: 128px; }
+  .teaser-dates { font-size: 27px; letter-spacing: 2px; }
+  .teaser-venue { font-size: 13px; }
+  .teaser-ctas { padding: 56px 48px 64px; }
+}
