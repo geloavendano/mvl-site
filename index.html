@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Metarice Volleyball League 2026 — 3rd Annual Invitational</title>
+<meta name="description" content="MVL 2026 — 3rd Annual Invitational. Watch the livestream, browse the teams, and catch past games. Aug 15–16 & 21–23 at Gameville Ball Park and Double Play.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body id="top">
+
+<!-- ============ TOP NAV ============ -->
+<header class="nav" id="nav">
+  <a class="nav-logo" href="#top" aria-label="MVL 2026 — back to top">
+    <span class="nav-logo-mark">MVL</span><span class="nav-logo-year">2026</span>
+  </a>
+  <nav class="nav-links" aria-label="Primary">
+    <a href="#teams">Teams</a>
+    <a href="#games">Videos</a>
+    <a href="schedule.html">Schedule</a>
+    <a href="#" data-todo="rules page">Rules</a>
+  </nav>
+</header>
+
+<!-- ============ FOLD 01 · HERO (full-bleed) ============ -->
+<section class="hero" id="hero">
+  <!-- PLACEHOLDER: swap for landscape hero photo or muted autoplay <video> -->
+  <img class="hero-bg" src="assets/mvl-kv.png" alt="" aria-hidden="true">
+  <div class="hero-scrim" aria-hidden="true"></div>
+
+  <div class="hero-content">
+    <p class="hero-kicker">Ricing up the game like never before
+      <span class="hero-kicker-ext"> · 3rd Annual Invitational · Aug 15–16 · 21–23</span>
+    </p>
+    <h1 class="hero-logo" id="heroLogo">
+      <span class="hero-logo-mark">MVL</span>
+      <span class="hero-logo-year">2026</span>
+    </h1>
+    <p class="hero-sub">Metarice Volleyball League · Gameville Ball Park &amp; Double Play</p>
+
+    <div class="hero-ctas">
+      <a class="cta cta--primary" href="#" data-livestream-link>
+        <span class="live-dot" aria-hidden="true"></span> Watch the Livestream
+      </a>
+      <a class="cta cta--secondary" href="#" data-todo="raffle link">Register for the Raffle</a>
+      <a class="cta cta--tertiary" href="schedule.html">Game Schedule &amp; Standings</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SPONSOR MARQUEE ============ -->
+<div class="marquee" aria-label="Sponsors">
+  <div class="marquee-track" data-marquee></div>
+</div>
+
+<!-- ============ FOLD 02 · THE TEAMS ============ -->
+<section class="teams" id="teams">
+  <header class="section-head reveal">
+    <p class="section-kicker">The Squads</p>
+    <h2 class="section-title">The <em>Teams</em></h2>
+  </header>
+  <div class="teams-grid" id="teamsGrid"><!-- rendered by js --></div>
+</section>
+
+<!-- ============ FOLD 03 · WATCH THE GAMES ============ -->
+<section class="games" id="games">
+  <div class="games-bg" aria-hidden="true"><img src="assets/mvl-kv.png" alt=""></div>
+  <div class="games-inner">
+    <header class="section-head reveal">
+      <p class="section-kicker section-kicker--teal">On the Court</p>
+      <h2 class="section-title">Watch the <em class="em-teal">Games</em></h2>
+    </header>
+
+    <div class="games-grid">
+      <div class="games-live reveal">
+        <p class="games-label"><span class="live-dot" aria-hidden="true"></span> Livestream</p>
+        <!-- PLACEHOLDER: swap for YouTube iframe embed
+             <iframe src="https://www.youtube.com/embed/VIDEO_ID" ...></iframe> -->
+        <div class="live-frame placeholder" id="liveEmbed">
+          <span class="play-btn" aria-hidden="true"></span>
+          <span class="ph-note">livestream embed</span>
+        </div>
+      </div>
+
+      <div class="games-side">
+        <p class="games-label reveal">Past Games</p>
+        <div class="past-grid" id="pastSide"><!-- first 2, rendered by js --></div>
+      </div>
+
+      <div class="past-grid past-grid--bottom" id="pastBottom"><!-- remaining 4, rendered by js --></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="marquee marquee--footer" aria-hidden="true">
+    <div class="marquee-track" data-marquee></div>
+  </div>
+  <div class="footer-bar">
+    <span class="footer-logo">MVL 2026</span>
+    <p class="footer-social">
+      <a href="#" data-todo="instagram url">Instagram</a>
+      <span class="sep">|</span>
+      <a href="#" data-todo="tiktok url">TikTok</a>
+    </p>
+  </div>
+</footer>
+
+<script src="js/league-data.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

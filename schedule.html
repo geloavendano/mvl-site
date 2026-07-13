@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Schedule & Standings — MVL 2026</title>
+<meta name="description" content="MVL 2026 schedule, standings, set scores, winners, and players of the game.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="schedule-page" id="top">
+
+<header class="nav nav--stuck page-nav" id="nav">
+  <a class="nav-logo" href="index.html" aria-label="MVL 2026 home">
+    <span class="nav-logo-mark">MVL</span><span class="nav-logo-year">2026</span>
+  </a>
+  <nav class="nav-links" aria-label="Primary">
+    <a href="index.html#teams">Teams</a>
+    <a href="index.html#games">Videos</a>
+    <a href="schedule.html" aria-current="page">Schedule</a>
+    <a href="#" data-todo="rules page">Rules</a>
+  </nav>
+</header>
+
+<main>
+  <section class="schedule-hero">
+    <p class="section-kicker">Tournament Control</p>
+    <h1 class="section-title">Schedule &amp; <em>Standings</em></h1>
+  </section>
+
+  <section class="standings-panel" aria-labelledby="standingsTitle">
+    <div class="schedule-section-head">
+      <div>
+        <p class="section-kicker section-kicker--teal">Live Table</p>
+        <h2 id="standingsTitle">Team Standings</h2>
+      </div>
+      <p class="schedule-note">Sorted by wins, set ratio, then set differential.</p>
+    </div>
+    <div class="standings-table-wrap">
+      <table class="standings-table">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Team</th>
+            <th>Wins</th>
+            <th>Losses</th>
+            <th>Sets</th>
+            <th>Set Ratio</th>
+          </tr>
+        </thead>
+        <tbody id="standingsBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="schedule-board" aria-labelledby="scheduleTitle">
+    <div class="schedule-section-head">
+      <div>
+        <p class="section-kicker">Match List</p>
+        <h2 id="scheduleTitle">Games</h2>
+      </div>
+      <a class="schedule-video-link" href="index.html#games">Latest Videos</a>
+    </div>
+
+    <div class="day-tabs" id="dayTabs" role="tablist" aria-label="Schedule days"></div>
+    <div class="match-list" id="matchList"></div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="footer-bar">
+    <span class="footer-logo">MVL 2026</span>
+    <p class="footer-social">
+      <a href="index.html">Home</a>
+      <span class="sep">|</span>
+      <a href="index.html#games">Videos</a>
+    </p>
+  </div>
+</footer>
+
+<script src="js/league-data.js"></script>
+<script src="js/schedule.js"></script>
+</body>
+</html>
