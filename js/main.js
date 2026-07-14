@@ -131,6 +131,7 @@ const updateHeroSequence = () => {
     }));
     if (heroCopy) heroCopy.style.setProperty('--hero-copy-opacity', 1);
     nav.classList.add('hero-ready');
+    nav.classList.add('logo-docked');
     return;
   }
 
@@ -146,7 +147,9 @@ const updateHeroSequence = () => {
   const player = easeOut(progressBetween(progress, 0.38, 0.66));
   const logo = easeOut(progressBetween(progress, 0.62, 0.84));
   const copy = easeOut(progressBetween(progress, 0.78, 0.96));
+  const logoHandoff = easeOut(progressBetween(progress, 0.99, 0.999));
   nav.classList.toggle('hero-ready', copy > .98);
+  nav.classList.toggle('logo-docked', logoHandoff > .995 || rect.bottom <= window.innerHeight + 2);
 
   setLayer(heroLayers.rays, {
     '--layer-opacity': rays,
@@ -179,7 +182,32 @@ const updateHeroSequence = () => {
     '--layer-scale': lerp(.78, 1, logo).toFixed(3),
     '--layer-rotate': `${lerp(4, 0, logo).toFixed(2)}deg`,
     '--layer-blur': `${lerp(8, 0, logo).toFixed(1)}px`,
+    '--handoff-x': '0px',
+    '--handoff-y': '0px',
+    '--handoff-scale': 1,
   });
+
+  if (heroLayers.logo && logoHandoff > 0) {
+    const logoRect = heroLayers.logo.getBoundingClientRect();
+    const targetSize = window.innerWidth >= 960 ? 42 : (window.innerWidth <= 430 ? 30 : 34);
+    const targetX = window.innerWidth >= 960 ? 48 : (window.innerWidth <= 430 ? 14 : 16);
+    const targetY = (nav.offsetHeight - targetSize) / 2;
+    const targetCenterX = targetX + targetSize / 2;
+    const targetCenterY = targetY + targetSize / 2;
+    const logoCenterX = logoRect.left + logoRect.width / 2;
+    const logoCenterY = logoRect.top + logoRect.height / 2;
+    const targetScale = targetSize / logoRect.height;
+
+    heroLayers.logo.classList.add('is-handing-off');
+    setLayer(heroLayers.logo, {
+      '--handoff-x': `${((targetCenterX - logoCenterX) * logoHandoff).toFixed(1)}px`,
+      '--handoff-y': `${((targetCenterY - logoCenterY) * logoHandoff).toFixed(1)}px`,
+      '--handoff-scale': lerp(1, targetScale, logoHandoff).toFixed(4),
+    });
+  } else if (heroLayers.logo) {
+    heroLayers.logo.classList.remove('is-handing-off');
+  }
+
   if (heroCopy) heroCopy.style.setProperty('--hero-copy-opacity', copy.toFixed(3));
 };
 
@@ -214,6 +242,25 @@ if (heroSequence && !reduceMotion && !sessionStorage.getItem('mvlHeroIntroSeen')
 
     requestAnimationFrame(step);
   }, 650);
+}
+
+// ---- save-the-dates action sheet -------------------------------------------
+const sheet = document.getElementById('saveDatesSheet');
+const sheetBtn = document.getElementById('saveDatesBtn');
+
+if (sheet && sheetBtn && typeof sheet.showModal === 'function') {
+  sheetBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    sheet.showModal();
+  });
+
+  sheet.addEventListener('click', (e) => {
+    if (e.target.closest('[data-sheet-close]')) {
+      sheet.close();
+      return;
+    }
+    if (e.target === sheet) sheet.close();
+  });
 }
 
 // ---- scroll-triggered reveals (animate once) --------------------------------

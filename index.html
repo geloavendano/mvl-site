@@ -44,7 +44,7 @@
       <p class="hero-kicker">3rd Annual Invitational</p>
       <p class="hero-schedule">
         Aug 29, 30, 31 <span>&middot;</span> Sep 5, 6
-        <a class="hero-calendar-link" href="assets/mvl-2026-dates.ics" download="MVL-2026-Save-the-Dates.ics" aria-label="Save MVL 2026 dates to calendar">
+        <a class="hero-calendar-link" id="saveDatesBtn" href="assets/mvl-2026-dates.ics" download="MVL-2026-Save-the-Dates.ics" aria-label="Save MVL 2026 dates to calendar">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17 3h1a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3h1V1.75a.75.75 0 0 1 1.5 0V3h7V1.75a.75.75 0 0 1 1.5 0V3ZM5 9v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9H5Zm6 4.44 2.97-2.97 1.06 1.06L11 15.56l-2.53-2.53 1.06-1.06L11 13.44Z"/></svg>
         </a>
       </p>
@@ -59,6 +59,42 @@
     </div>
   </div>
 </section>
+
+<!-- ============ SAVE THE DATES — action sheet ============ -->
+<dialog class="sheet" id="saveDatesSheet" aria-labelledby="sheetTitle">
+  <div class="sheet-head">
+    <h2 class="sheet-title" id="sheetTitle">Save the Dates</h2>
+    <p class="sheet-sub">Five game days at Gameville Ball Park.</p>
+  </div>
+
+  <a class="sheet-option" href="assets/mvl-2026-dates.ics" download="MVL-2026-Save-the-Dates.ics" data-sheet-close>
+    <svg class="sheet-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17 3h1a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3h1V1.75a.75.75 0 0 1 1.5 0V3h7V1.75a.75.75 0 0 1 1.5 0V3ZM5 9v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9H5Zm6 4.44 2.97-2.97 1.06 1.06L11 15.56l-2.53-2.53 1.06-1.06L11 13.44Z"/></svg>
+    <span>
+      <strong>Device calendar</strong>
+      <small>Apple, Outlook &amp; more &middot; adds both weekends at once (.ics)</small>
+    </span>
+  </a>
+
+  <a class="sheet-option" target="_blank" rel="noopener" data-sheet-close
+     href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=MVL%202026%20%C2%B7%20Metarice%20Volleyball%20League&amp;dates=20260829/20260901&amp;location=Gameville%20Ball%20Park&amp;details=Metarice%20Volleyball%20League%202026%20%E2%80%94%20game%20days%201%E2%80%933.%0AVenue%3A%20https%3A%2F%2Fmaps.app.goo.gl%2FsK1HuKBVwRSZPpHz9">
+    <svg class="sheet-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.5 3H16V1.75a.75.75 0 0 0-1.5 0V3h-5V1.75a.75.75 0 0 0-1.5 0V3H5.5A2.5 2.5 0 0 0 3 5.5v13A2.5 2.5 0 0 0 5.5 21h13a2.5 2.5 0 0 0 2.5-2.5v-13A2.5 2.5 0 0 0 18.5 3ZM5 9h14v9.5a1 1 0 0 1-1 1h-12a1 1 0 0 1-1-1V9Zm4.2 3.1h5.6v1.6H9.2v-1.6Z"/></svg>
+    <span>
+      <strong>Google Calendar &middot; Weekend 1</strong>
+      <small>Aug 29 &ndash; 31</small>
+    </span>
+  </a>
+
+  <a class="sheet-option" target="_blank" rel="noopener" data-sheet-close
+     href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=MVL%202026%20%C2%B7%20Metarice%20Volleyball%20League&amp;dates=20260905/20260907&amp;location=Gameville%20Ball%20Park&amp;details=Metarice%20Volleyball%20League%202026%20%E2%80%94%20game%20days%204%E2%80%935.%0AVenue%3A%20https%3A%2F%2Fmaps.app.goo.gl%2FsK1HuKBVwRSZPpHz9">
+    <svg class="sheet-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.5 3H16V1.75a.75.75 0 0 0-1.5 0V3h-5V1.75a.75.75 0 0 0-1.5 0V3H5.5A2.5 2.5 0 0 0 3 5.5v13A2.5 2.5 0 0 0 5.5 21h13a2.5 2.5 0 0 0 2.5-2.5v-13A2.5 2.5 0 0 0 18.5 3ZM5 9h14v9.5a1 1 0 0 1-1 1h-12a1 1 0 0 1-1-1V9Zm4.2 3.1h5.6v1.6H9.2v-1.6Z"/></svg>
+    <span>
+      <strong>Google Calendar &middot; Weekend 2</strong>
+      <small>Sep 5 &ndash; 6</small>
+    </span>
+  </a>
+
+  <button class="sheet-cancel" type="button" data-sheet-close>Cancel</button>
+</dialog>
 
 <!-- ============ SPONSOR MARQUEE ============ -->
 <div class="marquee" aria-label="Sponsors">
@@ -110,8 +146,8 @@
     <div class="marquee-track" data-marquee></div>
   </div>
   <div class="footer-bar">
-    <a class="footer-logo" href="#top" aria-label="MVL 2026">
-      <img class="footer-logo-img" src="assets/mvl-logo.png" alt="Metarice Volleyball League">
+    <a class="footer-logo" href="#top" aria-label="Metarice Volley">
+      <img class="footer-logo-img footer-logo-img--metarice" src="assets/metarice-wordmark.png" alt="Metarice Volley">
     </a>
     <p class="footer-social">
       <a href="https://instagram.com/metaricevolley" target="_blank" rel="noopener" aria-label="Instagram">
