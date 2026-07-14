@@ -14,9 +14,20 @@ const teamById = Object.fromEntries(TEAMS.map((team) => [team.id, team]));
 // ---- render: team cards ----------------------------------------------------
 const teamsGrid = document.getElementById('teamsGrid');
 if (teamsGrid) {
+  const ovalPositions = [
+    ['-18%', '12%', '-16deg'],
+    ['42%', '-18%', '18deg'],
+    ['18%', '54%', '-24deg'],
+    ['58%', '18%', '26deg'],
+    ['-12%', '48%', '14deg'],
+    ['48%', '44%', '-18deg'],
+    ['8%', '-14%', '22deg'],
+    ['62%', '58%', '-28deg'],
+  ];
   teamsGrid.innerHTML = TEAMS.map((team, i) => `
   <article class="team-card reveal"
-           style="--team-a:${team.grad[0]}; --team-b:${team.grad[1]}; --photo-pos:${team.pos}; --d:${(i % 4) * 55}ms">
+           style="--team-a:${team.grad[0]}; --team-b:${team.grad[1]}; --oval-x:${ovalPositions[i % ovalPositions.length][0]}; --oval-y:${ovalPositions[i % ovalPositions.length][1]}; --oval-rot:${ovalPositions[i % ovalPositions.length][2]}; --d:${(i % 4) * 55}ms">
+    <div class="team-card-oval" aria-hidden="true"></div>
     <div class="team-card-photo" aria-hidden="true"></div>
     <div class="team-card-shards" aria-hidden="true"></div>
     <div class="team-card-copy">

@@ -751,6 +751,22 @@ img { display: block; max-width: 100%; }
   box-shadow: 0 16px 34px rgba(0, 0, 0, .26);
   transition: border-color .16s ease, transform .16s ease, box-shadow .16s ease;
 }
+.team-card-oval {
+  position: absolute;
+  z-index: 0;
+  left: var(--oval-x, 12%);
+  top: var(--oval-y, 8%);
+  width: min(72vw, 360px);
+  height: min(34vw, 160px);
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at 35% 42%, rgba(255, 255, 255, .2), transparent 38%),
+    linear-gradient(112deg, var(--team-a) 5%, color-mix(in srgb, var(--team-a) 42%, var(--team-b)) 46%, var(--team-b) 96%);
+  transform: rotate(var(--oval-rot, -16deg));
+  filter: saturate(1.18);
+  opacity: .86;
+  pointer-events: none;
+}
 /* starfield dots */
 .team-card::before {
   content: '';
@@ -1173,26 +1189,43 @@ img { display: block; max-width: 100%; }
 }
 
 .day-tabs {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 18px 16px;
   border-bottom: 1px solid rgba(255, 255, 255, .08);
 }
+.day-tabs::-webkit-scrollbar { display: none; }
 .day-tab {
   appearance: none;
   border: 0;
-  border-right: 1px solid rgba(255, 255, 255, .08);
-  border-bottom: 1px solid rgba(255, 255, 255, .08);
-  background: rgba(255, 255, 255, .04);
+  background: transparent;
   color: #fff;
-  min-height: 54px;
+  min-height: 36px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font: 900 12px var(--ui);
   letter-spacing: 1.8px;
   text-transform: uppercase;
   cursor: pointer;
+  padding: 4px 0;
+  border-bottom: 2px solid transparent;
+  transition: color .15s ease, border-color .15s ease;
+}
+.day-tab + .day-tab::before {
+  content: '/';
+  padding: 0 13px;
+  color: rgba(255, 255, 255, .45);
+  pointer-events: none;
 }
 .day-tab.is-active {
-  background: linear-gradient(90deg, var(--mint), var(--teal));
-  color: var(--navy-deep);
+  color: var(--mint);
+  border-bottom-color: var(--mint);
 }
 
 .match-list {
@@ -1557,13 +1590,11 @@ img { display: block; max-width: 100%; }
     padding: 24px 28px 20px;
   }
   .schedule-section-head h2 { font-size: 44px; }
-  .day-tabs {
-    grid-template-columns: repeat(5, 1fr);
-  }
+  .day-tabs { padding: 20px 28px; }
   .day-tab {
-    min-height: 68px;
     font-size: 14px;
   }
+  .day-tab + .day-tab::before { padding: 0 18px; }
   .match-list {
     gap: 18px;
     padding: 24px 28px 28px;
