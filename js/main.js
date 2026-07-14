@@ -13,7 +13,8 @@ const teamById = Object.fromEntries(TEAMS.map((team) => [team.id, team]));
 
 // ---- render: team cards ----------------------------------------------------
 const teamsGrid = document.getElementById('teamsGrid');
-teamsGrid.innerHTML = TEAMS.map((team, i) => `
+if (teamsGrid) {
+  teamsGrid.innerHTML = TEAMS.map((team, i) => `
   <article class="team-card reveal"
            style="--team-a:${team.grad[0]}; --team-b:${team.grad[1]}; --photo-pos:${team.pos}; --d:${(i % 4) * 55}ms">
     <div class="team-card-photo" aria-hidden="true"></div>
@@ -25,7 +26,8 @@ teamsGrid.innerHTML = TEAMS.map((team, i) => `
     </div>
     <a class="team-card-link" href="team.html?id=${team.id}" aria-label="${team.name} team page">&#8599;</a>
   </article>
-`).join('');
+  `).join('');
+}
 
 // ---- render: livestream ----------------------------------------------------
 document.querySelectorAll('[data-livestream-link]').forEach((link) => {
@@ -44,6 +46,129 @@ if (liveEmbed && livestream.youtubeId) {
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
       allowfullscreen></iframe>
   `;
+}
+
+// ---- render: schedule & standings preview ----------------------------------
+const timeZone = 'Asia/Manila';
+const homeScheduleTitle = document.getElementById('homeScheduleTitle');
+const homeScheduleList = document.getElementById('homeScheduleList');
+const homeStandingsList = document.getElementById('homeStandingsList');
+
+const dateKey = (date) => new Intl.DateTimeFormat('en-CA', {
+  timeZone,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+}).format(date);
+
+const formatPreviewDate = (iso) => new Intl.DateTimeFormat('en-US', {
+  timeZone,
+  month: 'short',
+  day: 'numeric',
+}).format(new Date(iso));
+
+const formatPreviewTime = (iso) => new Intl.DateTimeFormat('en-US', {
+  timeZone,
+  hour: 'numeric',
+  minute: '2-digit',
+}).format(new Date(iso));
+
+const setsWonBy = (game, teamId) => {
+  if (!game.sets?.length) return 0;
+  return game.sets.reduce((wins, set) => {
+    const isA = game.teamA === teamId;
+    const scored = isA ? set.a : set.b;
+    const allowed = isA ? set.b : set.a;
+    return wins + (scored > allowed ? 1 : 0);
+  }, 0);
+};
+
+const pointsFor = (game, teamId) => (game.sets || []).reduce((sum, set) => {
+  if (game.teamA === teamId) return sum + set.a;
+  if (game.teamB === teamId) return sum + set.b;
+  return sum;
+}, 0);
+
+const pointsAgainst = (game, teamId) => (game.sets || []).reduce((sum, set) => {
+  if (game.teamA === teamId) return sum + set.b;
+  if (game.teamB === teamId) return sum + set.a;
+  return sum;
+}, 0);
+
+const ratio = (forValue, againstValue) => {
+  if (!againstValue && forValue) return Number.POSITIVE_INFINITY;
+  if (!againstValue) return 0;
+  return forValue / againstValue;
+};
+
+const buildStandingsPreview = () => TEAMS.map((team) => {
+  const played = GAMES.filter((game) =>
+    game.status === 'final' && (game.teamA === team.id || game.teamB === team.id)
+  );
+  const wins = played.filter((game) => game.winner === team.id).length;
+  const setsFor = played.reduce((sum, game) => sum + setsWonBy(game, team.id), 0);
+  const setsAgainst = played.reduce((sum, game) => {
+    const opponent = game.teamA === team.id ? game.teamB : game.teamA;
+    return sum + setsWonBy(game, opponent);
+  }, 0);
+  const ptsFor = played.reduce((sum, game) => sum + pointsFor(game, team.id), 0);
+  const ptsAgainst = played.reduce((sum, game) => sum + pointsAgainst(game, team.id), 0);
+
+  return {
+    ...team,
+    wins,
+    losses: played.length - wins,
+    setRatio: ratio(setsFor, setsAgainst),
+    pointRatio: ratio(ptsFor, ptsAgainst),
+  };
+}).sort((a, b) =>
+  b.wins - a.wins ||
+  b.setRatio - a.setRatio ||
+  b.pointRatio - a.pointRatio ||
+  a.name.localeCompare(b.name)
+);
+
+if (homeScheduleList && homeScheduleTitle) {
+  const now = new Date();
+  const today = dateKey(now);
+  const sortedGames = [...GAMES].sort((a, b) => new Date(a.startsAt) - new Date(b.startsAt));
+  const todayGames = sortedGames.filter((game) => dateKey(new Date(game.startsAt)) === today);
+  const nextGame = sortedGames.find((game) => new Date(game.startsAt) >= now) || sortedGames.at(-1);
+  const activeKey = todayGames.length ? today : dateKey(new Date(nextGame.startsAt));
+  const activeGames = sortedGames.filter((game) => dateKey(new Date(game.startsAt)) === activeKey);
+
+  homeScheduleTitle.textContent = todayGames.length
+    ? `Today · ${formatPreviewDate(activeGames[0].startsAt)}`
+    : `Next Games · ${formatPreviewDate(activeGames[0].startsAt)}`;
+
+  homeScheduleList.innerHTML = activeGames.map((game) => {
+    const teamA = teamById[game.teamA];
+    const teamB = teamById[game.teamB];
+    const status = game.status === 'final' ? 'Final' : 'Upcoming';
+    const score = game.sets?.length
+      ? game.sets.map((set) => `${set.a}-${set.b}`).join(' · ')
+      : formatPreviewTime(game.startsAt);
+    return `
+      <article class="home-match">
+        <div>
+          <p class="home-match-time">${score}</p>
+          <h4>${teamA.name} <span>vs</span> ${teamB.name}</h4>
+          <p>${game.court}</p>
+        </div>
+        <span class="home-status home-status--${game.status}">${status}</span>
+      </article>
+    `;
+  }).join('');
+}
+
+if (homeStandingsList) {
+  homeStandingsList.innerHTML = buildStandingsPreview().slice(0, 6).map((team, index) => `
+    <a class="home-standing-row" href="team.html?id=${team.id}">
+      <span>${String(index + 1).padStart(2, '0')}</span>
+      <strong>${team.name}</strong>
+      <em>${team.wins}W</em>
+    </a>
+  `).join('');
 }
 
 // ---- render: past game cards ----------------------------------------------
@@ -86,14 +211,6 @@ if (!isLive) {
 const nav = document.getElementById('nav');
 const hero = document.getElementById('hero');
 
-new IntersectionObserver(([entry]) => {
-  nav.classList.toggle('nav--stuck', !entry.isIntersecting);
-}, {
-  // trigger once the hero's bottom clears the nav
-  rootMargin: '-64px 0px 0px 0px',
-  threshold: 0,
-}).observe(hero);
-
 // ---- hero: scroll-built intro ----------------------------------------------
 const heroSequence = document.querySelector('[data-hero-sequence]');
 const heroLayers = {
@@ -104,6 +221,12 @@ const heroLayers = {
 };
 const heroCopy = document.querySelector('[data-hero-copy]');
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const logoFlight = document.createElement('img');
+logoFlight.className = 'logo-flight';
+logoFlight.src = 'assets/hero-mvl-2026-logo.png';
+logoFlight.alt = '';
+logoFlight.setAttribute('aria-hidden', 'true');
+document.body.appendChild(logoFlight);
 
 const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
 const progressBetween = (value, start, end) => clamp((value - start) / (end - start));
@@ -130,8 +253,10 @@ const updateHeroSequence = () => {
       '--layer-blur': '0px',
     }));
     if (heroCopy) heroCopy.style.setProperty('--hero-copy-opacity', 1);
+    nav.classList.add('nav--stuck');
     nav.classList.add('hero-ready');
     nav.classList.add('logo-docked');
+    logoFlight.classList.remove('is-active');
     return;
   }
 
@@ -141,15 +266,17 @@ const updateHeroSequence = () => {
   const isPinned = rect.top <= 0 && rect.bottom > window.innerHeight;
   heroSequence.classList.toggle('hero-is-pinned', isPinned);
   heroSequence.classList.toggle('hero-is-done', rect.bottom <= window.innerHeight);
+  nav.classList.toggle('nav--stuck', rect.bottom <= window.innerHeight + 2);
 
   const rays = easeOut(progressBetween(progress, 0.02, 0.22));
   const star = easeOut(progressBetween(progress, 0.18, 0.42));
   const player = easeOut(progressBetween(progress, 0.38, 0.66));
   const logo = easeOut(progressBetween(progress, 0.62, 0.84));
   const copy = easeOut(progressBetween(progress, 0.78, 0.96));
-  const logoHandoff = easeOut(progressBetween(progress, 0.99, 0.999));
+  const logoHandoff = easeOut(progressBetween(progress, 0.976, 0.999));
   nav.classList.toggle('hero-ready', copy > .98);
-  nav.classList.toggle('logo-docked', logoHandoff > .995 || rect.bottom <= window.innerHeight + 2);
+  const isDocked = logoHandoff > .995 || rect.bottom <= window.innerHeight + 2;
+  nav.classList.toggle('logo-docked', isDocked);
 
   setLayer(heroLayers.rays, {
     '--layer-opacity': rays,
@@ -182,30 +309,31 @@ const updateHeroSequence = () => {
     '--layer-scale': lerp(.78, 1, logo).toFixed(3),
     '--layer-rotate': `${lerp(4, 0, logo).toFixed(2)}deg`,
     '--layer-blur': `${lerp(8, 0, logo).toFixed(1)}px`,
-    '--handoff-x': '0px',
-    '--handoff-y': '0px',
-    '--handoff-scale': 1,
   });
 
-  if (heroLayers.logo && logoHandoff > 0) {
+  if (heroLayers.logo && logoHandoff > 0 && logoHandoff < .995 && isPinned) {
     const logoRect = heroLayers.logo.getBoundingClientRect();
     const targetSize = window.innerWidth >= 960 ? 42 : (window.innerWidth <= 430 ? 30 : 34);
     const targetX = window.innerWidth >= 960 ? 48 : (window.innerWidth <= 430 ? 14 : 16);
     const targetY = (nav.offsetHeight - targetSize) / 2;
-    const targetCenterX = targetX + targetSize / 2;
-    const targetCenterY = targetY + targetSize / 2;
-    const logoCenterX = logoRect.left + logoRect.width / 2;
-    const logoCenterY = logoRect.top + logoRect.height / 2;
-    const targetScale = targetSize / logoRect.height;
+    const width = lerp(logoRect.width, targetSize * (logoRect.width / logoRect.height), logoHandoff);
+    const height = lerp(logoRect.height, targetSize, logoHandoff);
+    const x = lerp(logoRect.left, targetX, logoHandoff);
+    const y = lerp(logoRect.top, targetY, logoHandoff);
 
-    heroLayers.logo.classList.add('is-handing-off');
-    setLayer(heroLayers.logo, {
-      '--handoff-x': `${((targetCenterX - logoCenterX) * logoHandoff).toFixed(1)}px`,
-      '--handoff-y': `${((targetCenterY - logoCenterY) * logoHandoff).toFixed(1)}px`,
-      '--handoff-scale': lerp(1, targetScale, logoHandoff).toFixed(4),
+    heroLayers.logo.classList.add('is-flight-hidden');
+    nav.classList.remove('logo-docked');
+    logoFlight.classList.add('is-active');
+    Object.assign(logoFlight.style, {
+      width: `${width.toFixed(1)}px`,
+      height: `${height.toFixed(1)}px`,
+      transform: `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`,
     });
-  } else if (heroLayers.logo) {
-    heroLayers.logo.classList.remove('is-handing-off');
+  } else {
+    logoFlight.classList.remove('is-active');
+    if (heroLayers.logo) {
+      heroLayers.logo.classList.toggle('is-flight-hidden', isDocked);
+    }
   }
 
   if (heroCopy) heroCopy.style.setProperty('--hero-copy-opacity', copy.toFixed(3));
@@ -229,7 +357,8 @@ if (heroSequence && !reduceMotion && !sessionStorage.getItem('mvlHeroIntroSeen')
   window.setTimeout(() => {
     if (window.scrollY > window.innerHeight * 0.25) return;
     const start = window.scrollY;
-    const target = Math.max(0, Math.round(heroSequence.offsetHeight - window.innerHeight - 24));
+    const travel = heroSequence.offsetHeight - window.innerHeight;
+    const target = Math.max(0, Math.round(travel * 0.965));
     const duration = 1450;
     const startedAt = performance.now();
 

@@ -61,7 +61,7 @@ window.MVL_DATA = {
     {
       id: 'g3',
       day: 1,
-      court: 'Double Play',
+      court: 'Gameville Ball Park',
       startsAt: '2026-08-29T23:00:00+08:00',
       teamA: 'gremlins',
       teamB: 'ssvc',
@@ -93,7 +93,7 @@ window.MVL_DATA = {
     {
       id: 'g5',
       day: 2,
-      court: 'Double Play',
+      court: 'Gameville Ball Park',
       startsAt: '2026-08-30T22:00:00+08:00',
       teamA: 'metarice-x',
       teamB: 'thurstrap',
@@ -135,7 +135,7 @@ window.MVL_DATA = {
     {
       id: 'g8',
       day: 5,
-      court: 'Double Play',
+      court: 'Gameville Ball Park',
       startsAt: '2026-09-06T21:00:00+08:00',
       teamA: 'ssvc',
       teamB: 'up-leftout',

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Metarice Volleyball League 2026 — 3rd Annual Invitational</title>
-<meta name="description" content="MVL 2026 — 3rd Annual Invitational. Watch the livestream, browse the teams, and catch past games. Aug 29, 30, 31, Sep 5 & 6 at Gameville Ball Park and Double Play.">
+<meta name="description" content="MVL 2026 — 3rd Annual Invitational. Watch the livestream, browse the teams, and catch past games. Aug 29, 30, 31, Sep 5 & 6 at Gameville Ball Park.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -18,10 +18,10 @@
     <img class="nav-logo-img" src="assets/hero-mvl-2026-logo.png" alt="Metarice Volleyball League 2026">
   </a>
   <nav class="nav-links" aria-label="Primary">
-    <a href="#teams">Teams</a>
+    <a href="#schedule-preview">Schedule</a>
     <a href="#games">Videos</a>
-    <a href="schedule.html">Schedule</a>
-    <a href="rules.html">Rules</a>
+    <a href="#teams">Teams</a>
+    <a href="#rules-preview">Rules</a>
   </nav>
 </header>
 
@@ -101,13 +101,32 @@
   <div class="marquee-track" data-marquee></div>
 </div>
 
-<!-- ============ FOLD 02 · THE TEAMS ============ -->
-<section class="teams" id="teams">
+<!-- ============ FOLD 02 · SCHEDULE PREVIEW ============ -->
+<section class="schedule-preview" id="schedule-preview">
   <header class="section-head reveal">
-    <p class="section-kicker">The Squads</p>
-    <h2 class="section-title">The <em>Teams</em></h2>
+    <p class="section-kicker">Next Up</p>
+    <h2 class="section-title">Schedule <em>&amp; Standings</em></h2>
   </header>
-  <div class="teams-grid" id="teamsGrid"><!-- rendered by js --></div>
+
+  <div class="home-preview-grid">
+    <article class="preview-panel reveal">
+      <div class="preview-panel-head">
+        <p class="games-label">Match Day</p>
+        <h3 id="homeScheduleTitle">Upcoming Games</h3>
+      </div>
+      <div class="home-match-list" id="homeScheduleList"><!-- rendered by js --></div>
+    </article>
+
+    <article class="preview-panel reveal">
+      <div class="preview-panel-head">
+        <p class="games-label">Standings Preview</p>
+        <h3>Rank &amp; Wins</h3>
+      </div>
+      <div class="home-standings-list" id="homeStandingsList"><!-- rendered by js --></div>
+    </article>
+  </div>
+
+  <a class="section-link reveal" href="schedule.html">Full Schedule &amp; Standings</a>
 </section>
 
 <!-- ============ FOLD 03 · WATCH THE GAMES ============ -->
@@ -138,6 +157,52 @@
       <div class="past-grid past-grid--bottom" id="pastBottom"><!-- remaining 4, rendered by js --></div>
     </div>
   </div>
+</section>
+
+<!-- ============ FOLD 04 · THE TEAMS ============ -->
+<section class="teams" id="teams">
+  <header class="section-head reveal">
+    <p class="section-kicker">The Squads</p>
+    <h2 class="section-title">The <em>Teams</em></h2>
+  </header>
+  <div class="teams-grid" id="teamsGrid"><!-- rendered by js --></div>
+</section>
+
+<!-- ============ FOLD 05 · RULES PREVIEW ============ -->
+<section class="rules-preview" id="rules-preview">
+  <header class="section-head reveal">
+    <p class="section-kicker">Quick Version</p>
+    <h2 class="section-title">Rules <em>FAQ</em></h2>
+  </header>
+
+  <div class="rules-preview-list">
+    <details class="faq-item reveal">
+      <summary>What's the tournament format?</summary>
+      <p>Single round robin preliminaries, then seeded Quarter-Finals, Semi-Finals, Battle for Bronze, and the Championship. Rankings start with total wins, then set ratio, points ratio, and head-to-head.</p>
+    </details>
+
+    <details class="faq-item reveal">
+      <summary>How much is the entry fee and what does it include?</summary>
+      <p>₱3,500 per person, covering 2 jerseys, court fees for guaranteed games, raffle prizes, medals, staff, documentation, and promotion.</p>
+    </details>
+
+    <details class="faq-item reveal">
+      <summary>When and where are the games?</summary>
+      <p>August 29, 30, 31, September 5, and September 6 at Gameville Ball Park. Teams should be at the venue 30 minutes before their scheduled match.</p>
+    </details>
+
+    <details class="faq-item reveal">
+      <summary>How do matches work?</summary>
+      <p>Most matches are best of 3 sets: sets 1 and 2 to 25, deciding set to 15, always win by two. The Championship is best of 5.</p>
+    </details>
+
+    <details class="faq-item reveal">
+      <summary>What happens if we're late or short on players?</summary>
+      <p>There is a 5-minute grace period from scheduled start. Fielding 5 players or fewer is an automatic default.</p>
+    </details>
+  </div>
+
+  <a class="section-link reveal" href="rules.html">Full Rules</a>
 </section>
 
 <!-- ============ FOOTER ============ -->

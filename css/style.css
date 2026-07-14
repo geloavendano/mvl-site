@@ -206,9 +206,8 @@ img { display: block; max-width: 100%; }
   will-change: transform, opacity, filter;
   opacity: var(--layer-opacity, 0);
   transform:
-    translate3d(calc(var(--layer-x, 0px) + var(--handoff-x, 0px)), calc(var(--layer-y, 0px) + var(--handoff-y, 0px)), 0)
+    translate3d(var(--layer-x, 0px), var(--layer-y, 0px), 0)
     scale(var(--layer-scale, 1))
-    scale(var(--handoff-scale, 1))
     rotate(var(--layer-rotate, 0deg));
   filter: blur(var(--layer-blur, 0));
   transition: opacity .16s linear, transform .16s linear, filter .16s linear;
@@ -236,7 +235,19 @@ img { display: block; max-width: 100%; }
   transform-origin: center center;
   filter: drop-shadow(0 22px 42px rgba(4, 2, 20, .5)) blur(var(--layer-blur, 0));
 }
-.hero-mark.is-handing-off { z-index: 6; }
+.hero-mark.is-flight-hidden { opacity: 0 !important; }
+
+.logo-flight {
+  position: fixed;
+  inset: 0 auto auto 0;
+  z-index: 120;
+  max-width: none;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, width, height, opacity;
+  filter: drop-shadow(0 18px 36px rgba(4, 2, 20, .46));
+}
+.logo-flight.is-active { opacity: 1; }
 
 .hero-content {
   position: absolute;
@@ -418,6 +429,159 @@ img { display: block; max-width: 100%; }
 /* ==========================================================================
    Fold 02 · The Teams — compressed IDL-style preview cards
    ========================================================================== */
+.schedule-preview {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 92% 8%, rgba(45, 212, 191, .18), transparent 26%),
+    linear-gradient(180deg, #0b0730 0%, #16104a 100%);
+  padding-bottom: 48px;
+}
+.schedule-preview::before,
+.rules-preview::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(116deg, transparent 0 41%, rgba(124, 245, 180, .08) 41% 42%, transparent 42% 100%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, .035) 0 1px, transparent 1px 92px);
+  opacity: .52;
+}
+.schedule-preview .section-head,
+.rules-preview .section-head,
+.home-preview-grid,
+.rules-preview-list,
+.section-link {
+  position: relative;
+  z-index: 1;
+}
+.home-preview-grid {
+  display: grid;
+  gap: 14px;
+  padding: 24px 16px 0;
+}
+.preview-panel {
+  min-width: 0;
+  border: 1px solid rgba(124, 245, 180, .2);
+  background:
+    linear-gradient(135deg, rgba(8, 5, 34, .92), rgba(22, 16, 74, .78)),
+    rgba(255, 255, 255, .03);
+  box-shadow: 0 18px 38px rgba(4, 2, 20, .3);
+}
+.preview-panel-head {
+  padding: 18px 16px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, .08);
+}
+.preview-panel-head .games-label { margin-bottom: 8px; }
+.preview-panel h3 {
+  font-family: var(--stretch);
+  font-size: 28px;
+  line-height: .95;
+  text-transform: uppercase;
+  color: #fff;
+}
+.home-match-list,
+.home-standings-list {
+  display: grid;
+}
+.home-match {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, .08);
+}
+.home-match:last-child,
+.home-standing-row:last-child { border-bottom: 0; }
+.home-match h4 {
+  font-size: 14px;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+.home-match h4 span {
+  margin: 0 4px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--mint);
+}
+.home-match p {
+  margin-top: 4px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.home-match-time {
+  margin-top: 0 !important;
+  margin-bottom: 6px;
+  color: var(--teal) !important;
+}
+.home-status {
+  flex: 0 0 auto;
+  border: 1px solid rgba(124, 245, 180, .25);
+  padding: 7px 9px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--mint);
+}
+.home-status--final { color: #fff; border-color: rgba(255, 255, 255, .2); }
+.home-standing-row {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 44px;
+  gap: 10px;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, .08);
+  transition: background .15s ease, color .15s ease;
+}
+.home-standing-row:hover {
+  background: rgba(124, 245, 180, .08);
+  color: var(--mint);
+}
+.home-standing-row span,
+.home-standing-row em {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 1.2px;
+  color: var(--teal);
+  font-style: normal;
+}
+.home-standing-row strong {
+  min-width: 0;
+  font-size: 13px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.section-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(100% - 32px);
+  max-width: 380px;
+  min-height: 48px;
+  margin: 20px 16px 0;
+  border: 2px solid var(--mint);
+  color: var(--mint);
+  font-weight: 900;
+  font-size: 12px;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  transition: background .15s ease, color .15s ease, transform .15s ease;
+}
+.section-link:hover {
+  background: var(--mint);
+  color: var(--navy);
+  transform: translateY(-1px);
+}
+
 .teams {
   position: relative;
   min-height: 100svh;
@@ -701,6 +865,34 @@ img { display: block; max-width: 100%; }
   letter-spacing: 1px;
   text-transform: uppercase;
   color: var(--teal);
+}
+
+/* ==========================================================================
+   Fold 05 · Rules FAQ preview
+   ========================================================================== */
+.rules-preview {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 6% 12%, rgba(124, 58, 237, .22), transparent 28%),
+    linear-gradient(180deg, #050911 0%, #0b0730 100%);
+  padding-bottom: 52px;
+}
+.rules-preview-list {
+  display: grid;
+  gap: 12px;
+  padding: 24px 16px 0;
+}
+.rules-preview .faq-item {
+  margin: 0;
+  background: rgba(255, 255, 255, .045);
+  border-color: rgba(124, 245, 180, .18);
+}
+.rules-preview .faq-item summary {
+  font-size: 14px;
+}
+.rules-preview .faq-item p {
+  color: var(--ink-muted);
 }
 
 /* ==========================================================================
@@ -1106,6 +1298,33 @@ img { display: block; max-width: 100%; }
   .section-title { font-size: 72px; }
   .games .section-title { font-size: 64px; }
 
+  .schedule-preview,
+  .rules-preview {
+    padding-bottom: 80px;
+  }
+  .home-preview-grid {
+    grid-template-columns: minmax(0, 1.25fr) minmax(320px, .75fr);
+    gap: 24px;
+    padding: 34px 48px 0;
+  }
+  .preview-panel-head { padding: 22px 24px 16px; }
+  .preview-panel h3 { font-size: 38px; }
+  .home-match {
+    min-height: 86px;
+    padding: 18px 24px;
+  }
+  .home-match h4 { font-size: 17px; }
+  .home-standing-row {
+    min-height: 58px;
+    padding: 0 24px;
+    grid-template-columns: 52px minmax(0, 1fr) 52px;
+  }
+  .home-standing-row strong { font-size: 15px; }
+  .section-link {
+    width: 360px;
+    margin: 28px 48px 0;
+  }
+
   .teams { padding-bottom: 34px; }
   .teams .section-head {
     padding-top: 48px;
@@ -1159,6 +1378,13 @@ img { display: block; max-width: 100%; }
   .video-title { font-size: 12px; }
   .video-meta { font-size: 10px; }
   .video-thumb { border-radius: 12px; }
+
+  .rules-preview-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    padding: 34px 48px 0;
+  }
+  .rules-preview .faq-item summary { min-height: 64px; }
 
   .footer-bar { padding: 22px 48px; }
   .footer-logo { font-size: 22px; }
