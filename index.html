@@ -25,28 +25,32 @@
   </nav>
 </header>
 
-<!-- ============ FOLD 01 · HERO (full-bleed) ============ -->
-<section class="hero" id="hero">
-  <!-- PLACEHOLDER: swap for landscape hero photo or muted autoplay <video> -->
-  <img class="hero-bg" src="assets/mvl-kv.png" alt="" aria-hidden="true">
-  <div class="hero-scrim" aria-hidden="true"></div>
+<!-- ============ FOLD 01 · HERO (scroll-built intro) ============ -->
+<section class="hero hero-sequence" id="hero" data-hero-sequence>
+  <div class="hero-pin">
+    <video class="hero-bg-video" autoplay muted loop playsinline preload="metadata" poster="assets/mvl-kv.png" aria-hidden="true">
+      <source src="assets/mvl-video-1-web-10s.mp4" type="video/mp4">
+    </video>
+    <div class="hero-scrim" aria-hidden="true"></div>
 
-  <div class="hero-content">
-    <p class="hero-kicker">Ricing up the game like never before
-      <span class="hero-kicker-ext"> · 3rd Annual Invitational · Aug 29–31 · Sep 5–6</span>
-    </p>
-    <h1 class="hero-logo" id="heroLogo">
-      <span class="hero-logo-mark">MVL</span>
-      <span class="hero-logo-year">2026</span>
-    </h1>
-    <p class="hero-sub">Metarice Volleyball League · Gameville Ball Park &amp; Double Play</p>
+    <div class="hero-stage" aria-hidden="true">
+      <img class="hero-layer hero-rays" data-hero-layer="rays" src="assets/hero-starburst-rays.png" alt="">
+      <img class="hero-layer hero-star" data-hero-layer="star" src="assets/hero-main-star.png" alt="">
+      <img class="hero-layer hero-player" data-hero-layer="player" src="assets/hero-player.png" alt="">
+      <img class="hero-layer hero-mark" data-hero-layer="logo" src="assets/hero-mvl-2026-logo.png" alt="">
+    </div>
 
-    <div class="hero-ctas">
-      <a class="cta cta--primary" href="#" data-livestream-link>
-        <span class="live-dot" aria-hidden="true"></span> Watch the Livestream
-      </a>
-      <a class="cta cta--secondary" href="#" data-todo="raffle link">Register for the Raffle</a>
-      <a class="cta cta--tertiary" href="schedule.html">Game Schedule &amp; Standings</a>
+    <div class="hero-content" data-hero-copy>
+      <p class="hero-kicker">3rd Annual Invitational <span class="hero-kicker-ext"> · Aug 29–31 · Sep 5–6</span></p>
+      <p class="hero-sub">Metarice Volleyball League · Gameville Ball Park &amp; Double Play</p>
+
+      <div class="hero-ctas">
+        <a class="cta cta--primary" href="#" data-livestream-link>
+          <span class="live-dot" aria-hidden="true"></span> Watch the Livestream
+        </a>
+        <a class="cta cta--secondary" href="#" data-todo="raffle link">Register for the Raffle</a>
+        <a class="cta cta--tertiary" href="schedule.html">Game Schedule &amp; Standings</a>
+      </div>
     </div>
   </div>
 </section>

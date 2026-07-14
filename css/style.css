@@ -23,6 +23,7 @@
 
   /* type */
   --display: 'Anton', 'Arial Narrow', sans-serif;
+  --stretch: 'Stretch Sans', 'Anton', 'Arial Narrow', sans-serif;
   --ui: 'Archivo', system-ui, sans-serif;
   --mono: ui-monospace, 'SF Mono', Menlo, monospace;
 
@@ -138,41 +139,114 @@ img { display: block; max-width: 100%; }
 }
 .nav-links a:hover { color: var(--mint); border-bottom-color: var(--mint); }
 
+/* Add a licensed Stretch Sans webfont here when available.
+@font-face {
+  font-family: 'Stretch Sans';
+  src: url('../assets/fonts/stretch-sans.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+*/
+
 /* ==========================================================================
-   Fold 01 · Hero — full-bleed
+   Fold 01 · Hero — scroll-built intro
    ========================================================================== */
 .hero {
   position: relative;
+  height: 340svh;
+  min-height: 1680px;
+  background: #05030f;
+}
+.hero-pin {
+  position: absolute;
+  inset: 0 0 auto 0;
   height: 100svh;
   min-height: 560px;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
 }
-.hero-bg {
+.hero-is-pinned .hero-pin {
+  position: fixed;
+  z-index: 1;
+}
+.hero-is-done .hero-pin {
+  position: absolute;
+  inset: auto 0 0 0;
+}
+.hero-bg-video {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 22%;
+  object-position: center center;
 }
 .hero-scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg,
-    rgba(16, 10, 50, .35) 0%,
-    transparent 26%,
-    rgba(18, 12, 58, .55) 62%,
-    rgba(16, 10, 50, .96) 90%);
+  background:
+    radial-gradient(circle at 50% 46%, rgba(124, 245, 180, .16), transparent 30%),
+    linear-gradient(180deg, rgba(5, 3, 15, .3) 0%, rgba(5, 3, 15, .18) 42%, rgba(5, 3, 15, .88) 100%);
+}
+
+.hero-stage {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  perspective: 1000px;
+}
+.hero-layer {
+  position: absolute;
+  max-width: none;
+  user-select: none;
+  will-change: transform, opacity, filter;
+  opacity: var(--layer-opacity, 0);
+  transform:
+    translate3d(var(--layer-x, 0), var(--layer-y, 0), 0)
+    scale(var(--layer-scale, 1))
+    rotate(var(--layer-rotate, 0deg));
+  filter: blur(var(--layer-blur, 0));
+  transition: opacity .16s linear, transform .16s linear, filter .16s linear;
+}
+.hero-rays {
+  width: max(112vw, 112svh);
+  height: max(104vw, 104svh);
+  object-fit: cover;
+  mix-blend-mode: screen;
+}
+.hero-star {
+  width: clamp(330px, 78vw, 940px);
+  filter: drop-shadow(0 24px 60px rgba(4, 2, 20, .38)) blur(var(--layer-blur, 0));
+}
+.hero-player {
+  width: clamp(300px, 62vw, 700px);
+  transform-origin: center bottom;
+  filter: drop-shadow(0 26px 42px rgba(0, 0, 0, .48)) blur(var(--layer-blur, 0));
+}
+.hero-mark {
+  width: clamp(220px, 62vw, 580px);
+  transform-origin: center center;
+  filter: drop-shadow(0 22px 42px rgba(4, 2, 20, .5)) blur(var(--layer-blur, 0));
 }
 
 .hero-content {
-  position: relative;
-  width: 100%;
-  padding: 0 18px 26px;
+  position: absolute;
+  inset: auto 16px max(18px, env(safe-area-inset-bottom)) 16px;
+  z-index: 4;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  opacity: var(--hero-copy-opacity, 0);
+  transform: translateY(calc((1 - var(--hero-copy-opacity, 0)) * 24px));
+  transition: opacity .16s linear, transform .16s linear;
 }
 .hero-kicker {
+  font-family: var(--stretch);
   font-weight: 700;
   font-size: 10px;
   letter-spacing: 2.4px;
@@ -182,24 +256,6 @@ img { display: block; max-width: 100%; }
 }
 .hero-kicker-ext { display: none; }
 
-.hero-logo {
-  font-family: var(--display);
-  font-style: italic;
-  text-transform: uppercase;
-  line-height: .92;
-  font-size: 76px;
-  letter-spacing: 1px;
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  text-shadow: 0 6px 40px rgba(4, 2, 20, .55);
-}
-.hero-logo-mark { color: #fff; }
-.hero-logo-year {
-  font-size: .42em;
-  color: var(--mint);
-  -webkit-text-stroke: 0;
-}
 .hero-sub {
   margin-top: 8px;
   font-size: 11px;
@@ -305,7 +361,7 @@ img { display: block; max-width: 100%; }
 }
 .section-kicker--teal { color: var(--teal); }
 .section-title {
-  font-family: var(--display);
+  font-family: var(--stretch);
   font-style: italic;
   text-transform: uppercase;
   font-size: 46px;
@@ -432,7 +488,7 @@ img { display: block; max-width: 100%; }
   margin-bottom: 38px;
 }
 .team-card-name {
-  font-family: var(--display);
+  font-family: var(--stretch);
   text-transform: uppercase;
   font-size: clamp(31px, 9vw, 46px);
   line-height: .92;
@@ -679,7 +735,7 @@ img { display: block; max-width: 100%; }
   border-bottom: 1px solid rgba(255, 255, 255, .08);
 }
 .schedule-section-head h2 {
-  font-family: var(--display);
+  font-family: var(--stretch);
   font-style: italic;
   font-size: 34px;
   line-height: 1;
@@ -942,11 +998,20 @@ img { display: block; max-width: 100%; }
   .nav-links { gap: 32px; }
   .nav-links a { font-size: 12px; letter-spacing: 2px; }
 
-  .hero { height: 92vh; min-height: 640px; }
-  .hero-content { padding: 0 48px 48px; }
+  .hero { height: 340svh; min-height: 2160px; }
+  .hero-pin { min-height: 640px; }
+  .hero-rays {
+    width: max(104vw, 112svh);
+    height: max(98vw, 106svh);
+  }
+  .hero-star { width: clamp(640px, 66vw, 980px); }
+  .hero-player { width: clamp(520px, 42vw, 720px); }
+  .hero-mark {
+    width: clamp(380px, 35vw, 560px);
+  }
+  .hero-content { inset: auto 48px 48px 48px; }
   .hero-kicker { font-size: 13px; letter-spacing: 3.2px; }
   .hero-kicker-ext { display: inline; }
-  .hero-logo { font-size: 132px; }
   .hero-sub { font-size: 13px; }
   .hero-ctas { flex-direction: row; margin-top: 26px; }
   .cta { padding: 18px 30px; font-size: 15px; }
@@ -1302,7 +1367,7 @@ img { display: block; max-width: 100%; }
   padding: 20px 18px 8px;
 }
 .faq-panel > h2 {
-  font-family: var(--display);
+  font-family: var(--stretch);
   font-style: italic;
   text-transform: uppercase;
   font-size: 22px;
@@ -1361,7 +1426,7 @@ img { display: block; max-width: 100%; }
   margin-bottom: 4px;
 }
 .rules-body h2 {
-  font-family: var(--display);
+  font-family: var(--stretch);
   font-style: italic;
   text-transform: uppercase;
   font-size: 27px;
@@ -1470,7 +1535,7 @@ img { display: block; max-width: 100%; }
 .release-copy p + p { margin-top: 10px; }
 .waiver-copy h2 {
   margin-top: 22px;
-  font-family: var(--display);
+  font-family: var(--stretch);
   font-style: italic;
   font-size: 28px;
   line-height: 1;
@@ -1492,7 +1557,7 @@ img { display: block; max-width: 100%; }
   border-bottom: 1px solid rgba(255, 255, 255, .08);
 }
 .form-panel-head h2 {
-  font-family: var(--display);
+  font-family: var(--stretch);
   font-style: italic;
   font-size: 31px;
   line-height: 1;

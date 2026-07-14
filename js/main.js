@@ -94,6 +94,117 @@ new IntersectionObserver(([entry]) => {
   threshold: 0,
 }).observe(hero);
 
+// ---- hero: scroll-built intro ----------------------------------------------
+const heroSequence = document.querySelector('[data-hero-sequence]');
+const heroLayers = {
+  rays: document.querySelector('[data-hero-layer="rays"]'),
+  star: document.querySelector('[data-hero-layer="star"]'),
+  player: document.querySelector('[data-hero-layer="player"]'),
+  logo: document.querySelector('[data-hero-layer="logo"]'),
+};
+const heroCopy = document.querySelector('[data-hero-copy]');
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
+const progressBetween = (value, start, end) => clamp((value - start) / (end - start));
+const easeOut = (value) => 1 - Math.pow(1 - value, 3);
+const lerp = (from, to, progress) => from + (to - from) * progress;
+
+const setLayer = (layer, values) => {
+  if (!layer) return;
+  Object.entries(values).forEach(([key, value]) => {
+    layer.style.setProperty(key, value);
+  });
+};
+
+const updateHeroSequence = () => {
+  if (!heroSequence) return;
+
+  if (reduceMotion) {
+    Object.values(heroLayers).forEach((layer) => setLayer(layer, {
+      '--layer-opacity': 1,
+      '--layer-x': '0px',
+      '--layer-y': '0px',
+      '--layer-scale': 1,
+      '--layer-rotate': '0deg',
+      '--layer-blur': '0px',
+    }));
+    if (heroCopy) heroCopy.style.setProperty('--hero-copy-opacity', 1);
+    return;
+  }
+
+  const rect = heroSequence.getBoundingClientRect();
+  const travel = heroSequence.offsetHeight - window.innerHeight;
+  const progress = travel > 0 ? clamp(-rect.top / travel) : 1;
+  const isPinned = rect.top <= 0 && rect.bottom > window.innerHeight;
+  heroSequence.classList.toggle('hero-is-pinned', isPinned);
+  heroSequence.classList.toggle('hero-is-done', rect.bottom <= window.innerHeight);
+
+  const rays = easeOut(progressBetween(progress, 0.02, 0.22));
+  const star = easeOut(progressBetween(progress, 0.18, 0.42));
+  const player = easeOut(progressBetween(progress, 0.38, 0.66));
+  const logo = easeOut(progressBetween(progress, 0.62, 0.84));
+  const copy = easeOut(progressBetween(progress, 0.78, 0.96));
+
+  setLayer(heroLayers.rays, {
+    '--layer-opacity': rays,
+    '--layer-x': `${lerp(-34, 0, rays).toFixed(1)}px`,
+    '--layer-y': `${lerp(20, 0, rays).toFixed(1)}px`,
+    '--layer-scale': lerp(1.16, 1, rays).toFixed(3),
+    '--layer-rotate': `${lerp(-10, 0, rays).toFixed(2)}deg`,
+    '--layer-blur': `${lerp(10, 0, rays).toFixed(1)}px`,
+  });
+  setLayer(heroLayers.star, {
+    '--layer-opacity': star,
+    '--layer-x': `${lerp(44, 0, star).toFixed(1)}px`,
+    '--layer-y': `${lerp(58, 0, star).toFixed(1)}px`,
+    '--layer-scale': lerp(.72, 1, star).toFixed(3),
+    '--layer-rotate': `${lerp(8, 0, star).toFixed(2)}deg`,
+    '--layer-blur': `${lerp(12, 0, star).toFixed(1)}px`,
+  });
+  setLayer(heroLayers.player, {
+    '--layer-opacity': player,
+    '--layer-x': `${lerp(-44, 0, player).toFixed(1)}px`,
+    '--layer-y': `${lerp(92, 0, player).toFixed(1)}px`,
+    '--layer-scale': lerp(.82, 1, player).toFixed(3),
+    '--layer-rotate': `${lerp(-6, 0, player).toFixed(2)}deg`,
+    '--layer-blur': `${lerp(10, 0, player).toFixed(1)}px`,
+  });
+  setLayer(heroLayers.logo, {
+    '--layer-opacity': logo,
+    '--layer-x': `${lerp(0, 0, logo).toFixed(1)}px`,
+    '--layer-y': `${lerp(-42, 0, logo).toFixed(1)}px`,
+    '--layer-scale': lerp(.78, 1, logo).toFixed(3),
+    '--layer-rotate': `${lerp(4, 0, logo).toFixed(2)}deg`,
+    '--layer-blur': `${lerp(8, 0, logo).toFixed(1)}px`,
+  });
+  if (heroCopy) heroCopy.style.setProperty('--hero-copy-opacity', copy.toFixed(3));
+};
+
+let heroRaf = 0;
+const requestHeroUpdate = () => {
+  if (heroRaf) return;
+  heroRaf = requestAnimationFrame(() => {
+    heroRaf = 0;
+    updateHeroSequence();
+  });
+};
+
+window.addEventListener('scroll', requestHeroUpdate, { passive: true });
+window.addEventListener('resize', requestHeroUpdate);
+updateHeroSequence();
+
+if (heroSequence && !reduceMotion && !sessionStorage.getItem('mvlHeroIntroSeen')) {
+  sessionStorage.setItem('mvlHeroIntroSeen', 'true');
+  window.setTimeout(() => {
+    if (window.scrollY > 8) return;
+    window.scrollTo({
+      top: Math.max(0, Math.round(heroSequence.offsetHeight - window.innerHeight - 24)),
+      behavior: 'smooth',
+    });
+  }, 650);
+}
+
 // ---- scroll-triggered reveals (animate once) --------------------------------
 const revealObserver = new IntersectionObserver((entries) => {
   entries.forEach((entry) => {
