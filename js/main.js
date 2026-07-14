@@ -214,6 +214,90 @@ document.querySelectorAll('[data-marquee]').forEach((track) => {
   track.innerHTML = sponsorMarkup + sponsorMarkup;
 });
 
+// auto-advancing scroll container: users can swipe (touch) or drag (mouse)
+// through the sponsors; the loop wraps seamlessly on the duplicated half.
+const marqueeReduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const setupMarquee = (marquee) => {
+  const track = marquee.querySelector('[data-marquee]');
+  if (!track) return;
+  marquee.querySelectorAll('img').forEach((img) => { img.draggable = false; });
+
+  let paused = false;
+  let resumeTimer = 0;
+  const pause = () => {
+    paused = true;
+    window.clearTimeout(resumeTimer);
+  };
+  const resumeSoon = () => {
+    window.clearTimeout(resumeTimer);
+    resumeTimer = window.setTimeout(() => { paused = false; }, 2200);
+  };
+
+  // mouse drag-to-scroll (touch gets native swipe from overflow-x: auto)
+  let dragging = false;
+  let dragStartX = 0;
+  let dragStartScroll = 0;
+  marquee.addEventListener('pointerdown', (e) => {
+    pause();
+    if (e.pointerType !== 'mouse') return;
+    dragging = true;
+    dragStartX = e.clientX;
+    dragStartScroll = marquee.scrollLeft;
+    marquee.classList.add('is-dragging');
+    marquee.setPointerCapture(e.pointerId);
+  });
+  marquee.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    marquee.scrollLeft = dragStartScroll - (e.clientX - dragStartX);
+  });
+  const endDrag = () => {
+    dragging = false;
+    marquee.classList.remove('is-dragging');
+    resumeSoon();
+  };
+  marquee.addEventListener('pointerup', endDrag);
+  marquee.addEventListener('pointercancel', endDrag);
+  marquee.addEventListener('mouseenter', pause);
+  marquee.addEventListener('mouseleave', () => { if (!dragging) resumeSoon(); });
+  marquee.addEventListener('touchend', resumeSoon, { passive: true });
+  marquee.addEventListener('wheel', () => { pause(); resumeSoon(); }, { passive: true });
+
+  // position accumulates in JS (scrollLeft readback rounds to device pixels,
+  // which would stall sub-pixel advances); only written while auto-advancing.
+  // speed is time-based so it's identical on 60Hz and 120Hz displays.
+  const SPEED = 36; // px per second
+  let pos = 0;
+  let lastTime = 0;
+  const tick = (now) => {
+    const dt = lastTime ? Math.min((now - lastTime) / 1000, .1) : 0;
+    lastTime = now;
+    const half = track.scrollWidth / 2;
+    if (half > 0) {
+      if (paused) {
+        // follow the user's swipe/drag; wrap on the duplicated half
+        pos = marquee.scrollLeft;
+        if (pos >= half) {
+          pos -= half;
+          marquee.scrollLeft = pos;
+          if (dragging) dragStartScroll -= half;
+        } else if (pos < 1 && !dragging) {
+          pos += half;
+          marquee.scrollLeft = pos;
+        }
+      } else if (!marqueeReduceMotion) {
+        pos += SPEED * dt;
+        if (pos >= half) pos -= half;
+        marquee.scrollLeft = pos;
+      }
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+};
+
+document.querySelectorAll('.marquee').forEach(setupMarquee);
+
 // ---- live state -------------------------------------------------------------
 if (!isLive) {
   document.querySelectorAll('.live-dot').forEach((d) => { d.style.animation = 'none'; d.style.opacity = '.35'; });
@@ -364,8 +448,8 @@ window.addEventListener('scroll', requestHeroUpdate, { passive: true });
 window.addEventListener('resize', requestHeroUpdate);
 updateHeroSequence();
 
-if (heroSequence && !reduceMotion && !sessionStorage.getItem('mvlHeroIntroSeen')) {
-  sessionStorage.setItem('mvlHeroIntroSeen', 'true');
+// intro auto-scroll runs on EVERY page load (client request), not just the first visit
+if (heroSequence && !reduceMotion) {
   window.setTimeout(() => {
     if (window.scrollY > window.innerHeight * 0.25) return;
     const start = window.scrollY;

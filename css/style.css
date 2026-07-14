@@ -291,26 +291,40 @@ img { display: block; max-width: 100%; }
   transform: translateY(calc((1 - var(--hero-copy-opacity, 0)) * 24px));
   transition: opacity .16s linear, transform .16s linear;
 }
+/* soft dark halo so the kicker/dates stay legible over the bright video */
+.hero-content::before {
+  content: '';
+  position: absolute;
+  inset: -34px -10px -14px;
+  z-index: -1;
+  background: radial-gradient(ellipse 62% 78% at 50% 46%,
+    rgba(5, 3, 24, .78) 0%,
+    rgba(5, 3, 24, .5) 48%,
+    transparent 74%);
+  filter: blur(14px);
+  pointer-events: none;
+}
 .hero-kicker {
   font-family: var(--stretch);
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 2.8px;
+  font-weight: 900;
+  font-size: 19px;
+  letter-spacing: 3.2px;
   text-transform: uppercase;
   color: var(--mint);
   margin-bottom: 7px;
+  text-shadow: 0 2px 14px rgba(4, 2, 20, .85);
 }
 .hero-kicker-ext { display: none; }
 
 .hero-schedule {
   font-family: var(--stretch);
-  font-size: 13px;
+  font-size: 17px;
   font-weight: 900;
-  letter-spacing: 2px;
+  letter-spacing: 2.4px;
   line-height: 1.25;
   text-transform: uppercase;
   color: #fff;
-  text-shadow: 0 4px 24px rgba(4, 2, 20, .7);
+  text-shadow: 0 2px 12px rgba(4, 2, 20, .9), 0 4px 26px rgba(4, 2, 20, .7);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -403,21 +417,26 @@ img { display: block; max-width: 100%; }
 /* ==========================================================================
    Sponsor marquee
    ========================================================================== */
+/* swipeable: a real scroll container auto-advanced by JS (see setupMarquee) */
 .marquee {
-  overflow: hidden;
+  overflow-x: auto;
+  scrollbar-width: none;
   background: var(--navy-deep);
   border-top: 1px solid rgba(124, 245, 180, .2);
   border-bottom: 1px solid rgba(124, 245, 180, .2);
   padding: 14px 0;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
 }
+.marquee::-webkit-scrollbar { display: none; }
+.marquee.is-dragging { cursor: grabbing; }
 .marquee-track {
   display: flex;
   align-items: center;
   gap: 20px;
   width: max-content;
-  animation: marquee 42s linear infinite;
 }
-.marquee:hover .marquee-track { animation-play-state: paused; }
 .marquee-item {
   display: inline-flex;
   align-items: center;
@@ -477,14 +496,31 @@ img { display: block; max-width: 100%; }
   max-width: 132px;
   max-height: 30px;
 }
-@keyframes marquee {
-  to { transform: translateX(-50%); }
-}
 
 /* ==========================================================================
    Section headers
    ========================================================================== */
-.section-head { padding: 44px 16px 0; }
+.section-head {
+  padding: 44px 16px 0;
+  position: relative;
+}
+/* KV gradient-oval motif tucked behind each section header */
+.section-head::before {
+  content: '';
+  position: absolute;
+  z-index: -1; /* behind the fold's content, above the section background */
+  top: 18px;
+  left: -74px;
+  width: 268px;
+  height: 104px;
+  border-radius: 50%;
+  background: linear-gradient(112deg, #6C4CF5 4%, #4A6FE8 46%, #35D3B8 96%);
+  transform: rotate(-16deg);
+  opacity: .85;
+  filter: blur(1px);
+  pointer-events: none;
+}
+.section-title { position: relative; z-index: 1; }
 .section-kicker {
   font-weight: 700;
   font-size: 10.5px;
@@ -516,8 +552,7 @@ img { display: block; max-width: 100%; }
     linear-gradient(180deg, #0b0730 0%, #16104a 100%);
   padding-bottom: 48px;
 }
-.schedule-preview::before,
-.rules-preview::before {
+.schedule-preview::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -673,10 +708,19 @@ img { display: block; max-width: 100%; }
   position: absolute;
   inset: 0;
   pointer-events: none;
+  /* space field: scattered stars + faint diagonal star-streaks (jersey motif) */
   background:
-    linear-gradient(115deg, transparent 0 45%, rgba(124, 245, 180, .08) 45% 46%, transparent 46% 100%),
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, .04) 0 1px, transparent 1px 82px);
-  opacity: .45;
+    radial-gradient(circle 1px at 18% 14%, rgba(255, 255, 255, .5) 0 1px, transparent 1.6px),
+    radial-gradient(circle 1px at 71% 32%, rgba(255, 255, 255, .38) 0 1px, transparent 1.6px),
+    radial-gradient(circle 1.4px at 44% 58%, rgba(255, 255, 255, .3) 0 1.4px, transparent 2px),
+    radial-gradient(circle 1px at 88% 74%, rgba(255, 255, 255, .42) 0 1px, transparent 1.6px),
+    radial-gradient(circle 1px at 8% 86%, rgba(255, 255, 255, .3) 0 1px, transparent 1.6px),
+    repeating-linear-gradient(115deg,
+      transparent 0 54px, rgba(255, 255, 255, .05) 54px 55.5px,
+      transparent 55.5px 132px, rgba(255, 255, 255, .03) 132px 134px, transparent 134px 210px);
+  background-size:
+    340px 300px, 420px 360px, 500px 420px, 380px 340px, 460px 400px, auto;
+  opacity: .8;
 }
 .teams .section-head {
   position: relative;
@@ -700,30 +744,43 @@ img { display: block; max-width: 100%; }
   overflow: hidden;
   isolation: isolate;
   border: 1px solid rgba(185, 235, 255, .22);
+  /* full-bleed team gradient, darkened on the left for the name (jersey look) */
   background:
-    linear-gradient(105deg, rgba(4, 9, 15, .96) 0 39%, rgba(4, 9, 15, .42) 39% 100%),
-    linear-gradient(135deg, var(--team-a), var(--team-b));
+    linear-gradient(100deg, rgba(4, 9, 15, .82) 0 26%, rgba(4, 9, 15, .3) 48%, transparent 66%),
+    linear-gradient(135deg, color-mix(in srgb, var(--team-b) 78%, #04090F), var(--team-a) 52%, var(--team-b));
   box-shadow: 0 16px 34px rgba(0, 0, 0, .26);
   transition: border-color .16s ease, transform .16s ease, box-shadow .16s ease;
 }
+/* starfield dots */
 .team-card::before {
   content: '';
   position: absolute;
   inset: 0;
-  z-index: -1;
-  background: linear-gradient(135deg, var(--team-a), var(--team-b));
-  clip-path: polygon(54% 0, 100% 0, 100% 100%, 39% 100%);
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle 1px at 22% 24%, rgba(255, 255, 255, .85) 0 1px, transparent 1.7px),
+    radial-gradient(circle 1.3px at 64% 12%, rgba(255, 255, 255, .6) 0 1.3px, transparent 2px),
+    radial-gradient(circle 1px at 47% 70%, rgba(255, 255, 255, .65) 0 1px, transparent 1.7px),
+    radial-gradient(circle 1px at 84% 46%, rgba(255, 255, 255, .5) 0 1px, transparent 1.7px),
+    radial-gradient(circle 1.4px at 8% 78%, rgba(255, 255, 255, .55) 0 1.4px, transparent 2.1px);
+  background-size: 150px 120px, 190px 150px, 170px 140px, 210px 160px, 230px 170px;
 }
+/* diagonal star-streak rain + team-color top bar */
 .team-card::after {
   content: '';
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 0;
   pointer-events: none;
   background:
     linear-gradient(180deg, var(--team-a) 0 4px, transparent 4px 100%),
-    linear-gradient(90deg, rgba(4, 9, 15, .9) 0%, rgba(4, 9, 15, .58) 37%, transparent 66%),
-    linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, .22) 100%);
+    repeating-linear-gradient(115deg,
+      transparent 0 18px, rgba(255, 255, 255, .16) 18px 19.5px,
+      transparent 19.5px 44px, rgba(255, 255, 255, .07) 44px 46.5px,
+      transparent 46.5px 78px, rgba(255, 255, 255, .11) 78px 79px,
+      transparent 79px 118px),
+    linear-gradient(180deg, transparent 55%, rgba(0, 0, 0, .28) 100%);
 }
 .team-card:hover {
   border-color: rgba(124, 245, 180, .58);
@@ -731,40 +788,36 @@ img { display: block; max-width: 100%; }
   transform: translateY(-2px);
 }
 
+/* captain cutout — big, on top, nothing overlapping it */
 .team-card-photo {
   position: absolute;
-  inset: -36px -8px -26px 42%;
-  z-index: 0;
+  inset: -44px -4px -30px 34%;
+  z-index: 2;
   background-image: url('../assets/hero-player.png');
   background-position: right center;
   background-repeat: no-repeat;
   background-size: contain;
-  filter: saturate(1.1) contrast(1.05) drop-shadow(0 16px 28px rgba(0, 0, 0, .44));
+  filter: saturate(1.1) contrast(1.05) drop-shadow(0 16px 30px rgba(0, 0, 0, .5));
   mix-blend-mode: normal;
-  opacity: .9;
-}
-.team-card-photo::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, rgba(4, 9, 15, .78), transparent 42%);
+  opacity: 1;
+  pointer-events: none;
 }
 
+/* lens-flare sparkle + one bright beam (jersey motif) */
 .team-card-shards {
   position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
   background:
-    linear-gradient(112deg, transparent 0 53%, rgba(255, 255, 255, .18) 53% 57%, transparent 57% 100%),
-    linear-gradient(112deg, transparent 0 68%, color-mix(in srgb, var(--team-a) 72%, #fff) 68% 74%, transparent 74% 100%),
-    linear-gradient(112deg, transparent 0 81%, rgba(0, 0, 0, .32) 81% 88%, transparent 88% 100%);
-  mix-blend-mode: normal;
+    radial-gradient(circle at 13% 84%, rgba(255, 255, 255, .75) 0 2px, rgba(255, 255, 255, .28) 3%, transparent 9%),
+    linear-gradient(115deg, transparent 0 58%, rgba(255, 255, 255, .22) 58% 60.5%, transparent 60.5% 100%);
+  mix-blend-mode: screen;
 }
 
 .team-card-copy {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   width: 64%;
   min-height: 112px;
   display: flex;
@@ -916,29 +969,38 @@ img { display: block; max-width: 100%; }
 /* ==========================================================================
    Fold 05 · Rules FAQ preview
    ========================================================================== */
+/* echoes the rules page: flat deep navy + one bordered mint panel */
 .rules-preview {
   position: relative;
   overflow: hidden;
   background:
-    radial-gradient(circle at 6% 12%, rgba(124, 58, 237, .22), transparent 28%),
-    linear-gradient(180deg, #050911 0%, #0b0730 100%);
+    radial-gradient(ellipse 60% 40% at 88% 0%, rgba(124, 58, 237, .28), transparent 70%),
+    #0B0730;
   padding-bottom: 52px;
 }
 .rules-preview-list {
-  display: grid;
-  gap: 12px;
-  padding: 24px 16px 0;
+  display: block;
+  margin: 24px 16px 0;
+  border: 1px solid rgba(124, 245, 180, .28);
+  background: rgba(11, 7, 48, .55);
+  border-radius: 14px;
+  padding: 8px 18px;
 }
 .rules-preview .faq-item {
   margin: 0;
-  background: rgba(255, 255, 255, .045);
-  border-color: rgba(124, 245, 180, .18);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, .1);
 }
+.rules-preview .faq-item:last-of-type { border-bottom: 0; }
 .rules-preview .faq-item summary {
   font-size: 14px;
+  padding-left: 0;
 }
+.rules-preview .faq-item summary::after { right: 4px; }
 .rules-preview .faq-item p {
   color: var(--ink-muted);
+  padding-left: 0;
 }
 
 /* ==========================================================================
@@ -1301,7 +1363,6 @@ img { display: block; max-width: 100%; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .reveal { opacity: 1; transform: none; transition: none; }
-  .marquee-track { animation: none; }
   .games-bg img { animation: none; }
   .live-dot { animation: none; }
   .nav-logo { transition: none; }
@@ -1360,9 +1421,9 @@ img { display: block; max-width: 100%; }
     translate: 0 -3svh;
   }
   .hero-content { inset: auto 48px 48px 48px; }
-  .hero-kicker { font-size: 22px; letter-spacing: 4px; }
-  .hero-schedule { font-size: 18px; letter-spacing: 3px; }
-  .hero-sub { font-size: 13px; }
+  .hero-kicker { font-size: 27px; letter-spacing: 4.4px; }
+  .hero-schedule { font-size: 22px; letter-spacing: 3.4px; }
+  .hero-sub { font-size: 14px; }
   .hero-ctas {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1372,7 +1433,7 @@ img { display: block; max-width: 100%; }
   .cta { min-height: 56px; padding: 15px 18px; font-size: 13px; }
 
   .marquee { padding: 18px 0; }
-  .marquee-track { animation-duration: 52s; gap: 28px; }
+  .marquee-track { gap: 28px; }
   .marquee-item { font-size: 13px; letter-spacing: 3px; }
   .marquee-tier {
     min-height: 46px;
@@ -1389,6 +1450,12 @@ img { display: block; max-width: 100%; }
   }
 
   .section-head { padding: 64px 48px 0; }
+  .section-head::before {
+    top: 30px;
+    left: -96px;
+    width: 430px;
+    height: 158px;
+  }
   .section-title { font-size: 72px; }
   .games .section-title { font-size: 64px; }
 
@@ -1437,7 +1504,7 @@ img { display: block; max-width: 100%; }
   }
   .team-card-name { font-size: clamp(48px, 4.7vw, 82px); }
   .team-card-photo {
-    inset: -46px -8px -34px 43%;
+    inset: -54px -4px -38px 36%;
   }
 
   .games-bg { inset: -40px; }
@@ -1469,11 +1536,10 @@ img { display: block; max-width: 100%; }
   .video-thumb { border-radius: 12px; }
 
   .rules-preview-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
-    padding: 34px 48px 0;
+    margin: 34px 48px 0; /* full width, aligned with the other folds' 48px gutters */
+    padding: 12px 26px;
   }
-  .rules-preview .faq-item summary { min-height: 64px; }
+  .rules-preview .faq-item summary { font-size: 14.5px; }
 
   .footer-bar { padding: 22px 48px; }
   .footer-logo { font-size: 22px; }
