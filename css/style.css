@@ -221,15 +221,18 @@ img { display: block; max-width: 100%; }
 }
 .hero-star {
   width: clamp(330px, 78vw, 940px);
+  translate: 0 -8svh;
   filter: drop-shadow(0 24px 60px rgba(4, 2, 20, .38)) blur(var(--layer-blur, 0));
 }
 .hero-player {
-  width: clamp(300px, 62vw, 700px);
+  width: clamp(340px, 74vw, 720px);
+  translate: 0 -8svh;
   transform-origin: center bottom;
   filter: drop-shadow(0 26px 42px rgba(0, 0, 0, .48)) blur(var(--layer-blur, 0));
 }
 .hero-mark {
-  width: clamp(220px, 62vw, 580px);
+  width: clamp(190px, 52vw, 520px);
+  translate: 0 -8svh;
   transform-origin: center center;
   filter: drop-shadow(0 22px 42px rgba(4, 2, 20, .5)) blur(var(--layer-blur, 0));
 }
@@ -252,12 +255,24 @@ img { display: block; max-width: 100%; }
   letter-spacing: 2.4px;
   text-transform: uppercase;
   color: var(--mint);
-  margin-bottom: 10px;
+  margin-bottom: 7px;
 }
 .hero-kicker-ext { display: none; }
 
+.hero-schedule {
+  font-family: var(--stretch);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  line-height: 1.25;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 4px 24px rgba(4, 2, 20, .7);
+}
+.hero-schedule span { color: var(--mint); }
+
 .hero-sub {
-  margin-top: 8px;
+  margin-top: 7px;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 1.2px;
@@ -268,15 +283,17 @@ img { display: block; max-width: 100%; }
 .hero-ctas {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 20px;
+  gap: 8px;
+  margin-top: 16px;
+  width: min(100%, 330px);
 }
 .cta {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 9px;
-  padding: 15px 16px;
+  min-height: 46px;
+  padding: 12px 14px;
   border-radius: 12px;
   font-weight: 900;
   font-size: 14px;
@@ -295,6 +312,12 @@ img { display: block; max-width: 100%; }
   color: var(--mint);
 }
 .cta--secondary:hover { background: rgba(124, 245, 180, .1); }
+.cta--calendar {
+  border: 2px solid rgba(255, 255, 255, .74);
+  color: #fff;
+  background: rgba(11, 7, 48, .24);
+}
+.cta--calendar:hover { background: rgba(255, 255, 255, .12); }
 .cta--tertiary {
   background: rgba(255, 255, 255, .12);
   color: #fff;
@@ -1004,17 +1027,29 @@ img { display: block; max-width: 100%; }
     width: max(104vw, 112svh);
     height: max(98vw, 106svh);
   }
-  .hero-star { width: clamp(640px, 66vw, 980px); }
-  .hero-player { width: clamp(520px, 42vw, 720px); }
+  .hero-star {
+    width: clamp(640px, 66vw, 980px);
+    translate: 0 -3svh;
+  }
+  .hero-player {
+    width: clamp(580px, 46vw, 760px);
+    translate: 0 -3svh;
+  }
   .hero-mark {
-    width: clamp(380px, 35vw, 560px);
+    width: clamp(330px, 30vw, 500px);
+    translate: 0 -3svh;
   }
   .hero-content { inset: auto 48px 48px 48px; }
   .hero-kicker { font-size: 13px; letter-spacing: 3.2px; }
-  .hero-kicker-ext { display: inline; }
+  .hero-schedule { font-size: 18px; letter-spacing: 3px; }
   .hero-sub { font-size: 13px; }
-  .hero-ctas { flex-direction: row; margin-top: 26px; }
-  .cta { padding: 18px 30px; font-size: 15px; }
+  .hero-ctas {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    width: min(100%, 1260px);
+    margin-top: 26px;
+  }
+  .cta { min-height: 56px; padding: 15px 18px; font-size: 13px; }
 
   .marquee { padding: 16px 0; }
   .marquee-track { animation-duration: 26s; gap: 40px; }
