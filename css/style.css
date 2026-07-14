@@ -22,8 +22,8 @@
   --band-4: #2563EB;
 
   /* type */
-  --display: 'Anton', 'Arial Narrow', sans-serif;
-  --stretch: 'Stretch Sans', 'Anton', 'Arial Narrow', sans-serif;
+  --display: 'Morganite', 'STRRETCH Sans Free', 'Anton', 'Arial Narrow', sans-serif;
+  --stretch: 'STRRETCH Sans Free', 'Morganite', 'Anton', 'Arial Narrow', sans-serif;
   --ui: 'Archivo', system-ui, sans-serif;
   --mono: ui-monospace, 'SF Mono', Menlo, monospace;
 
@@ -138,15 +138,45 @@ img { display: block; max-width: 100%; }
 }
 .nav-links a:hover { color: var(--mint); border-bottom-color: var(--mint); }
 
-/* Add a licensed Stretch Sans webfont here when available.
 @font-face {
-  font-family: 'Stretch Sans';
-  src: url('../assets/fonts/stretch-sans.woff2') format('woff2');
+  font-family: 'STRRETCH Sans Free';
+  src: url('../assets/fonts/STRRETCH SANS FREE.otf') format('opentype');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
-*/
+
+@font-face {
+  font-family: 'Morganite';
+  src: url('../assets/fonts/Morganite/Morganite-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Morganite';
+  src: url('../assets/fonts/Morganite/Morganite-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Morganite';
+  src: url('../assets/fonts/Morganite/Morganite-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Morganite';
+  src: url('../assets/fonts/Morganite/Morganite-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
 
 /* ==========================================================================
    Fold 01 · Hero — scroll-built intro
@@ -1808,8 +1838,9 @@ img { display: block; max-width: 100%; }
 }
 .rules-body h3 {
   margin: 24px 0 8px;
+  font-family: var(--display);
   font-weight: 800;
-  font-size: 12px;
+  font-size: 24px;
   letter-spacing: 2px;
   text-transform: uppercase;
   color: var(--mint);
@@ -1984,8 +2015,9 @@ img { display: block; max-width: 100%; }
 }
 .release-copy h3 {
   margin: 22px 0 7px;
+  font-family: var(--display);
   font-weight: 900;
-  font-size: 12px;
+  font-size: 24px;
   letter-spacing: 1.9px;
   text-transform: uppercase;
   color: var(--mint);
