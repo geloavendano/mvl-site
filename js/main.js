@@ -20,11 +20,8 @@ if (teamsGrid) {
     <div class="team-card-photo" aria-hidden="true"></div>
     <div class="team-card-shards" aria-hidden="true"></div>
     <div class="team-card-copy">
-      <p class="team-card-index">${String(i + 1).padStart(2, '0')} / ${String(TEAMS.length).padStart(2, '0')}</p>
       <h3 class="team-card-name">${team.name}</h3>
-      <p class="team-card-tag">${team.tag}</p>
     </div>
-    <a class="team-card-link" href="team.html?id=${team.id}" aria-label="${team.name} team page">&#8599;</a>
   </article>
   `).join('');
 }
