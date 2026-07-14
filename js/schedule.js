@@ -138,7 +138,7 @@ const matchList = document.getElementById('matchList');
 const renderTabs = () => {
   dayTabs.innerHTML = days.map((day) => `
     <button class="day-tab ${day === activeDay ? 'is-active' : ''}" type="button" data-day="${day}" role="tab" aria-selected="${day === activeDay}">
-      ${day === activeDay ? `Day ${day}` : day}
+      Day ${day}
     </button>
   `).join('');
 };

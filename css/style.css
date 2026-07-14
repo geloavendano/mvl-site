@@ -1189,43 +1189,36 @@ img { display: block; max-width: 100%; }
 }
 
 .day-tabs {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  scrollbar-width: none;
-  padding: 18px 16px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  padding: 0;
   border-bottom: 1px solid rgba(255, 255, 255, .08);
 }
-.day-tabs::-webkit-scrollbar { display: none; }
 .day-tab {
   appearance: none;
   border: 0;
-  background: transparent;
+  border-right: 1px solid rgba(255, 255, 255, .12);
+  background: rgba(255, 255, 255, .035);
   color: #fff;
-  min-height: 36px;
-  flex: 0 0 auto;
+  min-width: 0;
+  min-height: 74px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font: 900 12px var(--ui);
+  font: 900 clamp(10px, 2.55vw, 13px) var(--ui);
   letter-spacing: 1.8px;
   text-transform: uppercase;
   cursor: pointer;
-  padding: 4px 0;
-  border-bottom: 2px solid transparent;
-  transition: color .15s ease, border-color .15s ease;
+  padding: 10px 4px;
+  transition: background .15s ease, color .15s ease;
+  white-space: nowrap;
 }
-.day-tab + .day-tab::before {
-  content: '/';
-  padding: 0 13px;
-  color: rgba(255, 255, 255, .45);
-  pointer-events: none;
+.day-tab:last-child {
+  border-right: 0;
 }
 .day-tab.is-active {
-  color: var(--mint);
-  border-bottom-color: var(--mint);
+  background: linear-gradient(135deg, #75efaa 0%, #20cfca 100%);
+  color: var(--navy);
 }
 
 .match-list {
@@ -1590,11 +1583,10 @@ img { display: block; max-width: 100%; }
     padding: 24px 28px 20px;
   }
   .schedule-section-head h2 { font-size: 44px; }
-  .day-tabs { padding: 20px 28px; }
   .day-tab {
+    min-height: 90px;
     font-size: 14px;
   }
-  .day-tab + .day-tab::before { padding: 0 18px; }
   .match-list {
     gap: 18px;
     padding: 24px 28px 28px;
