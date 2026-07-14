@@ -195,11 +195,26 @@ document.getElementById('pastSide').innerHTML = completedGames.slice(0, 2).map(g
 document.getElementById('pastBottom').innerHTML = completedGames.slice(2, 6).map(gameCard).join('');
 
 // ---- render: sponsor marquees (list duplicated for the seamless loop) ------
+const sponsorTierOrder = ['Official Partner', 'Co-presenter', 'Major Sponsor', 'Minor Sponsor'];
+const sortedSponsors = [...SPONSORS].sort((a, b) =>
+  sponsorTierOrder.indexOf(a.tier) - sponsorTierOrder.indexOf(b.tier) ||
+  a.order - b.order ||
+  a.name.localeCompare(b.name)
+);
+const sponsorMarkup = sortedSponsors.map((sponsor, index, list) => {
+  const tierChanged = index === 0 || sponsor.tier !== list[index - 1].tier;
+  return `
+    ${tierChanged ? `<span class="marquee-tier">${sponsor.tier}</span>` : ''}
+    <span class="marquee-item marquee-item--logo" title="${sponsor.name}">
+      <img src="${sponsor.logo}" alt="${sponsor.name}" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.style.display='inline';">
+      <span class="marquee-fallback">${sponsor.name}</span>
+    </span>
+    <span class="marquee-sep">&#9670;</span>
+  `;
+}).join('');
+
 document.querySelectorAll('[data-marquee]').forEach((track) => {
-  const seq = SPONSORS.map((s) =>
-    `<span class="marquee-item">${s}</span><span class="marquee-sep">&#9670;</span>`
-  ).join('');
-  track.innerHTML = seq + seq;
+  track.innerHTML = sponsorMarkup + sponsorMarkup;
 });
 
 // ---- live state -------------------------------------------------------------

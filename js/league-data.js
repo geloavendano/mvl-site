@@ -17,8 +17,31 @@ window.MVL_DATA = {
   ],
 
   sponsors: [
-    'ATOMM STUDIOS', 'AVEENO', 'CAMOU', 'CONVERGE',
-    'DUREX', 'GAMEVILLE BALL PARK', 'GAVISCON', 'KG BODY RECOVERY',
+    { name: 'Converge', tier: 'Official Partner', order: 1, logo: 'assets/Sponsor Logos/Official Partners/Converge.png' },
+    { name: 'Immuni', tier: 'Official Partner', order: 2, logo: 'assets/Sponsor Logos/Official Partners/Immuni - Company 1.png' },
+    { name: 'JBL', tier: 'Official Partner', order: 3, logo: 'assets/Sponsor Logos/Official Partners/JBL.png' },
+    { name: 'KG Body Recovery', tier: 'Official Partner', order: 4, logo: 'assets/Sponsor Logos/Official Partners/KG Body Recovery.png' },
+    { name: 'Lysol', tier: 'Official Partner', order: 5, logo: 'assets/Sponsor Logos/Official Partners/Lysol Logo-01.png' },
+
+    { name: 'Aveeno', tier: 'Co-presenter', order: 1, logo: 'assets/Sponsor Logos/Co-Presenters/Aveeno.png' },
+    { name: 'Camou', tier: 'Co-presenter', order: 2, logo: 'assets/Sponsor Logos/Co-Presenters/Camou.png' },
+    { name: 'DoubleDragon Corporation', tier: 'Co-presenter', order: 3, logo: 'assets/Sponsor Logos/Co-Presenters/DoubleDragon Corporation logo final (3).png' },
+    { name: 'Dr. O White', tier: 'Co-presenter', order: 4, logo: 'assets/Sponsor Logos/Co-Presenters/Dr O White Logo.png' },
+    { name: 'Future Glow', tier: 'Co-presenter', order: 5, logo: 'assets/Sponsor Logos/Co-Presenters/future glow.png' },
+    { name: 'Listerine', tier: 'Co-presenter', order: 6, logo: 'assets/Sponsor Logos/Co-Presenters/Listerine.png' },
+    { name: 'OFBANK', tier: 'Co-presenter', order: 7, logo: 'assets/Sponsor Logos/Co-Presenters/OFBANK LOGO.jpg' },
+    { name: 'Oxecure', tier: 'Co-presenter', order: 8, logo: 'assets/Sponsor Logos/Co-Presenters/Oxecure.png' },
+    { name: 'Tropicana', tier: 'Co-presenter', order: 9, logo: 'assets/Sponsor Logos/Co-Presenters/tropicana.png' },
+    { name: 'Vitanature', tier: 'Co-presenter', order: 10, logo: 'assets/Sponsor Logos/Co-Presenters/VITANATURE White Logo.png' },
+
+    { name: 'BPI Trade', tier: 'Major Sponsor', order: 1, logo: 'assets/Sponsor Logos/Major Sponsors/bpi trade horizontal.png' },
+    { name: 'F2 Logistics', tier: 'Major Sponsor', order: 2, logo: 'assets/Sponsor Logos/Major Sponsors/F2 Logistics.png' },
+    { name: 'Old Spice', tier: 'Major Sponsor', order: 3, logo: 'assets/Sponsor Logos/Major Sponsors/Old Spice.png' },
+    { name: 'PGA Cars', tier: 'Major Sponsor', order: 4, logo: 'assets/Sponsor Logos/Major Sponsors/PGA Cars Logo.jpg' },
+    { name: 'Western Appliances', tier: 'Major Sponsor', order: 5, logo: 'assets/Sponsor Logos/Major Sponsors/Western Appliances.png' },
+
+    { name: 'Nature\'s Spring', tier: 'Minor Sponsor', order: 1, logo: 'assets/Sponsor Logos/Minor Sponsors/Natures Spring-Logo-TransparentBG-(Low Resolution).png' },
+    { name: 'Potato Corner', tier: 'Minor Sponsor', order: 2, logo: 'assets/Sponsor Logos/Minor Sponsors/Potato Corner PPS Logo.png' },
   ],
 
   games: [
