@@ -130,6 +130,7 @@ const updateHeroSequence = () => {
       '--layer-blur': '0px',
     }));
     if (heroCopy) heroCopy.style.setProperty('--hero-copy-opacity', 1);
+    nav.classList.add('hero-ready');
     return;
   }
 
@@ -145,6 +146,7 @@ const updateHeroSequence = () => {
   const player = easeOut(progressBetween(progress, 0.38, 0.66));
   const logo = easeOut(progressBetween(progress, 0.62, 0.84));
   const copy = easeOut(progressBetween(progress, 0.78, 0.96));
+  nav.classList.toggle('hero-ready', copy > .98);
 
   setLayer(heroLayers.rays, {
     '--layer-opacity': rays,
@@ -197,11 +199,20 @@ updateHeroSequence();
 if (heroSequence && !reduceMotion && !sessionStorage.getItem('mvlHeroIntroSeen')) {
   sessionStorage.setItem('mvlHeroIntroSeen', 'true');
   window.setTimeout(() => {
-    if (window.scrollY > 8) return;
-    window.scrollTo({
-      top: Math.max(0, Math.round(heroSequence.offsetHeight - window.innerHeight - 24)),
-      behavior: 'smooth',
-    });
+    if (window.scrollY > window.innerHeight * 0.25) return;
+    const start = window.scrollY;
+    const target = Math.max(0, Math.round(heroSequence.offsetHeight - window.innerHeight - 24));
+    const duration = 1450;
+    const startedAt = performance.now();
+
+    const step = (now) => {
+      const progress = clamp((now - startedAt) / duration);
+      const eased = 1 - Math.pow(1 - progress, 4);
+      window.scrollTo(0, Math.round(lerp(start, target, eased)));
+      if (progress < 1) requestAnimationFrame(step);
+    };
+
+    requestAnimationFrame(step);
   }, 650);
 }
 
