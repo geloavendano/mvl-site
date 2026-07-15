@@ -219,7 +219,11 @@ img { display: block; max-width: 100%; }
   inset: 0;
   background:
     radial-gradient(circle at 50% 46%, rgba(124, 245, 180, .16), transparent 30%),
-    linear-gradient(180deg, rgba(5, 3, 15, .3) 0%, rgba(5, 3, 15, .18) 42%, rgba(5, 3, 15, .88) 100%);
+    linear-gradient(180deg,
+      rgba(16, 10, 50, .24) 0%,
+      rgba(16, 10, 50, .42) 42%,
+      rgba(16, 10, 50, .68) 72%,
+      rgba(16, 10, 50, .9) 100%);
 }
 
 .hero-stage {
