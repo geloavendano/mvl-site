@@ -1456,7 +1456,7 @@ img { display: block; max-width: 100%; }
   .hero-sub { font-size: 14px; }
   .hero-ctas {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
     width: min(100%, 680px);
     margin-top: 26px;
   }
