@@ -11,7 +11,7 @@
 <header class="admin-topbar"><a href="index.html"><img src="assets/hero-mvl-2026-logo.png" alt="MVL 2026"></a><button id="signOutBtn" class="admin-link is-hidden">Sign out</button></header>
 <main class="admin-main">
   <section id="loginPanel" class="admin-panel admin-login"><p class="games-label">Restricted access</p><h1>MVL Admin</h1>
-    <form id="loginForm" class="admin-form"><label class="field"><span>Email</span><input name="email" type="email" required></label><label class="field"><span>Password</span><input name="password" type="password" required></label><button class="cta cta--primary">Sign in</button><p id="loginStatus" class="form-status"></p></form>
+    <div class="admin-form"><p class="admin-login-copy">Continue with an allowlisted Google account.</p><button id="googleSignInBtn" class="cta cta--primary" type="button">Continue with Google</button><p id="loginStatus" class="form-status"></p></div>
   </section>
   <section id="dashboard" class="is-hidden">
     <div class="admin-heading"><div><p class="games-label">Control room</p><h1>Game Day Admin</h1></div><p id="adminIdentity"></p></div>
@@ -19,5 +19,5 @@
     <div class="admin-heading admin-games-head"><div><p class="games-label">Scores & recordings</p><h2>Games</h2></div></div><div id="adminGameList"></div>
   </section>
 </main>
-<script src="js/supabase-config.js"></script><script src="js/league-data.js"></script><script src="js/admin.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/supabase-config.js"></script><script src="js/league-data.js"></script><script src="js/admin.js"></script>
 </body></html>

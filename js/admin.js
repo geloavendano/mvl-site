@@ -1,6 +1,6 @@
 const cfg = window.MVL_SUPABASE;
-const key = 'mvl_admin_session';
-let session = JSON.parse(localStorage.getItem(key) || 'null');
+const authClient = window.supabase.createClient(cfg.url, cfg.anonKey);
+let session = null;
 let data;
 const teams = Object.fromEntries(window.MVL_DATA.teams.map((t) => [t.id, t]));
 const status = (el, text, type = '') => { el.textContent = text; el.className = `form-status ${type ? `is-${type}` : ''}`; };
@@ -27,11 +27,31 @@ const show = async () => {
     const live = data.publicData.livestream, form = livestreamForm.elements;
     form.isLive.checked = live.is_live; form.youtubeUrl.value = live.youtube_url || ''; form.youtubeId.value = live.youtube_id || '';
     render();
-  } catch (e) { localStorage.removeItem(key); status(loginStatus, e.message, 'error'); }
+  } catch (e) {
+    session = null;
+    authClient.auth.signOut();
+    status(loginStatus, e.message === 'Admin access required' ? 'This Google account is not an MVL administrator.' : e.message, 'error');
+  }
 };
-loginForm.addEventListener('submit', async (e) => { e.preventDefault(); const f = new FormData(e.target); status(loginStatus, 'Signing in…'); try { session = await call('/auth/v1/token?grant_type=password', { email: f.get('email'), password: f.get('password') }, cfg.anonKey); localStorage.setItem(key, JSON.stringify(session)); show(); } catch (err) { status(loginStatus, err.message, 'error'); } });
+googleSignInBtn.addEventListener('click', async () => {
+  status(loginStatus, 'Redirecting to Google…');
+  const { error } = await authClient.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: `${window.location.origin}/admin` },
+  });
+  if (error) status(loginStatus, error.message, 'error');
+});
 livestreamForm.addEventListener('submit', async (e) => { e.preventDefault(); const s = e.target.querySelector('.form-status'), f = e.target.elements; status(s, 'Saving…'); try { await rpc('mvl_admin_update_livestream', { p_is_live: f.isLive.checked, p_youtube_url: f.youtubeUrl.value, p_youtube_id: f.youtubeId.value }); status(s, 'Livestream updated.', 'success'); } catch (err) { status(s, err.message, 'error'); } });
 adminGameList.addEventListener('submit', async (e) => { const form = e.target.closest('[data-id]'); if (!form) return; e.preventDefault(); const s = form.querySelector('.form-status'), g = data.publicData.games.find((x) => x.id === form.dataset.id); const sets = [0,1,2,3,4].filter((i) => form.elements[`a${i}`].value !== '' && form.elements[`b${i}`].value !== '').map((i) => ({ team_a_score: +form.elements[`a${i}`].value, team_b_score: +form.elements[`b${i}`].value })); status(s, 'Saving…'); try { if (!sets.length) throw new Error('Enter at least one set.'); await rpc('mvl_record_game_result', { p_game_id:g.id,p_winner_team_id:form.elements.winner.value,p_player_of_game_id:null,p_sets:sets,p_youtube_id:form.elements.youtubeId.value||null,p_video_title:`${teams[g.teamA].name} vs ${teams[g.teamB].name} · Full Game`,p_duration_seconds:duration(form.elements.duration.value),p_video_published_at:new Date().toISOString(),p_video_is_featured:true }); status(s,'Result updated.','success'); } catch(err){ status(s,err.message,'error'); } });
 adminGameList.addEventListener('click', async (e) => { const btn=e.target.closest('[data-reset]'); if(!btn)return; const form=btn.closest('[data-id]'),s=form.querySelector('.form-status'); status(s,'Resetting…'); try{await rpc('mvl_admin_reset_game',{p_game_id:form.dataset.id});form.elements.winner.value='';form.querySelectorAll('.admin-sets input').forEach((i)=>i.value='');status(s,'Reset to pending.','success');}catch(err){status(s,err.message,'error');}});
-signOutBtn.addEventListener('click',()=>{localStorage.removeItem(key);location.reload();});
-if(session?.access_token)show();
+signOutBtn.addEventListener('click', async()=>{await authClient.auth.signOut();location.reload();});
+authClient.auth.onAuthStateChange((_event, nextSession) => {
+  if (nextSession?.access_token && nextSession.access_token !== session?.access_token) {
+    session = nextSession;
+    window.setTimeout(show, 0);
+  }
+});
+authClient.auth.getSession().then(({ data: authData }) => {
+  session = authData.session;
+  if (session?.access_token) show();
+});

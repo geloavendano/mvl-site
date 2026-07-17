@@ -36,6 +36,7 @@
 .admin-topbar img{height:38px;width:auto}.admin-main{width:min(1180px,100%);margin:auto;padding:36px 16px 80px}
 .admin-panel{padding:20px;border:1px solid rgba(124,245,180,.2);background:rgba(8,5,34,.74);box-shadow:0 20px 60px rgba(0,0,0,.2)}
 .admin-login{width:min(480px,100%);margin:8vh auto}.admin-login h1,.admin-heading h1{font:italic 700 54px/1 var(--stretch);text-transform:uppercase;margin-bottom:24px}
+.admin-login-copy{color:var(--ink-muted);font-size:14px;line-height:1.6}
 .admin-form{display:grid;gap:18px}.admin-heading,.admin-panel-head{display:flex;align-items:center;justify-content:space-between;gap:16px}.admin-heading{margin-bottom:24px}.admin-heading>p{color:var(--ink-muted);font:11px var(--mono)}
 .admin-panel-head h2,.admin-games-head h2{font:italic 700 42px/1 var(--stretch);text-transform:uppercase}.admin-panel-head h3{text-transform:uppercase}.admin-panel-head h3 em{color:var(--teal)}
 .admin-fields{display:grid;gap:16px}.admin-switch{display:flex;gap:8px;align-items:center;font-size:11px;font-weight:800;text-transform:uppercase}.admin-switch input{width:20px;height:20px;accent-color:var(--mint)}
