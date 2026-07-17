@@ -405,6 +405,17 @@ img { display: block; max-width: 100%; }
   text-align: center;
   transition: filter .15s ease, background .15s ease;
 }
+/* <button class="cta"> must not inherit the UA's white button chrome */
+button.cta {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  background: none;
+  font-family: var(--ui);
+  color: inherit;
+  cursor: pointer;
+}
+button.cta--secondary { border: 2px solid var(--mint); color: var(--mint); }
 .cta--primary {
   background: linear-gradient(90deg, var(--mint), var(--teal));
   color: #16104A;
