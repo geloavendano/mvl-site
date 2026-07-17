@@ -151,11 +151,13 @@ const buildStandingsPreview = () => TEAMS.map((team) => {
 if (homeScheduleList && homeScheduleTitle) {
   const now = new Date();
   const today = dateKey(now);
-  const sortedGames = [...GAMES].sort((a, b) => new Date(a.startsAt) - new Date(b.startsAt));
-  const todayGames = sortedGames.filter((game) => dateKey(new Date(game.startsAt)) === today);
-  const nextGame = sortedGames.find((game) => new Date(game.startsAt) >= now) || sortedGames.at(-1);
+  const chronologicalGames = [...GAMES].sort((a, b) => new Date(a.startsAt) - new Date(b.startsAt));
+  const todayGames = chronologicalGames.filter((game) => dateKey(new Date(game.startsAt)) === today);
+  const nextGame = chronologicalGames.find((game) => new Date(game.startsAt) >= now) || chronologicalGames.at(-1);
   const activeKey = todayGames.length ? today : dateKey(new Date(nextGame.startsAt));
-  const activeGames = sortedGames.filter((game) => dateKey(new Date(game.startsAt)) === activeKey);
+  const activeGames = chronologicalGames
+    .filter((game) => dateKey(new Date(game.startsAt)) === activeKey)
+    .sort((a, b) => (a.gameOrder || 999) - (b.gameOrder || 999) || new Date(a.startsAt) - new Date(b.startsAt));
 
   homeScheduleTitle.textContent = todayGames.length
     ? `Today · ${formatPreviewDate(activeGames[0].startsAt)}`

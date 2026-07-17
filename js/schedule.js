@@ -162,7 +162,7 @@ const gameStatus = (game) => {
 const renderMatches = () => {
   const gamesForDay = games
     .filter((game) => game.day === activeDay)
-    .sort((a, b) => new Date(a.startsAt) - new Date(b.startsAt));
+    .sort((a, b) => (a.gameOrder || 999) - (b.gameOrder || 999) || new Date(a.startsAt) - new Date(b.startsAt));
 
   matchList.innerHTML = gamesForDay.map((game) => {
     const teamA = teamById[game.teamA];
