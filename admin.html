@@ -15,7 +15,7 @@
   </section>
   <section id="dashboard" class="is-hidden">
     <div class="admin-heading"><div><p class="games-label">Control room</p><h1>Game Day Admin</h1></div><p id="adminIdentity"></p></div>
-    <form id="livestreamForm" class="admin-panel admin-form"><div class="admin-panel-head"><div><p class="games-label">Broadcast</p><h2>Livestream</h2></div><label class="admin-switch"><input name="isLive" type="checkbox"> Live now</label></div><div class="admin-fields"><label class="field"><span>YouTube URL</span><input name="youtubeUrl" type="url"></label><label class="field"><span>YouTube video ID</span><input name="youtubeId"></label></div><button class="cta cta--primary">Save livestream</button><p class="form-status"></p></form>
+    <form id="livestreamForm" class="admin-panel admin-form"><div class="admin-panel-head"><div><p class="games-label">Broadcast</p><h2>Livestream</h2></div><label class="admin-switch"><input name="isLive" type="checkbox"> Live now</label></div><div class="admin-fields"><label class="field"><span>YouTube livestream link</span><input name="youtubeUrl" type="url" placeholder="https://youtube.com/watch?v=..."></label><label class="field"><span>YouTube video ID</span><input name="youtubeId" placeholder="The code after v= or youtu.be/"><small>This is the unique code in the YouTube link, used for the embedded player.</small></label></div><button class="cta cta--primary">Save livestream</button><p class="form-status"></p></form>
     <div class="admin-heading admin-games-head"><div><p class="games-label">Scores & recordings</p><h2>Games</h2></div></div><div id="adminGameList"></div>
   </section>
 </main>

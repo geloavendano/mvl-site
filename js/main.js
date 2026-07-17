@@ -38,13 +38,26 @@ if (teamsGrid) {
 
 // ---- render: livestream ----------------------------------------------------
 document.querySelectorAll('[data-livestream-link]').forEach((link) => {
-  link.href = livestream.youtubeUrl;
-  link.target = '_blank';
-  link.rel = 'noopener';
+  if (isLive) {
+    link.href = livestream.youtubeUrl;
+    link.target = '_blank';
+    link.rel = 'noopener';
+    link.innerHTML = '<span class="live-dot" aria-hidden="true"></span> Watch the Livestream';
+  } else {
+    link.href = 'schedule.html';
+    link.removeAttribute('target');
+    link.removeAttribute('rel');
+    link.textContent = 'View the Schedule';
+  }
 });
 
 const liveEmbed = document.getElementById('liveEmbed');
-if (liveEmbed && livestream.youtubeId) {
+const gamesLive = document.querySelector('.games-live');
+const gamesGrid = document.querySelector('.games-grid');
+if (!isLive) {
+  gamesLive?.classList.add('is-hidden');
+  gamesGrid?.classList.add('is-offline');
+} else if (liveEmbed && livestream.youtubeId) {
   liveEmbed.classList.remove('placeholder');
   liveEmbed.innerHTML = `
     <iframe
