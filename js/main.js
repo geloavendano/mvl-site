@@ -5,10 +5,9 @@
    ========================================================================== */
 
 // ---- state ---------------------------------------------------------------
-const isLive = true; // TODO: flip manually (or via YouTube API) when stream is live
-
 // ---- data ----------------------------------------------------------------
 const { teams: TEAMS, sponsors: SPONSORS, games: GAMES, livestream } = window.MVL_DATA;
+const isLive = Boolean(livestream.isLive);
 const teamById = Object.fromEntries(TEAMS.map((team) => [team.id, team]));
 
 // ---- render: team cards ----------------------------------------------------
