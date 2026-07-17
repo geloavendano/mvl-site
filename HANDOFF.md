@@ -1,6 +1,12 @@
 # HANDOFF — Metarice Volleyball League (MVL 2026) website
 
-## Project state: Phase 2 landing DONE. Phase 1 teaser DONE. Rules page DONE. Waiver page DONE and connected to Supabase. Remaining: raffle page/RPC UI, team detail pages.
+## Project state: Phase 2 landing DONE. Phase 1 teaser DONE. Rules page DONE. Waiver page DONE and connected to Supabase. Raffle check-in page BUILT (pending one migration on live DB — see Raffle section). Remaining: team detail pages.
+
+## Raffle check-in (`raffle.html` + `js/raffle.js`)
+Game-day raffle per client decisions (2026-07-17): one successful entry per person per game day; identity = name + team only (winners claim on-site); open on game days only (derived from `games` data, Manila time); outside-venue attempts are recorded as ineligible, not rejected.
+- Flow: game-day gate → team + full name → one-time `getCurrentPosition` (no manual pin, per backend/README.md) → `mvl_create_raffle_checkin` RPC → server decides `inside_radius` vs the venue's 150m radius. Result states: confirmed / already-entered / outside-with-distance+retry / geolocation errors. `?preview=1` unlocks the form UI on non-game days for testing (server still refuses).
+- Venue UUID hardcoded in raffle.js: `11111111-1111-4111-8111-111111111111`.
+- **⚠️ BLOCKER until applied:** `supabase/migrations/20260717000100_raffle_checkin_rules.sql` must be run against the linked project (`supabase db query --linked --file …`, NOT `db push`). It sets Gameville's real coordinates (14.575241, 121.0543052 — venues were seeded with NULL locations, so every check-in fails without this), deletes the duplicate venue row, adds the one-entry-per-day partial unique index, and updates the RPC (adds `already_entered` to the return row + game-day gate). Get client go-ahead before applying — it's their production DB.
 
 ## What this is
 Immersive site for a volleyball league (MVL 2026, "3rd Annual Invitational", Gameville Ball Park + Double Play). Client's peg is https://www.idl.pro/ — maximal, energetic, everything about the competition laid out excitingly. Mobile-first, responsive.

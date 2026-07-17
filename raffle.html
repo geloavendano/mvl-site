@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game-Day Raffle — MVL 2026</title>
+<meta name="description" content="Metarice Volleyball League 2026 game-day raffle. Check in at Gameville Ball Park on game days to join the draw.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="raffle-page" id="top">
+
+<header class="nav nav--stuck page-nav" id="nav">
+  <a class="nav-logo" href="index.html" aria-label="MVL 2026 home">
+    <img class="nav-logo-img" src="assets/hero-mvl-2026-logo.png" alt="Metarice Volleyball League 2026">
+  </a>
+  <nav class="nav-links" aria-label="Primary">
+    <a href="schedule.html">Schedule</a>
+    <a href="index.html#games">Videos</a>
+    <a href="index.html#teams">Teams</a>
+    <a href="rules.html">Rules</a>
+  </nav>
+</header>
+
+<main class="waiver-main">
+  <section class="waiver-intro">
+    <p class="section-kicker">Game-Day Raffle</p>
+    <h1 class="section-title">Raffle <em>Check-In</em></h1>
+
+    <div class="waiver-copy">
+      <p>Watching the games at Gameville Ball Park? Check in below to join the game-day raffle — prizes are drawn and claimed at the venue.</p>
+      <p>You can enter once per game day. Use your full name, and use the same name every day so your entries match.</p>
+      <p class="raffle-privacy">To confirm you're at the venue, your device's location is checked <strong>once</strong> when you enter. It's used only for this check and nothing else.</p>
+    </div>
+  </section>
+
+  <!-- closed outside game days -->
+  <section class="form-panel raffle-closed is-hidden" id="raffleClosed">
+    <div class="form-panel-head">
+      <p class="section-kicker section-kicker--teal">See You on Game Day</p>
+      <h2>The raffle isn't open today</h2>
+    </div>
+    <p class="raffle-closed-copy">Check-in opens on game days only: <strong>Aug 29, 30, 31 &amp; Sep 5, 6</strong> at Gameville Ball Park. Come back then!</p>
+    <div class="raffle-closed-actions">
+      <a class="cta cta--secondary" href="schedule.html">View the Schedule</a>
+    </div>
+  </section>
+
+  <!-- entry form -->
+  <form class="waiver-form is-hidden" id="raffleForm" novalidate>
+    <section class="form-panel">
+      <div class="form-panel-head">
+        <p class="section-kicker section-kicker--teal">Join Today's Draw</p>
+        <h2>Enter the Raffle</h2>
+      </div>
+
+      <div class="form-grid">
+        <label class="field">
+          <span>Team You're Supporting</span>
+          <select name="team_id" id="teamSelect" required>
+            <option value="">Select a team</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Full Name</span>
+          <input name="entrant_name" id="entrantName" type="text" autocomplete="name" placeholder="Juan Dela Cruz" required minlength="4">
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
+        <button class="cta cta--primary" type="submit" id="submitBtn">
+          <svg class="teaser-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>
+          Check In &amp; Enter
+        </button>
+      </div>
+    </section>
+  </form>
+
+  <!-- result states (rendered by js) -->
+  <section class="form-panel raffle-result is-hidden" id="raffleResult" role="status" aria-live="polite">
+    <div class="form-panel-head">
+      <p class="section-kicker section-kicker--teal" id="resultKicker"></p>
+      <h2 id="resultTitle"></h2>
+    </div>
+    <p class="raffle-result-copy" id="resultCopy"></p>
+    <div class="raffle-closed-actions">
+      <button class="cta cta--secondary is-hidden" type="button" id="retryBtn">Try Again</button>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="footer-bar">
+    <a class="footer-logo" href="index.html" aria-label="MVL 2026 home">
+      <img class="footer-logo-img" src="assets/hero-mvl-2026-logo.png" alt="Metarice Volleyball League 2026">
+    </a>
+    <p class="footer-social">
+      <a href="https://instagram.com/metaricevolley" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.2c3.2 0 3.58.01 4.85.07 3.25.15 4.77 1.69 4.92 4.92.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.15 3.23-1.66 4.77-4.92 4.92-1.27.06-1.64.07-4.85.07s-3.58-.01-4.85-.07c-3.26-.15-4.77-1.7-4.92-4.92-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85C2.42 3.92 3.94 2.38 7.15 2.27 8.42 2.21 8.8 2.2 12 2.2Zm0 1.8c-3.15 0-3.5.01-4.74.07-2.42.11-3.56 1.26-3.67 3.67-.06 1.24-.07 1.6-.07 4.74s.01 3.51.07 4.74c.11 2.41 1.25 3.56 3.67 3.67 1.24.06 1.6.07 4.74.07 3.15 0 3.51-.01 4.74-.07 2.42-.11 3.56-1.26 3.67-3.67.06-1.24.07-1.6.07-4.74s-.01-3.5-.07-4.74c-.11-2.41-1.25-3.56-3.67-3.67-1.24-.06-1.6-.07-4.74-.07Zm0 3.06a4.94 4.94 0 1 1 0 9.88 4.94 4.94 0 0 1 0-9.88Zm0 1.8a3.14 3.14 0 1 0 0 6.28 3.14 3.14 0 0 0 0-6.28Zm5.15-3.2a1.15 1.15 0 1 1 0 2.3 1.15 1.15 0 0 1 0-2.3Z"/></svg>
+      </a>
+      <a href="https://www.tiktok.com/@metaricevolley" target="_blank" rel="noopener" aria-label="TikTok">
+        <svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.6 0-1.72 1.66-3.01 3.37-2.48V9.66c-3.45-.46-6.47 2.22-6.47 5.64 0 3.33 2.76 5.7 5.69 5.7 3.14 0 5.69-2.55 5.69-5.7V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3c-1.32 0-2.5-.56-3.24-1.48Z"/></svg>
+      </a>
+      <a href="https://www.youtube.com/@metaricevolley" target="_blank" rel="noopener" aria-label="YouTube">
+        <svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.51 3.55 12 3.55 12 3.55s-7.51 0-9.38.5A3.02 3.02 0 0 0 .5 6.19C0 8.07 0 12 0 12s0 3.93.5 5.81a3.02 3.02 0 0 0 2.12 2.14c1.87.5 9.38.5 9.38.5s7.51 0 9.38-.5a3.02 3.02 0 0 0 2.12-2.14C24 15.93 24 12 24 12s0-3.93-.5-5.81ZM9.55 15.57V8.43L15.82 12l-6.27 3.57Z"/></svg>
+      </a>
+    </p>
+  </div>
+</footer>
+
+<script src="js/league-data.js"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/raffle.js"></script>
+</body>
+</html>
