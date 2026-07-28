@@ -9,6 +9,7 @@
 const { teams: TEAMS, sponsors: SPONSORS, games: GAMES, livestream } = window.MVL_DATA;
 const isLive = Boolean(livestream.isLive);
 const teamById = Object.fromEntries(TEAMS.map((team) => [team.id, team]));
+const playoffGameIds = new Set(['qf1', 'qf2', 'qf3', 'qf4', 'sf1', 'sf2', 'bronze', 'final']);
 const gameTeam = (game, side) => {
   const id = side === 'A' ? game.teamA : game.teamB;
   const label = side === 'A' ? game.teamALabel : game.teamBLabel;
@@ -128,6 +129,7 @@ const ratio = (forValue, againstValue) => {
 
 const buildStandingsPreview = () => TEAMS.map((team) => {
   const played = GAMES.filter((game) =>
+    !playoffGameIds.has(game.id) &&
     game.status === 'final' && (game.teamA === team.id || game.teamB === team.id)
   );
   const wins = played.filter((game) => game.winner === team.id).length;

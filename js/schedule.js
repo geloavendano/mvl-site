@@ -1,5 +1,6 @@
 const { teams, games } = window.MVL_DATA;
 const teamById = Object.fromEntries(teams.map((team) => [team.id, team]));
+const playoffGameIds = new Set(['qf1', 'qf2', 'qf3', 'qf4', 'sf1', 'sf2', 'bronze', 'final']);
 const gameTeam = (game, side) => {
   const id = side === 'A' ? game.teamA : game.teamB;
   const label = side === 'A' ? game.teamALabel : game.teamBLabel;
@@ -42,7 +43,7 @@ const buildStandings = () => {
     headToHeadPointRatio: 0,
   }));
   const rowByTeam = Object.fromEntries(rows.map((row) => [row.team.id, row]));
-  const finalGames = games.filter((game) => game.status === 'final');
+  const finalGames = games.filter((game) => game.status === 'final' && !playoffGameIds.has(game.id));
 
   finalGames.forEach((game) => {
     const a = rowByTeam[game.teamA];
