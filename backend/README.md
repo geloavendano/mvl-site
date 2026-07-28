@@ -96,6 +96,39 @@ delete from mvl.admin_users
 where email = lower(trim('admin@example.com'));
 ```
 
+## Player of the Game roster
+
+Player portraits live in the public `mvl-player-photos` Storage bucket. Use an
+object path based on the team and admin lookup key:
+
+```text
+metarice-x/santos-04.webp
+```
+
+Create the matching roster row in `mvl.players`:
+
+```sql
+insert into mvl.players (
+  team_id,
+  display_name,
+  surname,
+  jersey_number,
+  role,
+  photo_path
+) values (
+  'metarice-x',
+  'Juan Santos',
+  'Santos',
+  '04',
+  'Outside Hitter',
+  'metarice-x/santos-04.webp'
+);
+```
+
+In the admin dashboard, select the winning team and enter `santos-04`. The
+lookup is scoped to that winning team's roster. A database trigger also prevents
+a Player of the Game from being assigned to a player on the losing team.
+
 ## Standings Ranking
 
 The standings helper is:

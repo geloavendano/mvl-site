@@ -11,6 +11,15 @@ const playoffNotes = {
   bronze: { round: 'Battle for Bronze', matchup: 'Loser SF1 vs Loser SF2' },
   final: { round: 'Championship Match', matchup: 'Winner SF1 vs Winner SF2' },
 };
+const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => ({
+  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
+}[char]));
+const playerPhotoUrl = (value) => {
+  if (!value) return '';
+  if (/^https?:\/\//i.test(value)) return value;
+  const path = value.split('/').filter(Boolean).map(encodeURIComponent).join('/');
+  return `${window.MVL_SUPABASE.url}/storage/v1/object/public/mvl-player-photos/${path}`;
+};
 const gameTeam = (game, side) => {
   const id = side === 'A' ? game.teamA : game.teamB;
   const label = side === 'A' ? game.teamALabel : game.teamBLabel;
@@ -185,6 +194,7 @@ const renderMatches = () => {
     const teamB = gameTeam(game, 'B');
     const winner = game.winner ? teamById[game.winner] : null;
     const pogTeam = game.playerOfGame?.team ? teamById[game.playerOfGame.team] : null;
+    const pogPhoto = playerPhotoUrl(game.playerOfGame?.photoPath);
     const videoHref = game.youtubeId ? `https://www.youtube.com/watch?v=${game.youtubeId}` : '';
     const playoffNote = playoffNotes[game.id];
 
@@ -217,11 +227,15 @@ const renderMatches = () => {
         </div>
 
         <div class="match-feature">
-          <div class="player-silhouette" aria-hidden="true"></div>
+          <div class="player-portrait ${pogPhoto ? 'has-photo' : ''}">
+            ${pogPhoto
+              ? `<img src="${escapeHtml(pogPhoto)}" alt="${escapeHtml(game.playerOfGame?.name || 'Player of the Game')}">`
+              : '<div class="player-silhouette" aria-hidden="true"></div>'}
+          </div>
           <div>
             <p class="feature-label">Player of the Game</p>
-            <h3>${game.playerOfGame?.name || 'To be announced'}</h3>
-            <p>${pogTeam?.name || 'Pending final result'}</p>
+            <h3>${escapeHtml(game.playerOfGame?.name || 'To be announced')}</h3>
+            <p>${pogTeam ? `${escapeHtml(pogTeam.name)}${game.playerOfGame?.jerseyNumber ? ` · #${escapeHtml(game.playerOfGame.jerseyNumber)}` : ''}` : 'Pending final result'}</p>
           </div>
         </div>
 
