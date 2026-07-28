@@ -13,7 +13,7 @@ window.MVL_DATA = {
     { id: 'gremlins', name: 'Gremlins', tag: 'Red Division', grad: ['#F51642', '#B90025'], pos: '20% 72%' },
     { id: 'ssvc', name: 'SSVC', tag: 'Yellow Division', grad: ['#FFE44D', '#D6A900'], pos: '20% 74%' },
     { id: 's24', name: 'S24', tag: 'Blue Division', grad: ['#3478FF', '#0039B8'], pos: '78% 24%' },
-    { id: 'up-leftout', name: 'UP Leftout', tag: 'Orange Division', grad: ['#FF9A05', '#FF5A00'], pos: '22% 72%' },
+    { id: 'up-leftout', name: 'Secret', tag: 'Orange Division', grad: ['#FF9A05', '#FF5A00'], pos: '22% 72%' },
   ],
 
   sponsors: [

@@ -9,6 +9,11 @@
 const { teams: TEAMS, sponsors: SPONSORS, games: GAMES, livestream } = window.MVL_DATA;
 const isLive = Boolean(livestream.isLive);
 const teamById = Object.fromEntries(TEAMS.map((team) => [team.id, team]));
+const gameTeam = (game, side) => {
+  const id = side === 'A' ? game.teamA : game.teamB;
+  const label = side === 'A' ? game.teamALabel : game.teamBLabel;
+  return { ...(teamById[id] || { id, grad: ['#4338CA', '#16104A'] }), name: label || teamById[id]?.name || 'TBD' };
+};
 
 // ---- render: team cards ----------------------------------------------------
 const teamsGrid = document.getElementById('teamsGrid');
@@ -164,8 +169,8 @@ if (homeScheduleList && homeScheduleTitle) {
     : `Next Games · ${formatPreviewDate(activeGames[0].startsAt)}`;
 
   homeScheduleList.innerHTML = activeGames.map((game) => {
-    const teamA = teamById[game.teamA];
-    const teamB = teamById[game.teamB];
+    const teamA = gameTeam(game, 'A');
+    const teamB = gameTeam(game, 'B');
     const status = game.status === 'final' ? 'Final' : 'Upcoming';
     const score = game.sets?.length
       ? game.sets.map((set) => `${set.a}-${set.b}`).join(' · ')
@@ -200,8 +205,8 @@ const completedGames = GAMES
   .slice(0, 6);
 
 const gameCard = (game) => {
-  const teamA = teamById[game.teamA];
-  const teamB = teamById[game.teamB];
+  const teamA = gameTeam(game, 'A');
+  const teamB = gameTeam(game, 'B');
   const href = game.youtubeId ? `https://www.youtube.com/watch?v=${game.youtubeId}` : 'schedule.html';
   return `
   <a class="video-card reveal" href="${href}" ${game.youtubeId ? 'target="_blank" rel="noopener"' : ''}>

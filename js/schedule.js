@@ -1,5 +1,10 @@
 const { teams, games } = window.MVL_DATA;
 const teamById = Object.fromEntries(teams.map((team) => [team.id, team]));
+const gameTeam = (game, side) => {
+  const id = side === 'A' ? game.teamA : game.teamB;
+  const label = side === 'A' ? game.teamALabel : game.teamBLabel;
+  return { ...(teamById[id] || { id, grad: ['#4338CA', '#16104A'] }), name: label || teamById[id]?.name || 'TBD' };
+};
 
 const formatTime = (iso) => new Intl.DateTimeFormat('en-PH', {
   hour: 'numeric',
@@ -165,8 +170,8 @@ const renderMatches = () => {
     .sort((a, b) => (a.gameOrder || 999) - (b.gameOrder || 999) || new Date(a.startsAt) - new Date(b.startsAt));
 
   matchList.innerHTML = gamesForDay.map((game) => {
-    const teamA = teamById[game.teamA];
-    const teamB = teamById[game.teamB];
+    const teamA = gameTeam(game, 'A');
+    const teamB = gameTeam(game, 'B');
     const winner = game.winner ? teamById[game.winner] : null;
     const pogTeam = game.playerOfGame?.team ? teamById[game.playerOfGame.team] : null;
     const videoHref = game.youtubeId ? `https://www.youtube.com/watch?v=${game.youtubeId}` : '';

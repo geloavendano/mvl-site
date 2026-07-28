@@ -55,7 +55,7 @@ Two audience phases:
 ## Client feedback already incorporated (do not regress)
 1. **Nav**: client disliked the mock's image-slice nav bg → now a clean glass bar: transparent at top, `nav--stuck` (dark + backdrop blur + mint hairline) past the hero. **Logo-join is the signature interaction**: nav has no logo while hero is in view; IntersectionObserver on `#hero` (rootMargin -64px) toggles `nav--stuck`, and `.nav-logo` animates in (translateY+scale → none, 300ms). Hero holds the big "MVL 2026" (Anton italic).
 2. **Teams fold**: now compressed into IDL-style preview cards so all 8 teams fit in one desktop fold. Cards use hard borders, angled color shards, photo texture on the right, `01 / 08` mono index, and ↗ bordered arrow button.
-3. **Roster (client-confirmed, `js/league-data.js`)**: Metarice X (violet), Metarice Y (green), Thurstrap (aqua), Gizmo (pink), Gremlins (red), SSVC (yellow), S24 (blue), UP Leftout (orange). `GAMES` team references were remapped 1:1 by original array position — matchup shape (day/court/scores) is unchanged from the sample data, only identities.
+3. **Roster (client-confirmed, `js/league-data.js`)**: Metarice X (violet), Metarice Y (green), Thurstrap (aqua), Gizmo (pink), Gremlins (red), SSVC (yellow), S24 (blue), Secret (orange). The database contains the full 36-game tournament schedule, including labeled playoff placeholders.
 
 ## Layout gotchas (bugs already fixed — don't reintroduce)
 - `overflow-x: hidden` must live on `html` (body-only propagates to viewport and inflates widths when a classic scrollbar exists).
