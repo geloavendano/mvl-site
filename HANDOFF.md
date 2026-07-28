@@ -15,16 +15,18 @@ Immersive site for a volleyball league (MVL 2026, "3rd Annual Invitational", Gam
 
 Two audience phases:
 - **Phase 1 (teaser, pre-event)**: players signing up. `teaser.html` — single-fold full-bleed video hero (no top nav, per wireframe): MVL logo image, dates, venue link (Google Maps: https://maps.app.goo.gl/sK1HuKBVwRSZPpHz9), "Save the Dates" pill (downloads `assets/mvl-2026-dates.ics` — 2 all-day span VEVENTs for Aug 29–31 and Sep 5–6, works across Apple/Google/Outlook; client chose ICS over per-service buttons), and all three CTAs (waiver / 2025 highlights / 2026 rules) within the first viewport at both breakpoints. IG|TT footer.
-- **Phase 2 (live)**: players in the tournament. `index.html` + `schedule.html`.
+- **Phase 2 (live)**: players in the tournament. `index.html` + `schedule.html` + `videos.html`.
 
 ## Stack & files (no build step, static, deliberate choice — do not introduce a framework without asking)
 - `index.html` — Phase 2 landing. Five folds: sticky nav / full-bleed hero / sponsor marquee / The Teams / Watch the Games / footer (2nd marquee + bar).
 - `schedule.html` — Schedule & standings page. Renders computed standings, day tabs, match cards, set scores, winner labels, pending games, and player-of-game slots.
+- `videos.html` — YouTube game-recording library. Shows only games with a valid video ID, newest first, with team/day filters and privacy-enhanced inline playback. `js/videos.js` renders it from the same public Supabase game data used by the homepage and schedule.
 - `teaser.html` — Phase 1 teaser landing. No top nav (nothing to link to pre-event). Hero + 3 CTAs + footer only. Uses `js/teaser.js` (just the reveal observer, no data deps) instead of `main.js`.
 - `css/style.css` — all styles for every page (index/schedule/teaser share one file). Mobile-first, ONE breakpoint at `min-width: 960px`. Design tokens as CSS vars in `:root`. Teaser-specific rules live in the `Teaser (Phase 1) page` block at the end of the file.
 - `js/league-data.js` — shared static data source for livestream, teams, sponsors, and games. Still used for front-end rendering; the same starter data has been seeded into Supabase.
 - `js/main.js` — landing page rendering + IntersectionObservers.
 - `js/schedule.js` — computes standings from `league-data.js`, renders tabs and games. Ranking order is wins, set ratio, points ratio, head-to-head wins, head-to-head set ratio, head-to-head points ratio, then team name.
+- `js/videos.js` — filters games with YouTube IDs, sorts them by game time descending, builds the Videos-page filters/cards, and replaces a thumbnail with a `youtube-nocookie.com` iframe when Play is selected.
 - `js/teaser.js` — reveal-on-scroll + the Save-the-Dates `<dialog>` action sheet (device-calendar .ics / Google Calendar Weekend 1 / Weekend 2; trigger href falls back to the .ics without JS). The 2025-highlights CTA is a plain link to the Instagram reel — an embedded lightbox was built and then REMOVED at client request (IG embeds don't play natively in-page), don't rebuild it.
 - `rules.html` — static rules page: FAQ accordion ("The Quick Version") at top, then the full 10-section rulebook (client-provided text) with tables for the bracket, schedule, and scoring. No JS. NOTE: the client's source text said "Battle for Gold: **Loser** of SF1 vs Loser of SF2" — an obvious copy-paste typo, rendered as Winner vs Winner.
 - `waiver.html` — participant registration + waiver form. Uses `js/league-data.js` to populate teams and `js/waiver.js` for client validation / relationship "Other" behavior. Submit calls Supabase RPC `public.mvl_submit_waiver(...)`, which writes to `mvl.waiver_submissions`.
@@ -81,7 +83,7 @@ Two audience phases:
 
 ## Next tasks (client priority order)
 1. **Raffle page + backend endpoint** — form asks for team, name, and detected GPS. Server must compute venue-radius eligibility and timestamp the entry; users should not manually adjust the pin.
-2. Rules page, team detail pages (team-card ↗ arrows), video pages/modal — all TBD with client.
+2. Team detail pages (team-card ↗ arrows) — TBD with client. The Videos page is complete.
 3. Decide how the two phases swap in production (single domain redirect, manual deploy swap, etc.) — not yet decided.
 
 ## Verification

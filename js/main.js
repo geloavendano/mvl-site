@@ -209,9 +209,9 @@ const completedGames = GAMES
 const gameCard = (game) => {
   const teamA = gameTeam(game, 'A');
   const teamB = gameTeam(game, 'B');
-  const href = game.youtubeId ? `https://www.youtube.com/watch?v=${game.youtubeId}` : 'schedule.html';
+  const href = game.youtubeId ? `videos.html#game-${game.id}` : 'schedule.html';
   return `
-  <a class="video-card reveal" href="${href}" ${game.youtubeId ? 'target="_blank" rel="noopener"' : ''}>
+  <a class="video-card reveal" href="${href}">
     <div class="video-thumb ${game.youtubeId ? '' : 'placeholder'}">
       <span class="play-btn play-btn--sm" aria-hidden="true"></span>
     </div>
