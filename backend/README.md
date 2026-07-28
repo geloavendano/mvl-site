@@ -76,6 +76,26 @@ public.mvl_record_game_result(...)
 
 It updates the game winner/status, replaces set scores, assigns Player of the Game, and upserts a YouTube recording link in one transaction.
 
+## Admin Access
+
+Admin access uses a normalized email allowlist and Google SSO. An administrator
+can be registered before their first sign-in:
+
+```sql
+insert into mvl.admin_users (email)
+values (lower(trim('admin@example.com')))
+on conflict (email) do nothing;
+```
+
+The email must be the exact email returned by the person's Google account.
+Removing the allowlist row revokes admin access without deleting their Supabase
+Auth account:
+
+```sql
+delete from mvl.admin_users
+where email = lower(trim('admin@example.com'));
+```
+
 ## Standings Ranking
 
 The standings helper is:

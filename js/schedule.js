@@ -1,6 +1,16 @@
 const { teams, games } = window.MVL_DATA;
 const teamById = Object.fromEntries(teams.map((team) => [team.id, team]));
 const playoffGameIds = new Set(['qf1', 'qf2', 'qf3', 'qf4', 'sf1', 'sf2', 'bronze', 'final']);
+const playoffNotes = {
+  qf1: { round: 'Quarter-Final 1', matchup: '3rd vs 6th' },
+  qf2: { round: 'Quarter-Final 2', matchup: '4th vs 5th' },
+  qf3: { round: 'Quarter-Final 3', matchup: '2nd vs 7th' },
+  qf4: { round: 'Quarter-Final 4', matchup: '1st vs 8th' },
+  sf1: { round: 'Semi-Final 1', matchup: 'Winner QF1 vs Winner QF4' },
+  sf2: { round: 'Semi-Final 2', matchup: 'Winner QF2 vs Winner QF3' },
+  bronze: { round: 'Battle for Bronze', matchup: 'Loser SF1 vs Loser SF2' },
+  final: { round: 'Championship Match', matchup: 'Winner SF1 vs Winner SF2' },
+};
 const gameTeam = (game, side) => {
   const id = side === 'A' ? game.teamA : game.teamB;
   const label = side === 'A' ? game.teamALabel : game.teamBLabel;
@@ -176,10 +186,17 @@ const renderMatches = () => {
     const winner = game.winner ? teamById[game.winner] : null;
     const pogTeam = game.playerOfGame?.team ? teamById[game.playerOfGame.team] : null;
     const videoHref = game.youtubeId ? `https://www.youtube.com/watch?v=${game.youtubeId}` : '';
+    const playoffNote = playoffNotes[game.id];
 
     return `
       <article class="match-card ${game.status === 'final' ? 'is-final' : 'is-pending'}">
         <div class="match-meta">
+          ${playoffNote ? `
+            <div class="match-stage">
+              <strong>${playoffNote.round}</strong>
+              <small>${playoffNote.matchup}</small>
+            </div>
+          ` : ''}
           <span>${gameStatus(game)}</span>
           <span>${formatTime(game.startsAt)}</span>
           <span>${game.court}</span>
