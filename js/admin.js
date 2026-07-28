@@ -2,10 +2,8 @@ const cfg = window.MVL_SUPABASE;
 const authClient = window.supabase.createClient(cfg.url, cfg.anonKey);
 let session = null;
 let data;
+let activeAdminDay = 1;
 const teams = Object.fromEntries(window.MVL_DATA.teams.map((t) => [t.id, t]));
-teamLetterMap.innerHTML = window.MVL_DATA.teams.map((team, index) =>
-  `<div><strong>${String.fromCharCode(65 + index)}</strong><span>${team.name}</span></div>`
-).join('');
 const gameTeamName = (game, side) => {
   const id = side === 'A' ? game.teamA : game.teamB;
   const label = side === 'A' ? game.teamALabel : game.teamBLabel;
@@ -40,8 +38,20 @@ const teamOptions = (selected, placeholder) => [
     `<option value="${team.id}" ${!placeholder && team.id === selected ? 'selected' : ''}>${team.name}</option>`
   ),
 ].join('');
+const formatAdminDay = (iso) => new Intl.DateTimeFormat('en-PH', {
+  timeZone: 'Asia/Manila', month: 'short', day: 'numeric', weekday: 'short',
+}).format(new Date(iso));
 const render = () => {
-  document.getElementById('adminGameList').innerHTML = data.publicData.games.map((g) => `<form class="admin-panel admin-game admin-form" data-id="${g.id}">
+  const allGames = data.publicData.games;
+  const days = [...new Set(allGames.map((game) => game.day))].sort((a, b) => a - b);
+  if (!days.includes(activeAdminDay)) activeAdminDay = days[0];
+  const dayGames = allGames.filter((game) => game.day === activeAdminDay);
+  adminDayFilter.innerHTML = days.map((day) => {
+    const first = allGames.find((game) => game.day === day);
+    return `<option value="${day}" ${day === activeAdminDay ? 'selected' : ''}>Day ${day} · ${formatAdminDay(first.startsAt)}</option>`;
+  }).join('');
+  adminDaySummary.textContent = `${dayGames.length} games · ${formatAdminDay(dayGames[0].startsAt)}`;
+  document.getElementById('adminGameList').innerHTML = dayGames.map((g) => `<form class="admin-panel admin-game admin-form" data-id="${g.id}">
     <div class="admin-panel-head"><div><p class="games-label">Day ${g.day} · ${g.court} · ${g.status}</p><h3>${gameTeamName(g, 'A')} <em>vs</em> ${gameTeamName(g, 'B')}</h3></div><button type="button" class="admin-link" data-reset>Reset</button></div>
     <div class="admin-fields admin-fields--matchup"><label class="field"><span>Team A</span><select name="teamA">${teamOptions(g.teamA, g.teamALabel)}</select></label><label class="field"><span>Team B</span><select name="teamB">${teamOptions(g.teamB, g.teamBLabel)}</select></label><label class="field"><span>Match day</span><input name="day" type="number" min="1" value="${g.day}" required></label><label class="field"><span>Game order</span><input name="gameOrder" type="number" min="1" value="${g.gameOrder || 1}" required><small>Lower numbers appear first.</small></label><label class="field"><span>Date & time (Philippines)</span><input name="startsAt" type="datetime-local" value="${manilaDateTime(g.startsAt)}" required></label><button class="cta cta--secondary" type="button" data-save-schedule>Save schedule & matchup</button></div>
     <p class="admin-warning">Changing either team clears the old result, set scores, and video because they belong to the previous matchup.</p>
@@ -73,8 +83,9 @@ googleSignInBtn.addEventListener('click', async () => {
   if (error) status(loginStatus, error.message, 'error');
 });
 livestreamForm.addEventListener('submit', async (e) => { e.preventDefault(); const s = e.target.querySelector('.form-status'), f = e.target.elements; status(s, 'Saving…'); try { const id = youtubeId(f.youtubeId.value) || youtubeId(f.youtubeUrl.value) || ''; await rpc('mvl_admin_update_livestream', { p_is_live: f.isLive.checked, p_youtube_url: f.youtubeUrl.value, p_youtube_id: id }); f.youtubeId.value = id; status(s, 'Livestream updated.', 'success'); } catch (err) { status(s, err.message, 'error'); } });
+adminDayFilter.addEventListener('change', () => { activeAdminDay = Number(adminDayFilter.value); render(); });
 adminGameList.addEventListener('submit', async (e) => { const form = e.target.closest('[data-id]'); if (!form) return; e.preventDefault(); const s = form.querySelector('.form-status'), g = data.publicData.games.find((x) => x.id === form.dataset.id); const sets = [0,1,2,3,4].filter((i) => form.elements[`a${i}`].value !== '' && form.elements[`b${i}`].value !== '').map((i) => ({ team_a_score: +form.elements[`a${i}`].value, team_b_score: +form.elements[`b${i}`].value })); status(s, 'Saving…'); try { if (!sets.length) throw new Error('Enter at least one set.'); await rpc('mvl_record_game_result', { p_game_id:g.id,p_winner_team_id:form.elements.winner.value,p_player_of_game_id:null,p_sets:sets,p_youtube_id:youtubeId(form.elements.youtubeId.value),p_video_title:`${gameTeamName(g, 'A')} vs ${gameTeamName(g, 'B')} · Full Game`,p_duration_seconds:duration(form.elements.duration.value),p_video_published_at:new Date().toISOString(),p_video_is_featured:true }); status(s,'Result and video updated.','success'); } catch(err){ status(s,err.message,'error'); } });
-adminGameList.addEventListener('click', async (e) => { const form=e.target.closest('[data-id]'); if(!form)return; const s=form.querySelector('.form-status'); if(e.target.closest('[data-save-schedule]')){status(s,'Saving schedule and matchup…');try{const gameId=form.dataset.id;const local=form.elements.startsAt.value;const game=data.publicData.games.find((item)=>item.id===gameId);const keepA=form.elements.teamA.value==='__placeholder__';const keepB=form.elements.teamB.value==='__placeholder__';const updated=await rpc('mvl_admin_update_game_schedule',{p_game_id:gameId,p_day:+form.elements.day.value,p_game_order:+form.elements.gameOrder.value,p_starts_at:new Date(`${local}:00+08:00`).toISOString(),p_team_a_id:keepA?game.teamA:form.elements.teamA.value,p_team_b_id:keepB?game.teamB:form.elements.teamB.value,p_team_a_label:keepA?game.teamALabel:null,p_team_b_label:keepB?game.teamBLabel:null});data=await rpc('mvl_admin_get_dashboard');render();const refreshed=document.querySelector(`[data-id="${gameId}"] .form-status`);status(refreshed,updated.matchupChanged?'Matchup updated; old result and video cleared.':'Schedule and order updated.','success');}catch(err){status(s,err.message,'error');}return;} const btn=e.target.closest('[data-reset]'); if(!btn)return; status(s,'Resetting…'); try{await rpc('mvl_admin_reset_game',{p_game_id:form.dataset.id});form.elements.winner.value='';form.querySelectorAll('.admin-sets input').forEach((i)=>i.value='');status(s,'Reset to pending.','success');}catch(err){status(s,err.message,'error');}});
+adminGameList.addEventListener('click', async (e) => { const form=e.target.closest('[data-id]'); if(!form)return; const s=form.querySelector('.form-status'); if(e.target.closest('[data-save-schedule]')){status(s,'Saving schedule and matchup…');try{const gameId=form.dataset.id;const local=form.elements.startsAt.value;const game=data.publicData.games.find((item)=>item.id===gameId);const keepA=form.elements.teamA.value==='__placeholder__';const keepB=form.elements.teamB.value==='__placeholder__';const updated=await rpc('mvl_admin_update_game_schedule',{p_game_id:gameId,p_day:+form.elements.day.value,p_game_order:+form.elements.gameOrder.value,p_starts_at:new Date(`${local}:00+08:00`).toISOString(),p_team_a_id:keepA?game.teamA:form.elements.teamA.value,p_team_b_id:keepB?game.teamB:form.elements.teamB.value,p_team_a_label:keepA?game.teamALabel:null,p_team_b_label:keepB?game.teamBLabel:null});data=await rpc('mvl_admin_get_dashboard');activeAdminDay=updated.day;render();const refreshed=document.querySelector(`[data-id="${gameId}"] .form-status`);status(refreshed,updated.matchupChanged?'Matchup updated; old result and video cleared.':'Schedule and order updated.','success');}catch(err){status(s,err.message,'error');}return;} const btn=e.target.closest('[data-reset]'); if(!btn)return; status(s,'Resetting…'); try{await rpc('mvl_admin_reset_game',{p_game_id:form.dataset.id});form.elements.winner.value='';form.querySelectorAll('.admin-sets input').forEach((i)=>i.value='');status(s,'Reset to pending.','success');}catch(err){status(s,err.message,'error');}});
 signOutBtn.addEventListener('click', async()=>{await authClient.auth.signOut();location.reload();});
 authClient.auth.onAuthStateChange((_event, nextSession) => {
   if (nextSession?.access_token && nextSession.access_token !== session?.access_token) {

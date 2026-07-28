@@ -30,23 +30,26 @@
   --nav-h: 56px;
 }
 
-/* Admin dashboard */
-.admin-page{min-height:100svh;background:linear-gradient(155deg,var(--navy),#050911 55%,var(--navy-footer))}
-.admin-topbar{height:64px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;background:rgba(8,5,34,.92);border-bottom:1px solid rgba(124,245,180,.18)}
-.admin-topbar img{height:38px;width:auto}.admin-main{width:min(1180px,100%);margin:auto;padding:36px 16px 80px}
-.admin-panel{padding:20px;border:1px solid rgba(124,245,180,.2);background:rgba(8,5,34,.74);box-shadow:0 20px 60px rgba(0,0,0,.2)}
-.admin-login{width:min(480px,100%);margin:8vh auto}.admin-login h1,.admin-heading h1{font:italic 700 54px/1 var(--stretch);text-transform:uppercase;margin-bottom:24px}
-.admin-login-copy{color:var(--ink-muted);font-size:14px;line-height:1.6}
-.admin-form{display:grid;gap:18px}.admin-heading,.admin-panel-head{display:flex;align-items:center;justify-content:space-between;gap:16px}.admin-heading{margin-bottom:24px}.admin-heading>p{color:var(--ink-muted);font:11px var(--mono)}
-.admin-panel-head h2,.admin-games-head h2{font:italic 700 42px/1 var(--stretch);text-transform:uppercase}.admin-panel-head h3{text-transform:uppercase}.admin-panel-head h3 em{color:var(--teal)}
-.admin-team-map{margin-bottom:18px}.admin-team-map #teamLetterMap{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.admin-team-map #teamLetterMap div{display:flex;align-items:center;gap:10px;padding:9px;border:1px solid rgba(255,255,255,.08)}.admin-team-map #teamLetterMap strong{display:grid;place-items:center;width:28px;height:28px;background:var(--mint);color:var(--navy-deep);font-size:12px}.admin-team-map #teamLetterMap span{font-size:11px;font-weight:800;text-transform:uppercase}
-.admin-fields{display:grid;gap:16px}.field small{color:var(--ink-muted);font-size:11px;line-height:1.45}.admin-switch{display:flex;gap:8px;align-items:center;font-size:11px;font-weight:800;text-transform:uppercase}.admin-switch input{width:20px;height:20px;accent-color:var(--mint)}
-.admin-warning{padding:10px 12px;border-left:3px solid #f5c77c;background:rgba(245,199,124,.08);color:#f8ddb0;font-size:11px;line-height:1.5}
-.admin-link{border:0;background:none;color:var(--mint);cursor:pointer;font:800 10px var(--ui);letter-spacing:1.4px;text-transform:uppercase}.admin-games-head{margin-top:42px}.admin-game+.admin-game{margin-top:16px}
-.admin-game .cta:disabled{cursor:not-allowed;opacity:.4}
-.admin-score-heading,.admin-sets label{display:grid;grid-template-columns:55px minmax(75px,1fr) minmax(75px,1fr);align-items:center;gap:8px}.admin-score-heading{font:800 10px var(--ui);text-transform:uppercase;color:var(--teal)}.admin-score-heading strong{text-align:center}.admin-sets{display:grid;gap:8px}.admin-sets label{font:800 10px var(--ui);text-transform:uppercase;color:var(--ink-muted)}
-.admin-sets input{width:65px;min-height:42px;padding:7px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff;font:800 16px var(--ui);text-align:center}
-@media(min-width:960px){.admin-main{padding:52px 32px 100px}.admin-panel{padding:28px}.admin-team-map #teamLetterMap{grid-template-columns:repeat(4,minmax(0,1fr))}.admin-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-fields--three{grid-template-columns:repeat(3,minmax(0,1fr))}.admin-fields--matchup{grid-template-columns:repeat(2,minmax(0,1fr)) 100px 110px minmax(220px,1fr);align-items:end}.admin-fields--matchup .cta{grid-column:1/-1}.admin-score-heading,.admin-sets label{grid-template-columns:80px minmax(100px,1fr) minmax(100px,1fr)}.admin-sets input{width:100%}}
+/* Admin dashboard — intentionally quiet and utilitarian */
+.admin-page{min-height:100svh;background:#f5f6f8;color:#1d2433;font-family:Arial,Helvetica,sans-serif}
+.admin-topbar{height:60px;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;background:#fff;box-shadow:0 1px 4px rgba(18,25,38,.08)}
+.admin-topbar img{height:34px;width:auto}.admin-main{width:min(1040px,100%);margin:auto;padding:32px 16px 72px}
+.admin-panel{padding:20px;border:0;border-radius:10px;background:#fff;box-shadow:0 1px 3px rgba(18,25,38,.1)}
+.admin-login{width:min(440px,100%);margin:8vh auto}.admin-login h1,.admin-heading h1{margin:0;font:700 28px/1.2 Arial,Helvetica,sans-serif;text-transform:none}
+.admin-login-copy,.admin-heading div>p,.admin-panel-head p,.admin-day-filter span{color:#667085;font-size:13px;line-height:1.5}
+.admin-form{display:grid;gap:18px}.admin-heading,.admin-panel-head,.admin-form-actions,.admin-games-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px}.admin-heading{margin-bottom:24px}.admin-heading>p{color:#667085;font-size:12px}
+.admin-panel-head h2,.admin-games-toolbar h2{margin:0;font:700 20px/1.3 Arial,Helvetica,sans-serif;text-transform:none}.admin-panel-head h3{margin:0;font:700 18px/1.3 Arial,Helvetica,sans-serif;text-transform:none}.admin-panel-head h3 em{color:#667085;font-style:normal;font-weight:400}
+.admin-fields{display:grid;gap:14px}.admin-page .field{gap:6px}.admin-page .field span{color:#344054;font:600 12px Arial,Helvetica,sans-serif;letter-spacing:0;text-transform:none}.admin-page .field small{color:#667085;font-size:11px;line-height:1.4}
+.admin-page .field input,.admin-page .field select,.admin-day-filter select{min-height:42px;border:1px solid #d0d5dd;border-radius:7px;background:#fff;color:#1d2433;font:400 14px Arial,Helvetica,sans-serif;padding:9px 11px;box-shadow:none}.admin-page .field input:focus,.admin-page .field select:focus,.admin-day-filter select:focus{border-color:#475467;box-shadow:0 0 0 3px rgba(71,84,103,.1);background:#fff}
+.admin-switch{display:flex;gap:8px;align-items:center;color:#344054;font-size:13px;font-weight:600}.admin-switch input{width:18px;height:18px;accent-color:#344054}
+.admin-warning{padding:10px 12px;border-radius:6px;background:#f9fafb;color:#667085;font-size:11px;line-height:1.5}
+.admin-link{border:0;background:none;color:#475467;cursor:pointer;font:600 12px Arial,Helvetica,sans-serif;letter-spacing:0;text-transform:none}.admin-link:hover{color:#101828}
+.admin-page .cta{min-height:40px;padding:10px 16px;border:0;border-radius:7px;background:#25324a;color:#fff;font:600 13px Arial,Helvetica,sans-serif;letter-spacing:0;text-transform:none;box-shadow:none}.admin-page .cta--secondary{background:#eef1f5;color:#25324a}.admin-page .cta:hover{filter:none;background:#34435e}.admin-page .cta--secondary:hover{background:#e3e7ed}.admin-game+.admin-game{margin-top:14px}.admin-game .cta:disabled{cursor:not-allowed;opacity:.4}
+.admin-games-toolbar{margin:36px 0 14px}.admin-games-toolbar>div>p{margin-top:3px;color:#667085;font-size:13px}.admin-day-filter{display:grid;gap:5px;min-width:210px}.admin-day-filter span{font-weight:600}
+.admin-score-heading,.admin-sets label{display:grid;grid-template-columns:54px minmax(75px,1fr) minmax(75px,1fr);align-items:center;gap:8px}.admin-score-heading{color:#667085;font-size:11px}.admin-score-heading strong{text-align:center;color:#344054}.admin-sets{display:grid;gap:7px}.admin-sets label{color:#667085;font-size:11px}
+.admin-page .admin-sets input{width:100%;min-height:38px;padding:7px;border:1px solid #d0d5dd;border-radius:6px;background:#fff;color:#1d2433;font:600 14px Arial,Helvetica,sans-serif;text-align:center}.admin-page .form-status{color:#667085;font:400 12px Arial,Helvetica,sans-serif;letter-spacing:0;text-transform:none}.admin-page .form-status.is-error{color:#b42318}.admin-page .form-status.is-success{color:#067647}
+@media(min-width:760px){.admin-main{padding:40px 24px 80px}.admin-panel{padding:22px}.admin-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-fields--three{grid-template-columns:repeat(3,minmax(0,1fr))}.admin-fields--matchup{grid-template-columns:repeat(4,minmax(0,1fr))}.admin-fields--matchup .field:nth-child(5){grid-column:span 2}.admin-fields--matchup .cta{align-self:end}.admin-score-heading,.admin-sets label{grid-template-columns:70px minmax(100px,1fr) minmax(100px,1fr)}}
+@media(max-width:600px){.admin-heading,.admin-panel-head,.admin-form-actions,.admin-games-toolbar{align-items:flex-start;flex-direction:column}.admin-day-filter{width:100%}.admin-day-filter select{width:100%}.admin-switch{margin-top:4px}}
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 

@@ -3,8 +3,6 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><title>MVL Admin</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="admin-page">
@@ -14,10 +12,10 @@
     <div class="admin-form"><p class="admin-login-copy">Continue with an allowlisted Google account.</p><button id="googleSignInBtn" class="cta cta--primary" type="button">Continue with Google</button><p id="loginStatus" class="form-status"></p></div>
   </section>
   <section id="dashboard" class="is-hidden">
-    <div class="admin-heading"><div><p class="games-label">Control room</p><h1>Game Day Admin</h1></div><p id="adminIdentity"></p></div>
-    <section class="admin-panel admin-team-map"><div class="admin-panel-head"><div><p class="games-label">Schedule placeholders</p><h2>Teams A–H</h2></div></div><div id="teamLetterMap"></div></section>
-    <form id="livestreamForm" class="admin-panel admin-form"><div class="admin-panel-head"><div><p class="games-label">Broadcast</p><h2>Livestream</h2></div><label class="admin-switch"><input name="isLive" type="checkbox"> Live now</label></div><div class="admin-fields"><label class="field"><span>YouTube livestream link</span><input name="youtubeUrl" type="url" placeholder="https://youtube.com/watch?v=..."></label><label class="field"><span>YouTube video ID</span><input name="youtubeId" placeholder="The code after v= or youtu.be/"><small>This is the unique code in the YouTube link, used for the embedded player.</small></label></div><button class="cta cta--primary">Save livestream</button><p class="form-status"></p></form>
-    <div class="admin-heading admin-games-head"><div><p class="games-label">Scores & recordings</p><h2>Games</h2></div></div><div id="adminGameList"></div>
+    <div class="admin-heading"><div><h1>MVL Admin</h1><p>Manage the livestream, schedule, matchups, and results.</p></div><p id="adminIdentity"></p></div>
+    <form id="livestreamForm" class="admin-panel admin-form"><div class="admin-panel-head"><div><h2>Livestream</h2><p>Controls the livestream state on the homepage.</p></div><label class="admin-switch"><input name="isLive" type="checkbox"> Live now</label></div><div class="admin-fields"><label class="field"><span>YouTube livestream link</span><input name="youtubeUrl" type="url" placeholder="https://youtube.com/watch?v=..."></label><label class="field"><span>YouTube video ID</span><input name="youtubeId" placeholder="The code after v= or youtu.be/"><small>A full YouTube link also works.</small></label></div><div class="admin-form-actions"><button class="cta cta--primary">Save livestream</button><p class="form-status"></p></div></form>
+    <div class="admin-games-toolbar"><div><h2>Games</h2><p id="adminDaySummary"></p></div><label class="admin-day-filter"><span>Match day</span><select id="adminDayFilter"></select></label></div>
+    <div id="adminGameList"></div>
   </section>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/supabase-config.js"></script><script src="js/league-data.js"></script><script src="js/admin.js"></script>

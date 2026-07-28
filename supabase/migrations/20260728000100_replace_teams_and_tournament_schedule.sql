@@ -50,9 +50,9 @@ insert into mvl.games (
 
   -- September 5 · final preliminary matches and Quarter-Finals
   ('pre-25', 4, 1, '11111111-1111-4111-8111-111111111111', '2026-09-05T09:00:00+08:00', 'metarice-x', 'metarice-y', null, null, 'pending', null),
-  ('pre-26', 4, 2, '22222222-2222-4222-8222-222222222222', '2026-09-05T09:00:00+08:00', 'thurstrap', 'gizmo', null, null, 'pending', null),
+  ('pre-26', 4, 2, '22222222-2222-4222-8222-222222222222', '2026-09-05T09:00:00+08:00', 'thurstrap', 'up-leftout', null, null, 'pending', null),
   ('pre-27', 4, 3, '11111111-1111-4111-8111-111111111111', '2026-09-05T10:30:00+08:00', 'gremlins', 'ssvc', null, null, 'pending', null),
-  ('pre-28', 4, 4, '22222222-2222-4222-8222-222222222222', '2026-09-05T10:30:00+08:00', 's24', 'up-leftout', null, null, 'pending', null),
+  ('pre-28', 4, 4, '22222222-2222-4222-8222-222222222222', '2026-09-05T10:30:00+08:00', 'gizmo', 's24', null, null, 'pending', null),
   ('qf1', 4, 5, '11111111-1111-4111-8111-111111111111', '2026-09-05T12:00:00+08:00', 'thurstrap', 'ssvc', '3rd Seed', '6th Seed', 'pending', null),
   ('qf2', 4, 6, '22222222-2222-4222-8222-222222222222', '2026-09-05T12:00:00+08:00', 'gizmo', 'gremlins', '4th Seed', '5th Seed', 'pending', null),
   ('qf3', 4, 7, '11111111-1111-4111-8111-111111111111', '2026-09-05T13:30:00+08:00', 'metarice-y', 's24', '2nd Seed', '7th Seed', 'pending', null),
