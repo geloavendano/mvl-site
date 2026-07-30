@@ -29,16 +29,36 @@
   </nav>
 </header>
 
-<main>
-  <section class="videos-hero page-hero">
-    <h1 class="section-title">Watch the <em>Games</em></h1>
+<main class="videos-main">
+  <section class="videos-feature" id="latestGame" aria-labelledby="latestGameTitle">
+    <div class="videos-feature-media" id="latestVideoMedia">
+      <img id="latestVideoPoster" src="/mvl/assets/mvl-kv.png" alt="">
+    </div>
+    <div class="videos-feature-scrim" aria-hidden="true"></div>
+    <div class="videos-feature-inner">
+      <div class="videos-feature-panel">
+        <p class="videos-feature-label"><span aria-hidden="true"></span>Latest Game</p>
+        <h1 class="videos-feature-title" id="latestGameTitle">Watch the <em>Games</em></h1>
+        <h2 class="videos-feature-matchup" id="latestGameMatchup">Latest recording</h2>
+        <p class="videos-feature-meta" id="latestGameMeta">MVL 2026</p>
+        <p class="videos-feature-result" id="latestGameResult">Game recordings will appear here.</p>
+        <div class="videos-feature-actions">
+          <button class="cta cta--primary videos-feature-play" id="latestVideoPlay" type="button" disabled>
+            <span class="play-btn play-btn--sm" aria-hidden="true"></span>
+            Play Latest Game
+          </button>
+          <a class="videos-feature-library-link" href="#videoLibraryTitle">View Library <span aria-hidden="true">&darr;</span></a>
+        </div>
+      </div>
+    </div>
+    <button class="videos-feature-close is-hidden" id="latestVideoClose" type="button">Back to video details</button>
   </section>
 
   <section class="video-library" aria-labelledby="videoLibraryTitle">
     <div class="video-library-head">
       <div>
-        <p class="games-label">Video Library</p>
-        <h2 id="videoLibraryTitle">Game Recordings</h2>
+        <p class="games-label">Game Video Library</p>
+        <h2 id="videoLibraryTitle">Recent Recordings</h2>
         <p id="videoResultCount" class="video-result-count"></p>
       </div>
       <div class="video-filters" role="group" aria-label="Filter game videos">

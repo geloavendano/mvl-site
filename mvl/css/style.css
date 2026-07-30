@@ -1114,39 +1114,215 @@ a.home-standing-row:hover {
    Game videos page
    ========================================================================== */
 .videos-page {
-  background:
-    radial-gradient(circle at 84% 10%, rgba(45, 212, 191, .18), transparent 28%),
-    linear-gradient(180deg, var(--navy) 0%, #050911 52%, var(--navy-deep) 100%);
+  background: var(--navy-deep);
 }
-.videos-page main {
+.videos-main {
   min-height: 100svh;
-  padding-top: var(--nav-h);
+  padding: 0;
 }
-.videos-hero {
-  padding: 46px 16px 28px;
+.videos-feature {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  min-height: max(680px, 100svh);
+  padding: calc(var(--nav-h) + 34px) 16px 82px;
+  overflow: hidden;
+  background: #05030f;
 }
-.videos-hero .section-kicker {
-  margin-bottom: 12px;
+.videos-feature-media,
+.videos-feature-scrim {
+  position: absolute;
+  inset: 0;
 }
-.videos-hero p:last-child {
-  max-width: 600px;
-  margin-top: 14px;
+.videos-feature-media {
+  z-index: -3;
+  background: #05030f;
+}
+.videos-feature-media img,
+.videos-feature-media iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.videos-feature-media img {
+  object-fit: cover;
+  object-position: center;
+  filter: saturate(.88) brightness(.7);
+  transform: scale(1.02);
+}
+.videos-feature-scrim {
+  z-index: -2;
+  background:
+    linear-gradient(90deg,
+      rgba(9, 6, 39, .94) 0%,
+      rgba(9, 6, 39, .7) 38%,
+      rgba(9, 6, 39, .2) 72%,
+      rgba(9, 6, 39, .42) 100%),
+    linear-gradient(180deg,
+      rgba(7, 5, 28, .66) 0%,
+      rgba(7, 5, 28, .06) 38%,
+      rgba(11, 7, 48, .88) 100%);
+  transition: opacity .2s ease;
+}
+.videos-feature-inner {
+  width: min(100%, 1504px);
+  margin: 0 auto;
+  transition: opacity .18s ease, transform .18s ease;
+}
+.videos-feature-panel {
+  width: min(100%, 680px);
+  padding: 26px 24px 28px;
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 24px;
+  background:
+    linear-gradient(135deg, rgba(23, 17, 71, .62), rgba(10, 8, 39, .52));
+  box-shadow: 0 32px 90px rgba(4, 3, 22, .38);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  backdrop-filter: blur(16px) saturate(120%);
+}
+.videos-feature-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--mint);
+  font: 800 10px var(--ui);
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+}
+.videos-feature-label span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--teal);
+  box-shadow: 0 0 16px rgba(45, 212, 191, .48);
+}
+.videos-feature-title {
+  margin-top: 15px;
+  font-family: var(--stretch);
+  font-size: clamp(58px, 18vw, 88px);
+  font-style: italic;
+  font-weight: 700;
+  line-height: .82;
+  text-transform: uppercase;
+}
+.videos-feature-title em {
+  color: var(--mint);
+  font-style: inherit;
+}
+.videos-feature-matchup {
+  margin-top: 28px;
+  font-size: clamp(24px, 7.6vw, 34px);
+  line-height: 1;
+  text-transform: uppercase;
+}
+.videos-feature-meta {
+  margin-top: 12px;
+  color: var(--ink-soft);
+  font: 800 10px var(--ui);
+  letter-spacing: 1.6px;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+.videos-feature-result {
+  margin-top: 18px;
   color: var(--ink-muted);
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.videos-feature-result::before {
+  display: inline-block;
+  width: 34px;
+  height: 2px;
+  margin-right: 10px;
+  background: var(--teal);
+  content: '';
+  vertical-align: middle;
+}
+.videos-feature-actions {
+  display: grid;
+  gap: 14px;
+  margin-top: 26px;
+}
+.videos-feature-play {
+  border: 0;
+  border-radius: 999px;
+}
+.videos-feature-play:disabled {
+  cursor: not-allowed;
+  filter: grayscale(.8);
+  opacity: .5;
+}
+.videos-feature-play .play-btn {
+  border-color: transparent;
+  background: var(--navy-deep);
+}
+.videos-feature-play .play-btn::after {
+  border-left-color: var(--mint);
+}
+.videos-feature-library-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 42px;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+.videos-feature-library-link span {
+  color: var(--mint);
+  font-size: 18px;
+  transition: transform .15s ease;
+}
+.videos-feature-library-link:hover span {
+  transform: translateY(3px);
+}
+.videos-feature-close {
+  position: absolute;
+  top: calc(var(--nav-h) + 16px);
+  right: 16px;
+  z-index: 4;
+  min-height: 40px;
+  padding: 9px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(11, 7, 48, .84);
+  color: #fff;
+  cursor: pointer;
+  font: 800 9px var(--ui);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+.videos-feature.is-playing .videos-feature-inner,
+.videos-feature.is-playing .videos-feature-scrim {
+  pointer-events: none;
+  opacity: 0;
+}
+.videos-feature.is-playing .videos-feature-inner {
+  transform: translateY(10px);
+}
+.videos-feature.is-playing .videos-feature-media {
+  top: var(--nav-h);
 }
 .video-library {
-  margin: 0 16px 34px;
-  padding: 18px;
-  border: 1px solid rgba(124, 245, 180, .18);
-  background: rgba(4, 9, 15, .7);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, .22);
+  position: relative;
+  z-index: 3;
+  width: min(calc(100% - 32px), 1504px);
+  margin: -32px auto 34px;
+  padding: 26px 18px 34px;
+  border-radius: 24px;
+  background: rgba(11, 7, 48, .94);
+  box-shadow: 0 -18px 60px rgba(4, 2, 20, .24);
 }
 .video-library-head {
   display: grid;
   gap: 20px;
-  padding-bottom: 18px;
-  border-bottom: 1px solid rgba(255, 255, 255, .09);
+  padding-bottom: 8px;
 }
 .video-library-head .games-label {
   margin-bottom: 8px;
@@ -1193,13 +1369,15 @@ a.home-standing-row:hover {
 .video-library-grid {
   display: grid;
   gap: 16px;
-  padding-top: 18px;
+  padding-top: 22px;
 }
 .library-video-card {
   min-width: 0;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, .12);
-  background: rgba(255, 255, 255, .035);
+  border: 0;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, .055);
+  box-shadow: 0 16px 36px rgba(4, 2, 20, .2);
 }
 .library-video-card:target {
   border-color: var(--mint);
@@ -1305,13 +1483,30 @@ a.home-standing-row:hover {
   line-height: 1.6;
 }
 @media (min-width: 760px) {
-  .videos-hero {
-    padding: 70px 48px 34px;
+  .videos-feature {
+    min-height: max(720px, 100svh);
+    padding: calc(var(--nav-h) + 42px) 48px 94px;
   }
-  .videos-hero p:last-child { font-size: 16px; }
+  .videos-feature-panel {
+    padding: 34px 38px 38px;
+    border-radius: 30px;
+  }
+  .videos-feature-title { font-size: 92px; }
+  .videos-feature-matchup { font-size: 36px; }
+  .videos-feature-meta { font-size: 12px; }
+  .videos-feature-result { font-size: 14px; }
+  .videos-feature-actions {
+    grid-template-columns: minmax(250px, 1fr) auto;
+    align-items: center;
+    gap: 24px;
+  }
+  .videos-feature-close {
+    right: 48px;
+  }
   .video-library {
-    margin: 0 48px 48px;
-    padding: 26px;
+    width: min(calc(100% - 96px), 1504px);
+    margin-top: -36px;
+    padding: 34px 22px 48px;
   }
   .video-library-head {
     grid-template-columns: minmax(0, 1fr) minmax(430px, .8fr);
@@ -1326,6 +1521,9 @@ a.home-standing-row:hover {
   .library-video-copy { padding: 18px; }
 }
 @media (min-width: 1240px) {
+  .videos-feature-panel {
+    width: 680px;
+  }
   .video-library-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -2912,8 +3110,8 @@ body:not(.admin-page) .video-filter select:focus-visible {
 .video-library {
   border: 0;
   border-radius: var(--surface-radius);
-  background: var(--surface-tonal);
-  box-shadow: var(--surface-shadow);
+  background: rgba(11, 7, 48, .94);
+  box-shadow: 0 -18px 60px rgba(4, 2, 20, .24);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
@@ -2933,8 +3131,8 @@ body:not(.admin-page) .video-filter select:focus-visible {
 }
 .library-video-card {
   border: 0;
-  border-radius: 18px;
-  background: rgba(4, 9, 15, .46);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, .055);
   box-shadow: 0 14px 34px rgba(4, 2, 20, .18);
 }
 .library-video-card:target {

@@ -5,6 +5,14 @@ const dayFilter = document.getElementById('videoDayFilter');
 const libraryGrid = document.getElementById('videoLibraryGrid');
 const emptyState = document.getElementById('videoLibraryEmpty');
 const resultCount = document.getElementById('videoResultCount');
+const feature = document.getElementById('latestGame');
+const featureMedia = document.getElementById('latestVideoMedia');
+const featurePoster = document.getElementById('latestVideoPoster');
+const featureMatchup = document.getElementById('latestGameMatchup');
+const featureMeta = document.getElementById('latestGameMeta');
+const featureResult = document.getElementById('latestGameResult');
+const featurePlay = document.getElementById('latestVideoPlay');
+const featureClose = document.getElementById('latestVideoClose');
 
 const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
@@ -42,6 +50,35 @@ const videoGames = games
 const videoRecords = videoGames.flatMap((game) =>
   gameVideos(game).map((video, index) => ({ game, video, index }))
 );
+const latestGame = videoGames[0];
+const latestVideos = latestGame ? gameVideos(latestGame) : [];
+const latestVideo = latestVideos.find((video) => /full\s*game/i.test(video.label || '')) || latestVideos[0];
+
+const renderLatestGame = () => {
+  if (!latestGame || !latestVideo) {
+    feature.classList.add('is-empty');
+    return;
+  }
+
+  const teamA = gameTeamName(latestGame, 'A');
+  const teamB = gameTeamName(latestGame, 'B');
+  const winner = latestGame.winner ? (teamById[latestGame.winner]?.name || latestGame.winner) : '';
+  const label = latestVideo.label || 'Full Game';
+  const maxresPoster = `https://i.ytimg.com/vi/${latestVideo.youtubeId}/maxresdefault.jpg`;
+  const fallbackPoster = `https://i.ytimg.com/vi/${latestVideo.youtubeId}/hqdefault.jpg`;
+
+  featurePoster.src = maxresPoster;
+  featurePoster.onerror = () => {
+    if (featurePoster.src !== fallbackPoster) featurePoster.src = fallbackPoster;
+  };
+  featureMatchup.textContent = `${teamA} vs ${teamB}`;
+  featureMeta.textContent = `Day ${latestGame.day} · ${formatDate(latestGame.startsAt)} · ${formatTime(latestGame.startsAt)}`;
+  featureResult.textContent = `${winner ? `Winner: ${winner}` : 'Result pending'} · ${label}${latestVideo.duration ? ` · ${latestVideo.duration}` : ''}`;
+  featurePlay.disabled = false;
+  featurePlay.dataset.videoId = latestVideo.youtubeId;
+  featurePlay.dataset.videoLabel = label;
+  featurePlay.setAttribute('aria-label', `Play ${label}: ${teamA} versus ${teamB}`);
+};
 
 const availableTeamIds = new Set(videoGames.flatMap((game) => [game.teamA, game.teamB]));
 teamFilter.insertAdjacentHTML('beforeend', teams
@@ -116,4 +153,36 @@ libraryGrid.addEventListener('click', (event) => {
   `;
 });
 
+featurePlay.addEventListener('click', () => {
+  const videoId = featurePlay.dataset.videoId;
+  if (!validYouTubeId(videoId)) return;
+  const label = featurePlay.dataset.videoLabel || 'Latest MVL game';
+  feature.classList.add('is-playing');
+  featureClose.classList.remove('is-hidden');
+  featureMedia.innerHTML = `
+    <iframe
+      src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1"
+      title="${escapeHtml(label)}"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      referrerpolicy="strict-origin-when-cross-origin"
+      allowfullscreen></iframe>
+  `;
+  featureClose.focus();
+});
+
+featureClose.addEventListener('click', () => {
+  feature.classList.remove('is-playing');
+  featureClose.classList.add('is-hidden');
+  featureMedia.innerHTML = '<img id="latestVideoPoster" src="" alt="">';
+  const restoredPoster = featureMedia.querySelector('img');
+  restoredPoster.src = `https://i.ytimg.com/vi/${latestVideo.youtubeId}/maxresdefault.jpg`;
+  restoredPoster.onerror = () => {
+    if (restoredPoster.dataset.fallbackApplied) return;
+    restoredPoster.dataset.fallbackApplied = 'true';
+    restoredPoster.src = `https://i.ytimg.com/vi/${latestVideo.youtubeId}/hqdefault.jpg`;
+  };
+  featurePlay.focus();
+});
+
+renderLatestGame();
 renderVideos();
