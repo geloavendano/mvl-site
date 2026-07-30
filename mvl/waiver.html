@@ -65,13 +65,11 @@
         </label>
 
         <label class="field">
-          <span>First Name</span>
-          <input name="first_name" type="text" autocomplete="given-name" required>
-        </label>
-
-        <label class="field">
-          <span>Last Name</span>
-          <input name="last_name" type="text" autocomplete="family-name" required>
+          <span>Player Name</span>
+          <select name="player_id" id="playerSelect" required disabled>
+            <option value="">Select a team first</option>
+          </select>
+          <small id="playerSelectHint">Players are loaded from the selected team's registered roster.</small>
         </label>
 
         <label class="field">
@@ -79,7 +77,7 @@
           <input name="contact_number" type="tel" inputmode="tel" autocomplete="tel" placeholder="09XXXXXXXXX" pattern="^(09|\+639)\d{9}$" required>
         </label>
 
-        <label class="field field--wide">
+        <label class="field">
           <span>Email Address</span>
           <input name="email" type="email" autocomplete="email" required>
         </label>

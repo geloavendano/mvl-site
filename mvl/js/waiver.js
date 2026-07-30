@@ -2,11 +2,14 @@ const { teams } = window.MVL_DATA;
 
 const form = document.getElementById('waiverForm');
 const teamSelect = document.getElementById('teamSelect');
+const playerSelect = document.getElementById('playerSelect');
+const playerSelectHint = document.getElementById('playerSelectHint');
 const relationshipSelect = document.getElementById('relationshipSelect');
 const relationshipOtherField = document.getElementById('relationshipOtherField');
 const relationshipOtherInput = document.getElementById('relationshipOtherInput');
 const formStatus = document.getElementById('formStatus');
 const supabase = window.MVL_SUPABASE;
+let playerLoadId = 0;
 
 teams.forEach((team) => {
   const option = document.createElement('option');
@@ -14,6 +17,80 @@ teams.forEach((team) => {
   option.textContent = team.name;
   teamSelect.append(option);
 });
+
+const setPlayerOptions = (message, players = []) => {
+  playerSelect.replaceChildren();
+  const placeholder = document.createElement('option');
+  placeholder.value = '';
+  placeholder.textContent = message;
+  playerSelect.append(placeholder);
+
+  players.forEach((player) => {
+    const option = document.createElement('option');
+    option.value = player.id;
+    option.textContent = player.jerseyNumber
+      ? `${player.name} · #${player.jerseyNumber}`
+      : player.name;
+    playerSelect.append(option);
+  });
+
+  playerSelect.disabled = players.length === 0;
+};
+
+const loadTeamPlayers = async () => {
+  const requestId = ++playerLoadId;
+  const teamId = teamSelect.value;
+  playerSelectHint.classList.remove('is-error');
+
+  if (!teamId) {
+    setPlayerOptions('Select a team first');
+    playerSelectHint.textContent = "Players are loaded from the selected team's registered roster.";
+    return;
+  }
+
+  if (!supabase?.url || !supabase?.anonKey) {
+    setPlayerOptions('Unable to load players');
+    playerSelectHint.textContent = 'The player roster is unavailable right now.';
+    playerSelectHint.classList.add('is-error');
+    return;
+  }
+
+  setPlayerOptions('Loading players…');
+  playerSelectHint.textContent = 'Loading the registered roster…';
+
+  try {
+    const response = await fetch(`${supabase.url}/rest/v1/rpc/mvl_get_team_players`, {
+      method: 'POST',
+      headers: {
+        apikey: supabase.anonKey,
+        Authorization: `Bearer ${supabase.anonKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ p_team_id: teamId }),
+    });
+
+    if (!response.ok) throw new Error('Unable to load the player roster.');
+
+    const players = await response.json();
+    if (requestId !== playerLoadId) return;
+
+    if (!Array.isArray(players) || players.length === 0) {
+      setPlayerOptions('No registered players for this team');
+      playerSelectHint.textContent = 'Ask your team representative to add the player to the official roster.';
+      return;
+    }
+
+    setPlayerOptions('Select your name', players);
+    playerSelectHint.textContent = `${players.length} registered player${players.length === 1 ? '' : 's'} found.`;
+  } catch (error) {
+    if (requestId !== playerLoadId) return;
+    setPlayerOptions('Unable to load players');
+    playerSelectHint.textContent = error.message;
+    playerSelectHint.classList.add('is-error');
+  }
+};
+
+teamSelect.addEventListener('change', loadTeamPlayers);
 
 const syncRelationshipOther = () => {
   const needsOther = relationshipSelect.value === 'Other';
@@ -30,7 +107,7 @@ const submitWaiver = async (payload) => {
     throw new Error('Supabase is not configured.');
   }
 
-  const response = await fetch(`${supabase.url}/rest/v1/rpc/mvl_submit_waiver`, {
+  const response = await fetch(`${supabase.url}/rest/v1/rpc/mvl_submit_player_waiver`, {
     method: 'POST',
     headers: {
       apikey: supabase.anonKey,
@@ -57,6 +134,13 @@ form.addEventListener('submit', async (event) => {
   event.preventDefault();
   formStatus.classList.remove('is-error', 'is-success');
 
+  if (!teamSelect.value || playerSelect.disabled || !playerSelect.value) {
+    formStatus.textContent = 'Select your team and your name from the registered player list.';
+    formStatus.classList.add('is-error');
+    (teamSelect.value && !playerSelect.disabled ? playerSelect : teamSelect).focus();
+    return;
+  }
+
   if (!form.checkValidity()) {
     formStatus.textContent = 'Please complete all required fields and check the mobile number format.';
     formStatus.classList.add('is-error');
@@ -67,8 +151,7 @@ form.addEventListener('submit', async (event) => {
   const formData = Object.fromEntries(new FormData(form));
   const payload = {
     p_team_id: formData.team_id,
-    p_first_name: formData.first_name.trim(),
-    p_last_name: formData.last_name.trim(),
+    p_player_id: formData.player_id,
     p_contact_number: formData.contact_number.trim(),
     p_email: formData.email.trim(),
     p_emergency_contact_name: formData.emergency_contact_name.trim(),

@@ -44,13 +44,22 @@ The initial `public.mvl_*` tables were removed after the schema migration.
 
 ## Current Live Integration
 
-`waiver.html` submits through this public RPC:
+`waiver.html` loads the selected team's roster through:
 
 ```text
-public.mvl_submit_waiver(...)
+public.mvl_get_team_players(...)
 ```
 
-The RPC writes into `mvl.waiver_submissions`.
+It then submits the selected roster player through:
+
+```text
+public.mvl_submit_player_waiver(...)
+```
+
+The submission RPC verifies that the player belongs to the selected team, then
+writes the player reference and contact details into `mvl.waiver_submissions`.
+The older `public.mvl_submit_waiver(...)` helper remains available for
+backward compatibility.
 
 using the public anon key in:
 
