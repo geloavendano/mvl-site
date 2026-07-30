@@ -2,5 +2,8 @@
 .env
 .env.local
 .env.*.local
-assets/*.mov
-assets/mvl-video-1-web.mp4
+
+# Source video masters — only the optimized mvl-video-1-web-10s.mp4 is committed.
+# Patterns are path-agnostic so they survive the site living under mvl/.
+*.mov
+mvl-video-1-web.mp4

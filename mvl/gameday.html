@@ -9,19 +9,23 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
+<script src="js/site-config.js"></script>
+<script src="js/nav.js"></script>
 </head>
 <body id="top">
 
 <!-- ============ TOP NAV ============ -->
 <header class="nav" id="nav">
-  <a class="nav-logo" href="#top" aria-label="MVL 2026 — back to top">
+  <a class="nav-logo" href="index.html" aria-label="MVL 2026 home">
     <img class="nav-logo-img" src="assets/hero-mvl-2026-logo.png" alt="Metarice Volleyball League 2026">
   </a>
   <nav class="nav-links" aria-label="Primary">
-    <a href="#schedule-preview">Schedule</a>
-    <a href="videos.html">Videos</a>
-    <a href="#teams">Teams</a>
-    <a href="#rules-preview">Rules</a>
+    <a href="schedule.html" data-phase="gameday">Schedule</a>
+    <a href="videos.html" data-phase="gameday">Videos</a>
+    <a href="index.html#teams" data-phase="gameday">Teams</a>
+    <a href="rules.html">Rules</a>
+    <a href="waiver.html" data-phase="registration">Waiver</a>
+    <a href="registration.html" data-phase="gameday">Registration</a>
   </nav>
 </header>
 
@@ -54,7 +58,7 @@
         <a class="cta cta--primary" href="#" data-livestream-link>
           <span class="live-dot" aria-hidden="true"></span> Watch the Livestream
         </a>
-        <a class="cta cta--secondary" href="raffle.html">Register for the Raffle</a>
+        <a class="cta cta--secondary" href="registration.html">Register for the Raffle</a>
       </div>
     </div>
   </div>
@@ -213,8 +217,8 @@
     <div class="marquee-track" data-marquee></div>
   </div>
   <div class="footer-bar">
-    <a class="footer-logo" href="#top" aria-label="Metarice Volley">
-      <img class="footer-logo-img footer-logo-img--metarice" src="assets/metarice-wordmark.png" alt="Metarice Volley">
+    <a class="footer-logo" href="index.html" aria-label="MVL 2026 home">
+      <img class="footer-logo-img" src="assets/hero-mvl-2026-logo.png" alt="Metarice Volleyball League 2026">
     </a>
     <p class="footer-social">
       <a href="https://instagram.com/metaricevolley" target="_blank" rel="noopener" aria-label="Instagram">

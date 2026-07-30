@@ -690,7 +690,9 @@ button.cta--secondary { border: 2px solid var(--mint); color: var(--mint); }
   border-bottom: 1px solid rgba(255, 255, 255, .08);
   transition: background .15s ease, color .15s ease;
 }
-.home-standing-row:hover {
+/* scoped to <a> — rows are plain <div>s until team detail pages exist,
+   and a non-interactive row shouldn't advertise interactivity */
+a.home-standing-row:hover {
   background: rgba(124, 245, 180, .08);
   color: var(--mint);
 }
@@ -1333,6 +1335,12 @@ button.cta--secondary { border: 2px solid var(--mint); color: var(--mint); }
 }
 .nav-links [aria-current='page'] { color: var(--mint); border-bottom-color: var(--mint); }
 
+/* Phase-aware nav: every page ships the full link set; the phase stamped on
+   <html> by js/nav.js decides which apply. Without JS nothing is stamped,
+   neither rule matches, and all links render — degraded but never broken. */
+html[data-phase='registration'] .nav-links a[data-phase='gameday'],
+html[data-phase='gameday'] .nav-links a[data-phase='registration'] { display: none; }
+
 .schedule-page {
   background:
     radial-gradient(circle at 82% 12%, rgba(45, 212, 191, .18), transparent 28%),
@@ -1698,13 +1706,14 @@ button.cta--secondary { border: 2px solid var(--mint); color: var(--mint); }
     align-items: center;
     flex-wrap: wrap;
     justify-content: flex-end;
-    gap: 5px 12px;
-    max-width: calc(100vw - 86px);
+    /* tuned so the 5-item gameday nav stays on one line at 375px */
+    gap: 5px 8px;
+    max-width: calc(100vw - 76px);
     padding-top: 1px;
   }
   .nav-links a {
-    font-size: 9px;
-    letter-spacing: 1.35px;
+    font-size: 8.5px;
+    letter-spacing: 1px;
     padding: 2px 0;
   }
 }
@@ -2559,3 +2568,55 @@ button.cta--secondary { border: 2px solid var(--mint); color: var(--mint); }
 .raffle-result--retry .form-panel-head h2 { color: #fff; }
 #submitBtn { display: inline-flex; align-items: center; gap: 8px; }
 #submitBtn:disabled { opacity: .6; cursor: wait; filter: none; }
+
+/* ==========================================================================
+   Rules page — section index
+   ========================================================================== */
+.rules-toc {
+  margin-top: 30px;
+  border: 1px solid rgba(124, 245, 180, .28);
+  background: rgba(11, 7, 48, .55);
+  border-radius: 14px;
+  padding: 20px 18px;
+}
+.rules-toc h2 {
+  font-family: var(--stretch);
+  font-style: italic;
+  text-transform: uppercase;
+  font-size: 22px;
+  color: var(--mint);
+  margin-bottom: 12px;
+}
+.rules-toc ol {
+  list-style: none;
+  display: grid;
+  gap: 2px;
+  counter-reset: toc;
+}
+.rules-toc li { counter-increment: toc; }
+.rules-toc a {
+  display: flex;
+  gap: 12px;
+  padding: 9px 4px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  border-bottom: 1px solid rgba(255, 255, 255, .07);
+  transition: color .15s ease;
+}
+.rules-toc li:last-child a { border-bottom: 0; }
+.rules-toc a::before {
+  content: counter(toc, decimal-leading-zero);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 1.4px;
+  color: var(--teal);
+  flex: 0 0 auto;
+  padding-top: 2px;
+}
+.rules-toc a:hover { color: var(--mint); }
+
+@media (min-width: 960px) {
+  .rules-toc { padding: 26px; }
+  .rules-toc ol { grid-template-columns: 1fr 1fr; gap: 2px 32px; }
+}

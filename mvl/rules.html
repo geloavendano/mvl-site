@@ -9,17 +9,22 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
+<script src="js/site-config.js"></script>
+<script src="js/nav.js"></script>
 </head>
 <body class="rules-page" id="top">
 
 <header class="nav nav--stuck page-nav" id="nav">
-  <a class="nav-logo" href="teaser.html" aria-label="MVL 2026 teaser">
-    <img class="nav-logo-img" src="assets/mvl-logo.png" alt="Metarice Volleyball League">
+  <a class="nav-logo" href="index.html" aria-label="MVL 2026 home">
+    <img class="nav-logo-img" src="assets/hero-mvl-2026-logo.png" alt="Metarice Volleyball League 2026">
   </a>
   <nav class="nav-links" aria-label="Primary">
-    <a href="teaser.html">Teaser</a>
-    <a href="waiver.html">Waiver</a>
-    <a href="rules.html" aria-current="page">Rules</a>
+    <a href="schedule.html" data-phase="gameday">Schedule</a>
+    <a href="videos.html" data-phase="gameday">Videos</a>
+    <a href="index.html#teams" data-phase="gameday">Teams</a>
+    <a href="rules.html">Rules</a>
+    <a href="waiver.html" data-phase="registration">Waiver</a>
+    <a href="registration.html" data-phase="gameday">Registration</a>
   </nav>
 </header>
 
@@ -80,6 +85,23 @@
       <p>Follow <a href="https://instagram.com/metaricevolley" target="_blank" rel="noopener">@metaricevolley on Instagram</a> for tournament updates and event documentation. Share your handle to get tagged in stories and posts.</p>
     </details>
   </section>
+
+  <!-- ============ Section index ============ -->
+  <nav class="rules-toc" aria-label="Rules sections">
+    <h2>The Full Rulebook</h2>
+    <ol>
+      <li><a href="#overview">Tournament Overview</a></li>
+      <li><a href="#match-structure">Match Structure</a></li>
+      <li><a href="#players-teams">Player &amp; Team Guidelines</a></li>
+      <li><a href="#libero">Libero Regulations</a></li>
+      <li><a href="#faults">Faults &amp; Violations</a></li>
+      <li><a href="#attire">Attire &amp; Equipment</a></li>
+      <li><a href="#warmups">Warmups &amp; Scheduling</a></li>
+      <li><a href="#venue">Venue &amp; Features</a></li>
+      <li><a href="#awards">Awards &amp; Prizes</a></li>
+      <li><a href="#comms">Communication Channels</a></li>
+    </ol>
+  </nav>
 
   <!-- ============ Full rulebook ============ -->
   <div class="rules-body">
@@ -297,7 +319,7 @@
 <footer class="footer">
   <div class="footer-bar">
     <a class="footer-logo" href="index.html" aria-label="MVL 2026 home">
-      <img class="footer-logo-img" src="assets/mvl-logo.png" alt="Metarice Volleyball League">
+      <img class="footer-logo-img" src="assets/hero-mvl-2026-logo.png" alt="Metarice Volleyball League 2026">
     </a>
     <p class="footer-social">
       <a href="https://instagram.com/metaricevolley" target="_blank" rel="noopener" aria-label="Instagram">

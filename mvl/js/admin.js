@@ -109,7 +109,7 @@ googleSignInBtn.addEventListener('click', async () => {
   status(loginStatus, 'Redirecting to Google…');
   const { error } = await authClient.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: `${window.location.origin}/admin` },
+    options: { redirectTo: `${window.location.origin}/mvl/admin` },
   });
   if (error) status(loginStatus, error.message, 'error');
 });

@@ -3,74 +3,72 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Schedule & Standings — MVL 2026</title>
-<meta name="description" content="MVL 2026 schedule, standings, set scores, winners, and players of the game.">
+<title>Game Videos — MVL 2026</title>
+<meta name="description" content="Watch every Metarice Volleyball League 2026 game. Filter recordings by team and tournament day.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
+<script src="js/site-config.js"></script>
+<script src="js/nav.js"></script>
 </head>
-<body class="schedule-page" id="top">
+<body class="videos-page" id="top">
 
 <header class="nav nav--stuck page-nav" id="nav">
   <a class="nav-logo" href="index.html" aria-label="MVL 2026 home">
     <img class="nav-logo-img" src="assets/hero-mvl-2026-logo.png" alt="Metarice Volleyball League 2026">
   </a>
   <nav class="nav-links" aria-label="Primary">
-    <a href="schedule.html" aria-current="page">Schedule</a>
-    <a href="videos.html">Videos</a>
-    <a href="index.html#teams">Teams</a>
+    <a href="schedule.html" data-phase="gameday">Schedule</a>
+    <a href="videos.html" data-phase="gameday">Videos</a>
+    <a href="index.html#teams" data-phase="gameday">Teams</a>
     <a href="rules.html">Rules</a>
+    <a href="waiver.html" data-phase="registration">Waiver</a>
+    <a href="registration.html" data-phase="gameday">Registration</a>
   </nav>
 </header>
 
 <main>
-  <section class="schedule-hero">
-    <h1 class="section-title">Schedule &amp; <em>Standings</em></h1>
+  <section class="videos-hero">
+    <p class="section-kicker section-kicker--teal">Full Game Replays</p>
+    <h1 class="section-title">Watch the <em>Games</em></h1>
+    <p>All available MVL 2026 game recordings, newest first.</p>
   </section>
 
-  <section class="standings-panel" aria-labelledby="standingsTitle">
-    <div class="schedule-section-head">
+  <section class="video-library" aria-labelledby="videoLibraryTitle">
+    <div class="video-library-head">
       <div>
-        <h2 id="standingsTitle">Team Standings</h2>
-        <p class="schedule-note schedule-note--mobile">Sorted by wins, set ratio, points ratio, then head-to-head.</p>
+        <p class="games-label">Video Library</p>
+        <h2 id="videoLibraryTitle">Game Recordings</h2>
+        <p id="videoResultCount" class="video-result-count"></p>
       </div>
-      <p class="schedule-note">Sorted by wins, set ratio, points ratio, then head-to-head.</p>
-    </div>
-    <div class="standings-table-wrap">
-      <table class="standings-table">
-        <thead>
-          <tr>
-            <th>Rank</th>
-            <th>Team</th>
-            <th>Wins</th>
-            <th>Losses</th>
-            <th>Sets</th>
-            <th>Set Ratio</th>
-          </tr>
-        </thead>
-        <tbody id="standingsBody"></tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="schedule-board" aria-labelledby="scheduleTitle">
-    <div class="schedule-section-head">
-      <div>
-        <h2 id="scheduleTitle">Games</h2>
+      <div class="video-filters" aria-label="Filter game videos">
+        <label class="video-filter">
+          <span>Team</span>
+          <select id="videoTeamFilter">
+            <option value="">All teams</option>
+          </select>
+        </label>
+        <label class="video-filter">
+          <span>Day</span>
+          <select id="videoDayFilter">
+            <option value="">All days</option>
+          </select>
+        </label>
       </div>
-      <a class="schedule-video-link" href="videos.html">Latest Videos</a>
     </div>
-
-    <div class="day-tabs" id="dayTabs" role="tablist" aria-label="Schedule days"></div>
-    <div class="match-list" id="matchList"></div>
+    <div class="video-library-grid" id="videoLibraryGrid"></div>
+    <div class="video-library-empty is-hidden" id="videoLibraryEmpty">
+      <h3>No videos found</h3>
+      <p>Videos will appear here after their YouTube links are added in the admin dashboard.</p>
+    </div>
   </section>
 </main>
 
 <footer class="footer">
   <div class="footer-bar">
     <a class="footer-logo" href="index.html" aria-label="MVL 2026 home">
-      <img class="footer-logo-img" src="assets/mvl-logo.png" alt="Metarice Volleyball League">
+      <img class="footer-logo-img" src="assets/hero-mvl-2026-logo.png" alt="Metarice Volleyball League 2026">
     </a>
     <p class="footer-social">
       <a href="https://instagram.com/metaricevolley" target="_blank" rel="noopener" aria-label="Instagram">
@@ -88,6 +86,6 @@
 
 <script src="js/league-data.js"></script>
 <script src="js/supabase-config.js"></script>
-<script src="js/public-data.js" data-entry="schedule"></script>
+<script src="js/public-data.js" data-entry="videos"></script>
 </body>
 </html>

@@ -192,11 +192,11 @@ if (homeScheduleList && homeScheduleTitle) {
 
 if (homeStandingsList) {
   homeStandingsList.innerHTML = buildStandingsPreview().slice(0, 6).map((team, index) => `
-    <a class="home-standing-row" href="team.html?id=${team.id}">
+    <div class="home-standing-row">
       <span>${String(index + 1).padStart(2, '0')}</span>
       <strong>${team.name}</strong>
       <em>${team.wins}W</em>
-    </a>
+    </div>
   `).join('');
 }
 

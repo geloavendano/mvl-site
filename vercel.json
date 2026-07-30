@@ -1,3 +1,14 @@
 {
-  "cleanUrls": true
+  "cleanUrls": true,
+  "redirects": [
+    { "source": "/", "destination": "/mvl", "permanent": false },
+    { "source": "/teaser", "destination": "/mvl", "permanent": false },
+    { "source": "/raffle", "destination": "/mvl/registration", "permanent": false },
+    { "source": "/tournament", "destination": "/mvl/gameday", "permanent": false },
+    { "source": "/schedule", "destination": "/mvl/schedule", "permanent": false },
+    { "source": "/videos", "destination": "/mvl/videos", "permanent": false },
+    { "source": "/rules", "destination": "/mvl/rules", "permanent": false },
+    { "source": "/waiver", "destination": "/mvl/waiver", "permanent": false },
+    { "source": "/admin", "destination": "/mvl/admin", "permanent": false }
+  ]
 }
