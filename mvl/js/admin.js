@@ -44,6 +44,30 @@ const youtubeId = (value) => {
     return url.searchParams.get('v') || clean;
   } catch { return clean; }
 };
+const validYouTubeId = (value) => /^[A-Za-z0-9_-]{11}$/.test(value || '');
+const gameVideos = (game) => {
+  if (Array.isArray(game.videos) && game.videos.length) return game.videos;
+  if (validYouTubeId(game.youtubeId)) {
+    return [{
+      youtubeId: game.youtubeId,
+      label: game.videoLabel || 'Full Game',
+      duration: game.duration || '',
+    }];
+  }
+  return [];
+};
+const videoRow = (video = {}) => `
+  <div class="admin-video-row" data-video-row>
+    <label class="field">
+      <span>Label</span>
+      <input data-video-label type="text" maxlength="80" value="${escapeHtml(video.label ?? 'Full Game')}" placeholder="Set 1">
+    </label>
+    <label class="field">
+      <span>YouTube URL</span>
+      <input data-video-url type="url" value="${video.youtubeId ? `https://www.youtube.com/watch?v=${escapeHtml(video.youtubeId)}` : ''}" placeholder="https://youtube.com/watch?v=...">
+    </label>
+    <button type="button" class="admin-link admin-video-remove" data-remove-video>Remove</button>
+  </div>`;
 const formatAdminDay = (iso) => new Intl.DateTimeFormat('en-PH', {
   timeZone: 'Asia/Manila', month: 'short', day: 'numeric', weekday: 'short',
 }).format(new Date(iso));
@@ -78,17 +102,21 @@ const render = () => {
   adminDaySummary.textContent = `${dayGames.length} games · ${formatAdminDay(dayGames[0].startsAt)}`;
   document.getElementById('adminGameList').innerHTML = dayGames.map((g) => {
     const setCount = g.id.startsWith('pre-') ? 3 : 5;
+    const videos = gameVideos(g);
     return `<form class="admin-panel admin-game admin-form" data-id="${g.id}">
     <div class="admin-panel-head"><div><p class="games-label">Day ${g.day} · ${g.court} · ${g.status}</p><h3>${gameTeamName(g, 'A')} <em>vs</em> ${gameTeamName(g, 'B')}</h3></div><button type="button" class="admin-link" data-reset>Reset</button></div>
     <div class="admin-result-fields">
       <label class="field"><span>Winner</span><select name="winner" required ${g.teamALabel || g.teamBLabel ? 'disabled' : ''}><option value="">Choose winner</option><option value="${g.teamA}" ${g.winner === g.teamA ? 'selected' : ''}>${gameTeamName(g, 'A')}</option><option value="${g.teamB}" ${g.winner === g.teamB ? 'selected' : ''}>${gameTeamName(g, 'B')}</option></select></label>
       <label class="field"><span>Player of the Game</span><div class="admin-player-search"><input name="playerLookup" type="text" value="${escapeHtml(g.playerOfGame?.lookupKey || '')}" placeholder="santos-04" autocomplete="off"><button type="button" class="cta cta--secondary" data-find-player>Find</button></div><small>Enter surname and jersey number. Lookup is limited to the selected winner.</small><input name="playerId" type="hidden" value="${escapeHtml(g.playerOfGame?.id || '')}"></label>
-      <label class="field"><span>YouTube link</span><input name="youtubeUrl" type="url" value="${g.youtubeId ? `https://www.youtube.com/watch?v=${g.youtubeId}` : ''}" placeholder="https://youtube.com/watch?v=..."></label>
     </div>
     ${playerPreview(g.playerOfGame)}
+    <section class="admin-video-editor">
+      <div class="admin-video-head"><div><strong>Game videos</strong><small>Add a custom label for every recording, such as Full Game, Set 1, or Set 2.</small></div><button type="button" class="admin-link" data-add-video>+ Add video</button></div>
+      <div class="admin-video-list" data-video-list>${(videos.length ? videos : [{}]).map(videoRow).join('')}</div>
+    </section>
     <div class="admin-score-heading"><span>Set</span><strong>${gameTeamName(g, 'A')}</strong><strong>${gameTeamName(g, 'B')}</strong></div>
     <div class="admin-sets">${Array.from({ length: setCount }, (_, i) => `<label><span>Set ${i+1}</span><input name="a${i}" aria-label="${gameTeamName(g, 'A')} set ${i+1}" type="number" min="0" value="${g.sets[i]?.a ?? ''}" ${g.teamALabel || g.teamBLabel ? 'disabled' : ''}><input name="b${i}" aria-label="${gameTeamName(g, 'B')} set ${i+1}" type="number" min="0" value="${g.sets[i]?.b ?? ''}" ${g.teamALabel || g.teamBLabel ? 'disabled' : ''}></label>`).join('')}</div>
-    <button class="cta cta--primary" ${g.teamALabel || g.teamBLabel ? 'disabled title="The teams will be assigned automatically from tournament results."' : ''}>Save result, player & video</button><p class="form-status"></p></form>`;
+    <button class="cta cta--primary" ${g.teamALabel || g.teamBLabel ? 'disabled title="The teams will be assigned automatically from tournament results."' : ''}>Save result, player & videos</button><p class="form-status"></p></form>`;
   }).join('');
 };
 const show = async () => {
@@ -138,27 +166,52 @@ adminGameList.addEventListener('submit', async (e) => {
   status(s, 'Saving…');
   try {
     if (!sets.length) throw new Error('Enter at least one set.');
+    const videos = [...form.querySelectorAll('[data-video-row]')].map((row) => {
+      const label = row.querySelector('[data-video-label]').value.trim();
+      const url = row.querySelector('[data-video-url]').value.trim();
+      if (!url) return null;
+      const id = youtubeId(url);
+      if (!label) throw new Error('Add a label for every YouTube URL.');
+      if (!validYouTubeId(id)) throw new Error(`"${label}" does not have a valid YouTube URL.`);
+      return { label, youtube_id: id };
+    }).filter(Boolean);
+    if (new Set(videos.map((video) => video.youtube_id)).size !== videos.length) {
+      throw new Error('The same YouTube video cannot be added twice to one game.');
+    }
     const player = form.elements.playerLookup.value.trim() ? await findPlayer(form, g) : null;
-    await rpc('mvl_record_game_result', {
+    await rpc('mvl_admin_save_game_result', {
       p_game_id: g.id,
       p_winner_team_id: form.elements.winner.value,
       p_player_of_game_id: player?.id || null,
       p_sets: sets,
-      p_youtube_id: youtubeId(form.elements.youtubeUrl.value),
-      p_video_title: `${gameTeamName(g, 'A')} vs ${gameTeamName(g, 'B')} · Full Game`,
-      p_duration_seconds: null,
-      p_video_published_at: new Date().toISOString(),
-      p_video_is_featured: true,
+      p_videos: videos,
     });
     data = await rpc('mvl_admin_get_dashboard');
     render();
     const refreshed = document.querySelector(`[data-id="${g.id}"] .form-status`);
-    status(refreshed, 'Result, player, and video updated.', 'success');
+    status(refreshed, 'Result, player, and videos updated.', 'success');
   } catch (err) {
     status(s, err.message, 'error');
   }
 });
 adminGameList.addEventListener('click', async (e) => {
+  const addVideoButton = e.target.closest('[data-add-video]');
+  if (addVideoButton) {
+    addVideoButton.closest('[data-id]').querySelector('[data-video-list]').insertAdjacentHTML('beforeend', videoRow({ label: '' }));
+    return;
+  }
+  const removeVideoButton = e.target.closest('[data-remove-video]');
+  if (removeVideoButton) {
+    const list = removeVideoButton.closest('[data-video-list]');
+    const rows = list.querySelectorAll('[data-video-row]');
+    if (rows.length > 1) {
+      removeVideoButton.closest('[data-video-row]').remove();
+    } else {
+      rows[0].querySelector('[data-video-label]').value = 'Full Game';
+      rows[0].querySelector('[data-video-url]').value = '';
+    }
+    return;
+  }
   const findButton = e.target.closest('[data-find-player]');
   if (findButton) {
     const form = findButton.closest('[data-id]');

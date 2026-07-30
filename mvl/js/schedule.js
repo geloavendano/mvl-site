@@ -195,7 +195,10 @@ const renderMatches = () => {
     const winner = game.winner ? teamById[game.winner] : null;
     const pogTeam = game.playerOfGame?.team ? teamById[game.playerOfGame.team] : null;
     const pogPhoto = playerPhotoUrl(game.playerOfGame?.photoPath);
-    const videoHref = game.youtubeId ? `https://www.youtube.com/watch?v=${game.youtubeId}` : '';
+    const videoCount = Array.isArray(game.videos)
+      ? game.videos.length
+      : (game.youtubeId ? 1 : 0);
+    const videoHref = videoCount ? `/mvl/videos.html#game-${game.id}` : '';
     const playoffNote = playoffNotes[game.id];
 
     return `
@@ -241,7 +244,7 @@ const renderMatches = () => {
 
         <div class="match-actions">
           ${winner ? `<span class="winner-pill">Winner: ${winner.name}</span>` : '<span class="winner-pill winner-pill--pending">Awaiting score</span>'}
-          ${videoHref ? `<a href="${videoHref}" target="_blank" rel="noopener">Watch</a>` : '<span class="video-pending">Video pending</span>'}
+          ${videoHref ? `<a href="${videoHref}">Watch ${videoCount > 1 ? `${videoCount} videos` : 'video'}</a>` : '<span class="video-pending">Video pending</span>'}
         </div>
       </article>
     `;

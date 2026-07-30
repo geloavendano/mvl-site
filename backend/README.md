@@ -68,13 +68,31 @@ Use this playbook for admin score entry in Supabase SQL Editor:
 supabase/admin-score-entry.sql
 ```
 
-The main helper is:
+The admin dashboard saves results through:
 
-```sql
-public.mvl_record_game_result(...)
+```text
+public.mvl_admin_save_game_result(
+  p_game_id,
+  p_winner_team_id,
+  p_player_of_game_id,
+  p_sets,
+  p_videos
+)
 ```
 
-It updates the game winner/status, replaces set scores, assigns Player of the Game, and upserts a YouTube recording link in one transaction.
+It updates the game winner/status, replaces set scores, assigns Player of the
+Game, and replaces that game's ordered video list in one transaction. Each
+video item contains a custom label and parsed YouTube ID:
+
+```json
+[
+  { "label": "Set 1", "youtube_id": "Q17jVubwlO8" },
+  { "label": "Full Game", "youtube_id": "vURQKclE9PI" }
+]
+```
+
+The older `public.mvl_record_game_result(...)` helper remains available for
+backward compatibility with single-video scripts.
 
 ## Admin Access
 

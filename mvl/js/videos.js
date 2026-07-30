@@ -11,6 +11,14 @@ const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => (
 }[char]));
 
 const validYouTubeId = (value) => /^[A-Za-z0-9_-]{11}$/.test(value || '');
+const gameVideos = (game) => {
+  if (Array.isArray(game.videos)) {
+    return game.videos.filter((video) => validYouTubeId(video.youtubeId));
+  }
+  return validYouTubeId(game.youtubeId)
+    ? [{ youtubeId: game.youtubeId, label: game.videoLabel || 'Full Game', duration: game.duration || '' }]
+    : [];
+};
 const gameTeamName = (game, side) => {
   const id = side === 'A' ? game.teamA : game.teamB;
   const label = side === 'A' ? game.teamALabel : game.teamBLabel;
@@ -29,8 +37,11 @@ const formatTime = (iso) => new Intl.DateTimeFormat('en-PH', {
 }).format(new Date(iso));
 
 const videoGames = games
-  .filter((game) => validYouTubeId(game.youtubeId))
+  .filter((game) => gameVideos(game).length)
   .sort((a, b) => new Date(b.startsAt) - new Date(a.startsAt));
+const videoRecords = videoGames.flatMap((game) =>
+  gameVideos(game).map((video, index) => ({ game, video, index }))
+);
 
 const availableTeamIds = new Set(videoGames.flatMap((game) => [game.teamA, game.teamB]));
 teamFilter.insertAdjacentHTML('beforeend', teams
@@ -51,7 +62,7 @@ dayFilter.insertAdjacentHTML('beforeend', [...dayGames.entries()]
 const renderVideos = () => {
   const selectedTeam = teamFilter.value;
   const selectedDay = dayFilter.value;
-  const filtered = videoGames.filter((game) =>
+  const filtered = videoRecords.filter(({ game }) =>
     (!selectedTeam || [game.teamA, game.teamB].includes(selectedTeam)) &&
     (!selectedDay || String(game.day) === selectedDay)
   );
@@ -59,15 +70,17 @@ const renderVideos = () => {
   resultCount.textContent = `${filtered.length} ${filtered.length === 1 ? 'video' : 'videos'}`;
   emptyState.classList.toggle('is-hidden', filtered.length > 0);
   libraryGrid.classList.toggle('is-hidden', filtered.length === 0);
-  libraryGrid.innerHTML = filtered.map((game) => {
+  libraryGrid.innerHTML = filtered.map(({ game, video, index }) => {
     const teamA = gameTeamName(game, 'A');
     const teamB = gameTeamName(game, 'B');
     const winner = game.winner ? teamById[game.winner]?.name : '';
+    const label = video.label || `Video ${index + 1}`;
+    const cardId = index === 0 ? `game-${game.id}` : `game-${game.id}-video-${index + 1}`;
     return `
-      <article class="library-video-card" id="game-${escapeHtml(game.id)}">
+      <article class="library-video-card" id="${escapeHtml(cardId)}">
         <div class="library-video-player">
-          <button type="button" data-play-video="${game.youtubeId}" aria-label="Play ${escapeHtml(teamA)} versus ${escapeHtml(teamB)}">
-            <img src="https://i.ytimg.com/vi/${game.youtubeId}/hqdefault.jpg" alt="" loading="lazy">
+          <button type="button" data-play-video="${video.youtubeId}" data-video-label="${escapeHtml(label)}" aria-label="Play ${escapeHtml(label)}: ${escapeHtml(teamA)} versus ${escapeHtml(teamB)}">
+            <img src="https://i.ytimg.com/vi/${video.youtubeId}/hqdefault.jpg" alt="" loading="lazy">
             <span class="play-btn" aria-hidden="true"></span>
           </button>
         </div>
@@ -76,8 +89,8 @@ const renderVideos = () => {
           <h3>${escapeHtml(teamA)} <em>vs</em> ${escapeHtml(teamB)}</h3>
           <p>${escapeHtml(game.court)}${winner ? ` · Winner: ${escapeHtml(winner)}` : ''}</p>
           <div class="library-video-actions">
-            <span>${escapeHtml(game.duration || 'Full game')}</span>
-            <a href="https://www.youtube.com/watch?v=${game.youtubeId}" target="_blank" rel="noopener">Open on YouTube</a>
+            <span>${escapeHtml(label)}${video.duration ? ` · ${escapeHtml(video.duration)}` : ''}</span>
+            <a href="https://www.youtube.com/watch?v=${video.youtubeId}" target="_blank" rel="noopener">Open on YouTube</a>
           </div>
         </div>
       </article>
@@ -92,10 +105,11 @@ libraryGrid.addEventListener('click', (event) => {
   if (!button) return;
   const videoId = button.dataset.playVideo;
   if (!validYouTubeId(videoId)) return;
+  const label = button.dataset.videoLabel || 'MVL game video';
   button.outerHTML = `
     <iframe
       src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1"
-      title="MVL game video"
+      title="${escapeHtml(label)}"
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
       referrerpolicy="strict-origin-when-cross-origin"
       allowfullscreen></iframe>
@@ -103,4 +117,3 @@ libraryGrid.addEventListener('click', (event) => {
 });
 
 renderVideos();
-

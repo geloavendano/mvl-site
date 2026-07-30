@@ -86,6 +86,7 @@ Two audience phases:
 - `supabase/migrations/20260713000200_drop_public_mvl_prefixed_tables.sql` — applied after the schema migration to remove the initial `public.mvl_*` tables.
 - `supabase/migrations/20260713000300_add_mvl_standings.sql` — adds `public.mvl_get_standings()`, which mirrors the frontend standings ranking from `mvl.games` and `mvl.game_sets`.
 - `supabase/migrations/20260714000100_update_mvl_event_dates.sql` — applied to align seeded Supabase game dates to Aug 29, Aug 30, Aug 31, Sep 5, and Sep 6.
+- `supabase/migrations/20260730000200_multiple_game_videos.sql` — applied. Adds ordered, custom-labeled video rows per game, the transactional `public.mvl_admin_save_game_result(...)` RPC, and public `videos` arrays while preserving the legacy single-video fields.
 - `backend/schema.sql` — older unprefixed draft; historical reference only.
 - `backend/README.md` — actual Supabase setup notes for the existing `sansayaw` project.
 - `assets/team-stock.png` — temporary local stock/comp image used inside the Teams cards to preview the eventual player-photo/cutout treatment.

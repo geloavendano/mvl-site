@@ -2,6 +2,22 @@
   const fallback = window.MVL_DATA;
   const config = window.MVL_SUPABASE;
   const entry = document.currentScript.dataset.entry;
+  const normalizeGames = (games = []) => games.map((game) => {
+    const videos = Array.isArray(game.videos) && game.videos.length
+      ? game.videos
+      : (/^[A-Za-z0-9_-]{11}$/.test(game.youtubeId || '') ? [{
+          youtubeId: game.youtubeId,
+          label: game.videoLabel || 'Full Game',
+          duration: game.duration || '',
+        }] : []);
+    return {
+      ...game,
+      videos,
+      youtubeId: videos[0]?.youtubeId || '',
+      videoLabel: videos[0]?.label || '',
+      duration: videos[0]?.duration || '',
+    };
+  });
   try {
     const response = await fetch(`${config.url}/rest/v1/rpc/mvl_get_public_data`, {
       method: 'POST',
@@ -17,10 +33,14 @@
         youtubeId: managed.livestream?.youtube_id || '',
         isLive: Boolean(managed.livestream?.is_live),
       },
-      games: managed.games?.length ? managed.games : fallback.games,
+      games: normalizeGames(managed.games?.length ? managed.games : fallback.games),
     };
   } catch (error) {
     console.warn('Using bundled MVL data:', error);
+    window.MVL_DATA = {
+      ...fallback,
+      games: normalizeGames(fallback.games),
+    };
   }
   const script = document.createElement('script');
   script.src = `/mvl/js/${entry}.js`;

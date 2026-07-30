@@ -209,14 +209,15 @@ const completedGames = GAMES
 const gameCard = (game) => {
   const teamA = gameTeam(game, 'A');
   const teamB = gameTeam(game, 'B');
-  const href = game.youtubeId ? `/mvl/videos.html#game-${game.id}` : '/mvl/schedule.html';
+  const videos = Array.isArray(game.videos) ? game.videos : (game.youtubeId ? [{ label: 'Full Game' }] : []);
+  const href = videos.length ? `/mvl/videos.html#game-${game.id}` : '/mvl/schedule.html';
   return `
   <a class="video-card reveal" href="${href}">
-    <div class="video-thumb ${game.youtubeId ? '' : 'placeholder'}">
+    <div class="video-thumb ${videos.length ? '' : 'placeholder'}">
       <span class="play-btn play-btn--sm" aria-hidden="true"></span>
     </div>
     <p class="video-title">${teamA.name} vs ${teamB.name}</p>
-    <p class="video-meta">${game.youtubeId ? 'Full Game' : 'Result'} &middot; ${game.duration || 'Pending video'}</p>
+    <p class="video-meta">${videos.length ? `${videos.length} ${videos.length === 1 ? 'Video' : 'Videos'}` : 'Result'} &middot; ${videos[0]?.label || 'Pending video'}</p>
   </a>
 `;
 };
