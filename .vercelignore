@@ -2,3 +2,9 @@
 backend
 supabase
 HANDOFF.md
+TOURNAMENT_WEBSITE_CHECKLIST.md
+
+# Video masters — only mvl-video-1-web-10s.mp4 is used by the site.
+# Without these, a CLI deploy uploads the 110MB master and fails.
+*.mov
+mvl/assets/mvl-video-1-web.mp4

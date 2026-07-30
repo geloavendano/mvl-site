@@ -8,6 +8,55 @@ Game-day raffle per client decisions (2026-07-17): one successful entry per pers
 - Venue UUID hardcoded in raffle.js: `11111111-1111-4111-8111-111111111111`.
 - **⚠️ BLOCKER until applied:** `supabase/migrations/20260717000100_raffle_checkin_rules.sql` must be run against the linked project (`supabase db query --linked --file …`, NOT `db push`). It sets Gameville's real coordinates (14.575241, 121.0543052 — venues were seeded with NULL locations, so every check-in fails without this), deletes the duplicate venue row, adds the one-entry-per-day partial unique index, and updates the RPC (adds `already_entered` to the return row + game-day gate). Get client go-ahead before applying — it's their production DB.
 
+## Site structure & the game-day flip
+
+Everything lives under **`mvl/`** because `metaricevolley.ph` is the *club's* domain and MVL 2026 is one event under it. `mvl/` holds the pages plus `assets/`, `css/`, `js/` — self-contained, so all links stay relative and the bundle previews locally at the same path shape as production.
+
+| URL | Now (registration) | After the flip |
+|---|---|---|
+| `/` | 307 -> `/mvl` | 307 -> `/mvl` |
+| `/mvl` | teaser (`mvl/index.html`) | gameday landing |
+| `/mvl/gameday` | parked, unlinked, robots-disallowed | alias of `/mvl` |
+| `/mvl/schedule`, `/videos`, `/rules`, `/waiver`, `/waiver-confirmation` | live | live |
+| `/mvl/registration` | game-day raffle check-in (was `/raffle`) | promoted into nav |
+| `/mvl/admin` | SSO console | unchanged |
+
+Legacy root paths (`/teaser`, `/raffle`, `/rules`, ...) all 307 to their new homes — verified on production.
+
+### Navigation
+Every page ships **one byte-identical nav block**. `mvl/js/site-config.js` holds the phase; `mvl/js/nav.js` stamps it on `<html>` synchronously in `<head>` so CSS hides the wrong-phase links **before first paint** (no flash, no layout shift). `aria-current` is derived from the URL, not hardcoded. The page you are on is always shown even if its phase is hidden.
+
+- registration nav: **Rules, Waiver**
+- gameday nav: **Schedule, Videos, Teams, Rules, Registration**
+
+Without JS nothing is stamped, neither CSS rule matches, and all six links render — degraded but never broken.
+
+**Standing invariant — run this after touching any nav:**
+```
+cd mvl && for f in gameday schedule videos rules registration waiver waiver-confirmation; do
+  sed -n '/<nav class="nav-links"/,/<\/nav>/p' $f.html | shasum
+done | sort -u | wc -l    # must print 1
+```
+This is the entire enforcement mechanism for "no page can drift out of sync again."
+
+### The game-day flip (Aug 29) — exactly two edits
+1. `mvl/js/site-config.js`: `phase: 'registration'` -> `'gameday'`
+2. `vercel.json`: add this key alongside `redirects`
+   ```json
+   "rewrites": [
+     { "source": "/mvl",  "destination": "/mvl/gameday.html" },
+     { "source": "/mvl/", "destination": "/mvl/gameday.html" }
+   ]
+   ```
+Commit and push; Vercel auto-deploys. **Rollback = revert both.** Do not use a `redirect` for this — it would change the visible URL and break every shared link to `/mvl`. `robots.txt` needs no change (post-flip `/mvl/gameday` is a duplicate of `/mvl`, so disallowing it stays correct).
+
+Post-flip the teaser has no public URL. That is intended; to archive it, add `{ "source": "/mvl/teaser", "destination": "/mvl/index.html" }` as a rewrite at that time.
+
+**Not yet rehearsed end-to-end:** the phase half is verified (toggling it locally produces the correct nav both ways), but the `vercel.json` rewrite half has not been exercised on a deploy — Vercel preview deployments are SSO-protected, so they can't be checked without a browser session. Rehearse it before Aug 29.
+
+### Prerequisite for going public
+`metaricevolley.ph` is attached to the `mvl-site` project but its nameservers still point at `dns1.domains.ph`, **not Vercel** — the domain serves nothing yet. Until DNS is repointed, verify on `mvl-site.vercel.app`.
+
 ## What this is
 Immersive site for a volleyball league (MVL 2026, "3rd Annual Invitational", Gameville Ball Park + Double Play). Client's peg is https://www.idl.pro/ — maximal, energetic, everything about the competition laid out excitingly. Mobile-first, responsive.
 
@@ -42,7 +91,7 @@ Two audience phases:
 - `assets/team-stock.png` — temporary local stock/comp image used inside the Teams cards to preview the eventual player-photo/cutout treatment.
 - `assets/mvl-video-1-web-10s.mp4` — optimized 10s teaser hero background video. The larger source video files are ignored by git.
 - `assets/mvl-kv.png` — 2026 key visual poster (portrait 1024×1280). Used as video poster/fallback for teaser, Phase 2 hero bg, and blurred drifting bg in games fold.
-- `assets/mvl-logo.png` — **2025** logo (client-provided placeholder, downscaled to 800px from a 4500px source in `~/Downloads/MVL 2025 Logo.png`). Used in the teaser hero. Swap for the 2026 mark when it exists — it will still say 2025 until then.
+- `mvl/assets/hero-mvl-2026-logo.png` — the logo used by every page (nav, hero, footers). NOTE: `mvl/assets/mvl-logo.png` is **byte-identical** to it (same MD5) — an earlier note claiming it was a 2025 mark was wrong; it was overwritten at some point. Nothing references `mvl-logo.png` any more, but it is kept on disk in case it is hotlinked from Instagram or a sponsor deck. There is still no visually distinct 2026 mark.
 - `assets/mvl-2026-dates.ics` — hand-built calendar file for the teaser's Save the Dates button (2 all-day span events: Aug 29–31 and Sep 5–6, literal `\n` escapes in DESCRIPTION — regenerate carefully if dates change).
 - `.claude/launch.json` — dev server: `python3 -m http.server 8742` (name `mvl-site`).
 - Design handoff source (Claude Design bundle w/ README spec + prototype) extracted at scratchpad `mvl-mock/design_handoff_mvl_phase2_landing/` — session-specific path; the client can re-share the zip (`~/Downloads/Metarice Volleyball League website.zip`) if needed.
@@ -84,7 +133,7 @@ Two audience phases:
 ## Next tasks (client priority order)
 1. **Raffle page + backend endpoint** — form asks for team, name, and detected GPS. Server must compute venue-radius eligibility and timestamp the entry; users should not manually adjust the pin.
 2. Team detail pages (team-card ↗ arrows) — TBD with client. The Videos page is complete.
-3. Decide how the two phases swap in production (single domain redirect, manual deploy swap, etc.) — not yet decided.
+3. ~~Decide how the two phases swap~~ — **DECIDED, see "Site structure & the game-day flip" below.**
 
 ## Verification
 Run the `mvl-site` launch config.
