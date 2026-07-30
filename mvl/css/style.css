@@ -1996,6 +1996,7 @@ html[data-phase='gameday'] .nav-links a[data-phase='registration'] { display: no
 }
 .teaser-dates {
   margin-top: 14px;
+  font-family: var(--stretch);
   font-weight: 800;
   font-size: 19px;
   letter-spacing: 1.4px;
@@ -2740,6 +2741,16 @@ body:not(.admin-page) button.cta.cta--secondary {
 body:not(.admin-page) .cta.cta--secondary:hover,
 body:not(.admin-page) button.cta.cta--secondary:hover {
   background: rgba(124, 245, 180, .14);
+}
+body:not(.admin-page) .hero-ctas .cta.cta--secondary,
+body:not(.admin-page) .hero-ctas button.cta.cta--secondary {
+  border: 2px solid var(--mint);
+  background: transparent;
+  color: var(--mint);
+}
+body:not(.admin-page) .hero-ctas .cta.cta--secondary:hover,
+body:not(.admin-page) .hero-ctas button.cta.cta--secondary:hover {
+  background: rgba(124, 245, 180, .1);
 }
 body:not(.admin-page) button.cta.cta--primary {
   background: linear-gradient(90deg, var(--mint), var(--teal));
