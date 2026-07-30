@@ -23,6 +23,6 @@
     console.warn('Using bundled MVL data:', error);
   }
   const script = document.createElement('script');
-  script.src = `js/${entry}.js`;
+  script.src = `/mvl/js/${entry}.js`;
   document.body.appendChild(script);
 })();

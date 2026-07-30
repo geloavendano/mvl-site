@@ -85,7 +85,7 @@ form.addEventListener('submit', async (event) => {
 
   try {
     await submitWaiver(payload);
-    window.location.assign('waiver-confirmation.html');
+    window.location.assign('/mvl/waiver-confirmation.html');
   } catch (error) {
     formStatus.textContent = error.message;
     formStatus.classList.add('is-error');

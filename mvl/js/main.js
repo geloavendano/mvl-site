@@ -50,7 +50,7 @@ document.querySelectorAll('[data-livestream-link]').forEach((link) => {
     link.rel = 'noopener';
     link.innerHTML = '<span class="live-dot" aria-hidden="true"></span> Watch the Livestream';
   } else {
-    link.href = 'schedule.html';
+    link.href = '/mvl/schedule.html';
     link.removeAttribute('target');
     link.removeAttribute('rel');
     link.textContent = 'View the Schedule';
@@ -209,7 +209,7 @@ const completedGames = GAMES
 const gameCard = (game) => {
   const teamA = gameTeam(game, 'A');
   const teamB = gameTeam(game, 'B');
-  const href = game.youtubeId ? `videos.html#game-${game.id}` : 'schedule.html';
+  const href = game.youtubeId ? `/mvl/videos.html#game-${game.id}` : '/mvl/schedule.html';
   return `
   <a class="video-card reveal" href="${href}">
     <div class="video-thumb ${game.youtubeId ? '' : 'placeholder'}">
@@ -351,7 +351,7 @@ const heroCopy = document.querySelector('[data-hero-copy]');
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const logoFlight = document.createElement('img');
 logoFlight.className = 'logo-flight';
-logoFlight.src = 'assets/hero-mvl-2026-logo.png';
+logoFlight.src = '/mvl/assets/hero-mvl-2026-logo.png';
 logoFlight.alt = '';
 logoFlight.setAttribute('aria-hidden', 'true');
 document.body.appendChild(logoFlight);
