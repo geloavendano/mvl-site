@@ -2,7 +2,7 @@
 
 ## Project state: Phase 2 landing DONE. Phase 1 teaser DONE. Rules page DONE. Waiver page DONE and connected to Supabase. Raffle check-in page BUILT (pending one migration on live DB — see Raffle section). Remaining: team detail pages.
 
-## Raffle check-in (`raffle.html` + `js/raffle.js`)
+## Raffle check-in (`checkin.html` + `js/raffle.js`)
 Game-day raffle per client decisions (2026-07-17): one successful entry per person per game day; identity = name + team only (winners claim on-site); open on game days only (derived from `games` data, Manila time); outside-venue attempts are recorded as ineligible, not rejected.
 - Flow: game-day gate → team + full name → one-time `getCurrentPosition` (no manual pin, per backend/README.md) → `mvl_create_raffle_checkin` RPC → server decides `inside_radius` vs the venue's 150m radius. Result states: confirmed / already-entered / outside-with-distance+retry / geolocation errors. `?preview=1` unlocks the form UI on non-game days for testing (server still refuses).
 - Venue UUID hardcoded in raffle.js: `11111111-1111-4111-8111-111111111111`.
@@ -16,9 +16,9 @@ Everything lives under **`mvl/`** because `metaricevolley.ph` is the *club's* do
 |---|---|---|
 | `/` | 307 -> `/mvl` | 307 -> `/mvl` |
 | `/mvl` | teaser (`mvl/index.html`) | gameday landing |
-| `/mvl/gameday` | parked, unlinked, robots-disallowed | alias of `/mvl` |
+| `/mvl/gametime` | parked, unlinked, robots-disallowed | alias of `/mvl` |
 | `/mvl/schedule`, `/videos`, `/rules`, `/waiver`, `/waiver-confirmation` | live | live |
-| `/mvl/registration` | game-day raffle check-in (was `/raffle`) | promoted into nav |
+| `/mvl/checkin` | game-day raffle check-in (was `/registration`) | promoted into nav |
 | `/mvl/admin` | SSO console | unchanged |
 
 Legacy root paths (`/teaser`, `/raffle`, `/rules`, ...) all 307 to their new homes — verified on production.
@@ -27,13 +27,13 @@ Legacy root paths (`/teaser`, `/raffle`, `/rules`, ...) all 307 to their new hom
 Every page ships **one byte-identical nav block**. `mvl/js/site-config.js` holds the phase; `mvl/js/nav.js` stamps it on `<html>` synchronously in `<head>` so CSS hides the wrong-phase links **before first paint** (no flash, no layout shift). `aria-current` is derived from the URL, not hardcoded. The page you are on is always shown even if its phase is hidden.
 
 - registration nav: **Rules, Waiver**
-- gameday nav: **Schedule, Videos, Teams, Rules, Registration**
+- gameday nav: **Schedule, Videos, Teams, Rules, Check-In**
 
 Without JS nothing is stamped, neither CSS rule matches, and all six links render — degraded but never broken.
 
 **Standing invariant — run this after touching any nav:**
 ```
-cd mvl && for f in gameday schedule videos rules registration waiver waiver-confirmation; do
+cd mvl && for f in gametime schedule videos rules checkin waiver waiver-confirmation; do
   sed -n '/<nav class="nav-links"/,/<\/nav>/p' $f.html | shasum
 done | sort -u | wc -l    # must print 1
 ```
@@ -44,11 +44,11 @@ This is the entire enforcement mechanism for "no page can drift out of sync agai
 2. `vercel.json`: add this key alongside `redirects`
    ```json
    "rewrites": [
-     { "source": "/mvl",  "destination": "/mvl/gameday.html" },
-     { "source": "/mvl/", "destination": "/mvl/gameday.html" }
+     { "source": "/mvl",  "destination": "/mvl/gametime.html" },
+     { "source": "/mvl/", "destination": "/mvl/gametime.html" }
    ]
    ```
-Commit and push; Vercel auto-deploys. **Rollback = revert both.** Do not use a `redirect` for this — it would change the visible URL and break every shared link to `/mvl`. `robots.txt` needs no change (post-flip `/mvl/gameday` is a duplicate of `/mvl`, so disallowing it stays correct).
+Commit and push; Vercel auto-deploys. **Rollback = revert both.** Do not use a `redirect` for this — it would change the visible URL and break every shared link to `/mvl`. `robots.txt` needs no change (post-flip `/mvl/gametime` is a duplicate of `/mvl`, so disallowing it stays correct).
 
 Post-flip the teaser has no public URL. That is intended; to archive it, add `{ "source": "/mvl/teaser", "destination": "/mvl/index.html" }` as a rewrite at that time.
 
@@ -80,7 +80,7 @@ Two audience phases:
 - `rules.html` — static rules page: FAQ accordion ("The Quick Version") at top, then the full 10-section rulebook (client-provided text) with tables for the bracket, schedule, and scoring. No JS. NOTE: the client's source text said "Battle for Gold: **Loser** of SF1 vs Loser of SF2" — an obvious copy-paste typo, rendered as Winner vs Winner.
 - `waiver.html` — participant registration + waiver form. Uses `js/league-data.js` to populate teams and `js/waiver.js` for client validation / relationship "Other" behavior. Submit calls Supabase RPC `public.mvl_submit_waiver(...)`, which writes to `mvl.waiver_submissions`.
 - `js/supabase-config.js` — public Supabase URL + anon key for the existing `sansayaw` project. The anon key is intentionally public; RLS protects writes.
-- **Footers (all pages)**: MVL logo image + Instagram/TikTok/YouTube icon links (instagram.com/metaricevolley, tiktok.com/@metaricevolley, youtube.com/@metaricevolley). Icon SVGs are duplicated inline per page — keep them in sync.
+- **Footers (all pages)**: Metarice Club full-color wordmark (`assets/metarice-club-wordmark.svg`) + Instagram/TikTok/YouTube icon links (instagram.com/metaricevolley, tiktok.com/@metaricevolley, youtube.com/@metaricevolley). Icon SVGs are duplicated inline per page — keep them in sync.
 - `supabase/migrations/20260713000100_create_mvl_schema.sql` — applied to existing Supabase project `sansayaw` (`ljebzcgfydaknyekwlqv`) via `supabase db query --linked --file ...`. Creates dedicated Postgres schema `mvl` with tables like `mvl.teams`, `mvl.games`, and `mvl.waiver_submissions`.
 - `supabase/seed.sql` — applied to the linked Supabase project; seeds venues, current teams, placeholder games, and set scores.
 - `supabase/migrations/20260713000200_drop_public_mvl_prefixed_tables.sql` — applied after the schema migration to remove the initial `public.mvl_*` tables.
