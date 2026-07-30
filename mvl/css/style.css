@@ -3073,3 +3073,64 @@ body:not(.admin-page) .video-filter select:focus-visible {
   }
   .sheet { border-bottom: 0; }
 }
+
+/* Shared public-page header and background */
+.rules-page,
+.videos-page,
+.schedule-page,
+.waiver-page,
+.raffle-page {
+  background:
+    radial-gradient(circle at 82% 12%, rgba(45, 212, 191, .18), transparent 28%),
+    linear-gradient(180deg, var(--navy) 0%, #050911 48%, var(--navy-deep) 100%);
+}
+.page-hero {
+  padding: 46px 16px 22px;
+}
+.page-hero .section-title {
+  font-size: 56px;
+  line-height: .82;
+}
+.rules-page main,
+.waiver-page .waiver-main,
+.raffle-page .waiver-main {
+  padding-top: var(--nav-h);
+}
+.rules-page .page-hero,
+.waiver-page .page-hero,
+.raffle-page .page-hero {
+  padding-right: 0;
+  padding-left: 0;
+}
+.rules-page .faq-panel,
+.waiver-page .waiver-copy,
+.raffle-page .waiver-copy {
+  margin-top: 0;
+}
+
+@media (max-width: 720px) {
+  .page-hero .section-title {
+    font-size: clamp(66px, 24vw, 112px);
+    line-height: .78;
+  }
+}
+
+@media (min-width: 960px) {
+  .page-hero {
+    padding: 70px 48px 30px;
+  }
+  .page-hero .section-title {
+    font-size: 72px;
+  }
+  .rules-page main,
+  .waiver-page .waiver-main,
+  .raffle-page .waiver-main {
+    padding-top: var(--nav-h);
+  }
+  .rules-page .page-hero,
+  .waiver-page .page-hero,
+  .raffle-page .page-hero {
+    padding-right: 0;
+    padding-left: 0;
+  }
+}

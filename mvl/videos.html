@@ -29,10 +29,8 @@
 </header>
 
 <main>
-  <section class="videos-hero">
-    <p class="section-kicker section-kicker--teal">Game Video Library</p>
+  <section class="videos-hero page-hero">
     <h1 class="section-title">Watch the <em>Games</em></h1>
-    <p>Full games and set-by-set recordings, newest games first.</p>
   </section>
 
   <section class="video-library" aria-labelledby="videoLibraryTitle">
@@ -42,7 +40,7 @@
         <h2 id="videoLibraryTitle">Game Recordings</h2>
         <p id="videoResultCount" class="video-result-count"></p>
       </div>
-      <div class="video-filters" aria-label="Filter game videos">
+      <div class="video-filters" role="group" aria-label="Filter game videos">
         <label class="video-filter">
           <span>Team</span>
           <select id="videoTeamFilter">
