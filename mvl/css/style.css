@@ -14,6 +14,12 @@
   --red: #E11D48;
   --ink-soft: #EDEBFF;
   --ink-muted: rgba(255, 255, 255, .65);
+  --surface-tonal: rgba(255, 255, 255, .065);
+  --surface-soft: rgba(255, 255, 255, .04);
+  --surface-deep: rgba(4, 9, 15, .62);
+  --surface-radius: 24px;
+  --control-radius: 12px;
+  --surface-shadow: 0 24px 70px rgba(4, 2, 20, .2);
 
   /* team band cycle */
   --band-1: #5B4FE8;
@@ -2498,8 +2504,8 @@ html[data-phase='gameday'] .nav-links a[data-phase='registration'] { display: no
   padding: 24px 18px;
   border: 0;
   border-radius: 22px;
-  background: rgba(255, 255, 255, .065);
-  box-shadow: 0 24px 70px rgba(4, 2, 20, .2);
+  background: var(--surface-tonal);
+  box-shadow: var(--surface-shadow);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
@@ -2512,8 +2518,8 @@ html[data-phase='gameday'] .nav-links a[data-phase='registration'] { display: no
 .waiver-page .field input,
 .waiver-page .field select {
   border: 0;
-  border-radius: 12px;
-  background: rgba(4, 9, 15, .62);
+  border-radius: var(--control-radius);
+  background: var(--surface-deep);
   box-shadow: 0 0 0 0 rgba(124, 245, 180, 0);
   transition: box-shadow .15s ease, background .15s ease;
 }
@@ -2719,4 +2725,351 @@ html[data-phase='gameday'] .nav-links a[data-phase='registration'] { display: no
 @media (min-width: 960px) {
   .rules-toc { padding: 26px; }
   .rules-toc ol { grid-template-columns: 1fr 1fr; gap: 2px 32px; }
+}
+
+/* ==========================================================================
+   Shared tonal-layer system for public pages
+   ========================================================================== */
+body:not(.admin-page) .cta.cta--secondary,
+body:not(.admin-page) button.cta.cta--secondary {
+  border: 0;
+  border-radius: var(--control-radius);
+  background: rgba(255, 255, 255, .1);
+  color: var(--mint);
+}
+body:not(.admin-page) .cta.cta--secondary:hover,
+body:not(.admin-page) button.cta.cta--secondary:hover {
+  background: rgba(124, 245, 180, .14);
+}
+body:not(.admin-page) button.cta.cta--primary {
+  background: linear-gradient(90deg, var(--mint), var(--teal));
+  color: var(--navy);
+}
+body:not(.admin-page) .cta:focus-visible,
+body:not(.admin-page) .section-link:focus-visible,
+body:not(.admin-page) .day-tab:focus-visible,
+body:not(.admin-page) .video-filter select:focus-visible {
+  outline: 2px solid var(--mint);
+  outline-offset: 4px;
+}
+
+/* Homepage and gameday landing */
+.marquee {
+  border-top: 0;
+  border-bottom: 0;
+  background: rgba(8, 5, 34, .82);
+}
+.marquee-tier { border-left: 0; }
+.preview-panel,
+.rules-preview-list {
+  border: 0;
+  border-radius: var(--surface-radius);
+  background: var(--surface-tonal);
+  box-shadow: var(--surface-shadow);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+}
+.preview-panel-head { border-bottom: 0; }
+.home-match-list,
+.home-standings-list {
+  gap: 8px;
+  padding: 0 12px 12px;
+}
+.home-match,
+.home-standing-row {
+  border-bottom: 0;
+  border-radius: var(--control-radius);
+  background: rgba(4, 9, 15, .38);
+}
+.home-status {
+  border: 0;
+  border-radius: 999px;
+  background: rgba(124, 245, 180, .1);
+}
+.home-status--final {
+  border: 0;
+  background: rgba(255, 255, 255, .08);
+}
+.section-link {
+  border: 0;
+  border-radius: var(--control-radius);
+  background: rgba(255, 255, 255, .09);
+  box-shadow: 0 12px 30px rgba(4, 2, 20, .16);
+}
+.section-link:hover {
+  background: linear-gradient(90deg, var(--mint), var(--teal));
+  color: var(--navy);
+}
+.team-card {
+  border: 0;
+  border-radius: 20px;
+  transition: transform .16s ease, box-shadow .16s ease;
+}
+.team-card:hover {
+  border-color: transparent;
+  box-shadow: 0 22px 48px rgba(0, 0, 0, .38);
+}
+.live-frame {
+  border: 0;
+  border-radius: 18px;
+  background-color: var(--surface-deep);
+  box-shadow: 0 18px 44px rgba(4, 2, 20, .28);
+}
+.video-thumb {
+  border: 0;
+  border-radius: 16px;
+  background-color: rgba(255, 255, 255, .06);
+}
+.video-card:hover .video-thumb {
+  border-color: transparent;
+  box-shadow: 0 14px 30px rgba(4, 2, 20, .24);
+}
+.rules-preview-list {
+  padding: 12px;
+}
+.rules-preview .faq-item {
+  margin-top: 8px;
+  border-bottom: 0;
+  border-radius: var(--control-radius);
+  background: rgba(4, 9, 15, .34);
+  overflow: hidden;
+}
+.rules-preview .faq-item:first-child { margin-top: 0; }
+.teaser-save-dates {
+  border: 0;
+  background: rgba(255, 255, 255, .12);
+}
+.sheet {
+  border: 0;
+  background: rgba(14, 9, 54, .94);
+  box-shadow: var(--surface-shadow);
+}
+.sheet-option,
+.sheet-cancel { border-top: 0; }
+
+/* Rules and FAQ */
+.rules-page main { max-width: 980px; }
+.faq-panel,
+.rules-toc {
+  border: 0;
+  border-radius: var(--surface-radius);
+  background: var(--surface-tonal);
+  box-shadow: var(--surface-shadow);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.rules-page .faq-item {
+  margin-top: 8px;
+  border-bottom: 0;
+  border-radius: var(--control-radius);
+  background: rgba(4, 9, 15, .34);
+  overflow: hidden;
+}
+.rules-page .faq-item:first-of-type { margin-top: 0; }
+.rules-toc ol { gap: 4px 20px; }
+.rules-toc a {
+  border-bottom: 0;
+  border-radius: 10px;
+  transition: color .15s ease, background .15s ease;
+}
+.rules-toc a:hover { background: rgba(124, 245, 180, .08); }
+.rules-body {
+  display: grid;
+  gap: 18px;
+}
+.rules-body section {
+  margin-top: 0;
+  padding: 22px 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, .038);
+}
+.rules-table {
+  border: 0;
+  border-radius: 14px;
+  background: rgba(4, 9, 15, .38);
+}
+.rules-table th { border-bottom-color: rgba(255, 255, 255, .08); }
+.rules-table td { border-bottom-color: rgba(255, 255, 255, .045); }
+.rules-note {
+  border-left: 0;
+  border-radius: 14px;
+  background: rgba(124, 245, 180, .08);
+}
+
+/* Video library */
+.video-library {
+  border: 0;
+  border-radius: var(--surface-radius);
+  background: var(--surface-tonal);
+  box-shadow: var(--surface-shadow);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.video-library-head {
+  border-bottom: 0;
+}
+.video-filter select {
+  border: 0;
+  border-radius: var(--control-radius);
+  background: var(--surface-deep);
+  outline: none;
+}
+.video-filter select:focus {
+  box-shadow:
+    0 0 0 2px var(--mint),
+    0 0 0 6px rgba(124, 245, 180, .12);
+}
+.library-video-card {
+  border: 0;
+  border-radius: 18px;
+  background: rgba(4, 9, 15, .46);
+  box-shadow: 0 14px 34px rgba(4, 2, 20, .18);
+}
+.library-video-card:target {
+  border-color: transparent;
+  box-shadow:
+    0 0 0 2px var(--mint),
+    0 0 0 6px rgba(124, 245, 180, .12);
+}
+.library-video-actions {
+  border-top: 0;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .045);
+  padding: 10px;
+}
+
+/* Registration and raffle */
+.raffle-page .waiver-main { max-width: 1120px; }
+.raffle-page .waiver-copy {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.raffle-page .form-panel {
+  padding: 24px 18px;
+  border: 0;
+  border-radius: 22px;
+  background: var(--surface-tonal);
+  box-shadow: var(--surface-shadow);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.raffle-page .form-panel-head {
+  padding: 0;
+  border-bottom: 0;
+}
+.raffle-page .form-grid { padding-top: 24px; }
+.raffle-page .field input,
+.raffle-page .field select {
+  border: 0;
+  border-radius: var(--control-radius);
+  background: var(--surface-deep);
+  box-shadow: 0 0 0 0 rgba(124, 245, 180, 0);
+}
+.raffle-page .field input:focus,
+.raffle-page .field select:focus {
+  box-shadow:
+    0 0 0 2px var(--mint),
+    0 0 0 6px rgba(124, 245, 180, .12),
+    0 0 22px rgba(124, 245, 180, .1);
+  background: rgba(4, 9, 15, .82);
+}
+.raffle-privacy {
+  border-left: 0;
+  border-radius: var(--control-radius);
+}
+.raffle-result,
+.raffle-result--retry { border-color: transparent; }
+.raffle-page .form-actions button.cta--primary {
+  min-height: 54px;
+  width: 100%;
+  padding: 15px 24px;
+  box-shadow: 0 14px 34px rgba(45, 212, 191, .18);
+}
+
+/* Schedule and standings */
+.standings-panel,
+.schedule-board {
+  border: 0;
+  border-radius: var(--surface-radius);
+  background: var(--surface-tonal);
+  box-shadow: var(--surface-shadow);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+}
+.schedule-section-head { border-bottom: 0; }
+.standing-team-mark { border-radius: 50%; }
+.day-tabs {
+  gap: 8px;
+  padding: 10px 16px;
+  border-bottom: 0;
+}
+.day-tab {
+  min-height: 58px;
+  border-right: 0;
+  border-radius: var(--control-radius);
+  background: rgba(4, 9, 15, .44);
+}
+.match-card {
+  border: 0;
+  border-radius: 18px;
+  background: rgba(4, 9, 15, .42);
+  box-shadow: 0 14px 34px rgba(4, 2, 20, .16);
+}
+.match-card::before { opacity: 0; }
+.match-meta span {
+  border: 0;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .055);
+}
+.match-stage {
+  border: 0;
+  border-radius: 10px;
+}
+.match-team { border-radius: 14px; }
+.match-feature {
+  border: 0;
+  border-radius: 14px;
+  background: rgba(4, 9, 15, .5);
+}
+.player-portrait.has-photo {
+  border: 0;
+  border-radius: 10px;
+}
+.winner-pill,
+.match-actions a,
+.video-pending {
+  border: 0;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, .055);
+}
+
+/* Confirmation */
+.confirmation-card {
+  border: 0;
+  border-radius: var(--surface-radius);
+  background:
+    linear-gradient(115deg, rgba(255, 255, 255, .08), transparent 44%),
+    var(--surface-tonal);
+  box-shadow: var(--surface-shadow);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+@media (min-width: 960px) {
+  .rules-body section { padding: 28px 30px; }
+  .raffle-page .form-panel {
+    padding: 32px 36px 34px;
+    border-radius: var(--surface-radius);
+  }
+  .raffle-page .form-actions button.cta--primary { width: auto; }
+  .match-meta { border-right: 0; }
+  .match-feature {
+    border-right: 0;
+    border-left: 0;
+  }
+  .sheet { border-bottom: 0; }
 }
