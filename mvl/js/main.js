@@ -191,7 +191,7 @@ if (homeScheduleList && homeScheduleTitle) {
 }
 
 if (homeStandingsList) {
-  homeStandingsList.innerHTML = buildStandingsPreview().slice(0, 6).map((team, index) => `
+  homeStandingsList.innerHTML = buildStandingsPreview().map((team, index) => `
     <div class="home-standing-row">
       <span>${String(index + 1).padStart(2, '0')}</span>
       <strong>${team.name}</strong>
