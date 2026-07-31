@@ -53,6 +53,11 @@ window.MVL_DATA = {
   //   tag     optional. Small pill, e.g. 'Grand Prize' or 'Daily'.
   // Set to [] to hide the prize section entirely.
   raffle: {
+    // Dates (Asia/Manila, YYYY-MM-DD) when check-in is open even though no game
+    // is scheduled. Mirrors mvl.raffle_open_dates in Supabase, which is the
+    // authority — this list only decides whether the form is shown.
+    // TEMP: client testing window, remove after 2026-08-02.
+    openDates: ['2026-07-31', '2026-08-01', '2026-08-02'],
     headline: 'Win big just for showing up',
     blurb: 'Check in at the venue on any game day and you are in the draw. Winners are announced and claimed on-site.',
     prizes: [

@@ -65,11 +65,17 @@ const manilaDate = (value) => new Intl.DateTimeFormat('en-CA', {
   day: '2-digit',
 }).format(value ? new Date(value) : new Date());
 
-const gameDays = new Set(games.map((game) => manilaDate(game.startsAt)));
+// Check-in is open on scheduled game days plus any explicit override dates.
+// The server enforces the same rule against mvl.raffle_open_dates and is the
+// authority; this only decides whether the form is shown.
+const openDays = new Set([
+  ...games.map((game) => manilaDate(game.startsAt)),
+  ...(raffle?.openDates || []),
+]);
 // ?preview=1 unlocks the form UI for testing; the server still refuses
-// entries outside game days, so this can't be used to sneak entries in.
+// entries on closed days, so this can't be used to sneak entries in.
 const previewMode = new URLSearchParams(location.search).has('preview');
-const isGameDay = gameDays.has(manilaDate());
+const isGameDay = openDays.has(manilaDate());
 
 if (isGameDay || previewMode) {
   form.classList.remove('is-hidden');
