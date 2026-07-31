@@ -6,13 +6,13 @@ window.MVL_DATA = {
   },
 
   teams: [
-    { id: 'metarice-x', name: 'Metarice X', tag: 'Violet Division', grad: ['#7C3BFF', '#2E00A8'], pos: '76% 24%' },
-    { id: 'metarice-y', name: 'Metarice Y', tag: 'Green Division', grad: ['#00B453', '#067B45'], pos: '76% 20%' },
+    { id: 'metarice-x', name: 'Metarice X', tag: 'Mint Division', grad: ['#3FE39A', '#0E7A4C'], pos: '76% 24%' },
+    { id: 'metarice-y', name: 'Metarice Y', tag: 'Violet Division', grad: ['#7C3BFF', '#2E00A8'], pos: '76% 20%' },
     { id: 'thurstrap', name: 'Thurstrap', tag: 'Aqua Division', grad: ['#10E0D4', '#078D96'], pos: '72% 22%' },
     { id: 'gizmo', name: 'Gizmo', tag: 'Pink Division', grad: ['#FF3FB4', '#D50083'], pos: '78% 25%' },
-    { id: 'gremlins', name: 'Gremlins', tag: 'Red Division', grad: ['#F51642', '#B90025'], pos: '20% 72%' },
+    { id: 'gremlins', name: 'Gremlins', tag: 'Forest Division', grad: ['#3D9E2A', '#0D4E14'], pos: '20% 72%' },
     { id: 'ssvc', name: 'SSVC', tag: 'Yellow Division', grad: ['#FFE44D', '#D6A900'], pos: '20% 74%' },
-    { id: 's24', name: 'S24', tag: 'Blue Division', grad: ['#3478FF', '#0039B8'], pos: '78% 24%' },
+    { id: 's24', name: 'S24', tag: 'Red Division', grad: ['#F51642', '#B90025'], pos: '78% 24%' },
     { id: 'up-leftout', name: 'Secret', tag: 'Orange Division', grad: ['#FF9A05', '#FF5A00'], pos: '22% 72%' },
   ],
 

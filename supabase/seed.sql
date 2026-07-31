@@ -21,13 +21,13 @@ on conflict (id) do update set
 
 insert into mvl.teams (id, name, division_label, color_a, color_b, sort_order)
 values
-  ('metarice-x', 'Metarice X', 'Violet Division', '#7C3BFF', '#2E00A8', 1),
-  ('metarice-y', 'Metarice Y', 'Green Division', '#00B453', '#067B45', 2),
+  ('metarice-x', 'Metarice X', 'Mint Division', '#3FE39A', '#0E7A4C', 1),
+  ('metarice-y', 'Metarice Y', 'Violet Division', '#7C3BFF', '#2E00A8', 2),
   ('thurstrap', 'Thurstrap', 'Aqua Division', '#10E0D4', '#078D96', 3),
   ('gizmo', 'Gizmo', 'Pink Division', '#FF3FB4', '#D50083', 4),
-  ('gremlins', 'Gremlins', 'Red Division', '#F51642', '#B90025', 5),
+  ('gremlins', 'Gremlins', 'Forest Division', '#3D9E2A', '#0D4E14', 5),
   ('ssvc', 'SSVC', 'Yellow Division', '#FFE44D', '#D6A900', 6),
-  ('s24', 'S24', 'Blue Division', '#3478FF', '#0039B8', 7),
+  ('s24', 'S24', 'Red Division', '#F51642', '#B90025', 7),
   ('up-leftout', 'Secret', 'Orange Division', '#FF9A05', '#FF5A00', 8)
 on conflict (id) do update set
   name = excluded.name,
