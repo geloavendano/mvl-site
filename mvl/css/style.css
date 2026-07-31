@@ -3462,3 +3462,124 @@ body:not(.admin-page) .video-filter select:focus-visible {
 @media (min-width: 960px) {
   .home-video-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
 }
+
+/* ==========================================================================
+   Raffle prize showcase (/checkin)
+   ========================================================================== */
+.prize-showcase { margin-top: 22px; }
+.prize-banner {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--panel-radius, 18px);
+  padding: 26px 20px 24px;
+  background:
+    radial-gradient(ellipse 70% 90% at 12% 8%, rgba(124, 58, 237, .5), transparent 62%),
+    linear-gradient(135deg, #6C4CF5 0%, #4A6FE8 46%, #35D3B8 100%);
+  box-shadow: var(--surface-shadow, 0 18px 38px rgba(4, 2, 20, .3));
+}
+/* starfield, echoing the team cards */
+.prize-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle 1px at 22% 24%, rgba(255,255,255,.9) 0 1px, transparent 1.7px),
+    radial-gradient(circle 1.3px at 68% 16%, rgba(255,255,255,.6) 0 1.3px, transparent 2px),
+    radial-gradient(circle 1px at 46% 74%, rgba(255,255,255,.65) 0 1px, transparent 1.7px),
+    radial-gradient(circle 1px at 86% 58%, rgba(255,255,255,.5) 0 1px, transparent 1.7px);
+  background-size: 160px 130px, 200px 160px, 180px 150px, 220px 170px;
+}
+.prize-banner > * { position: relative; }
+.prize-banner h2 {
+  font-family: var(--stretch);
+  font-style: italic;
+  text-transform: uppercase;
+  font-size: clamp(30px, 9vw, 46px);
+  line-height: .92;
+  color: #fff;
+  margin-bottom: 8px;
+  text-shadow: 0 4px 22px rgba(4, 2, 20, .4);
+}
+.prize-blurb {
+  color: rgba(255, 255, 255, .92);
+  font-size: 13.5px;
+  line-height: 1.6;
+  max-width: 52ch;
+}
+.prize-cta { margin-top: 16px; display: inline-flex; width: auto; }
+
+.prize-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+.prize-card {
+  min-width: 0;
+  border-radius: var(--control-radius, 12px);
+  overflow: hidden;
+  background: rgba(11, 7, 48, .55);
+  border: 1px solid rgba(124, 245, 180, .22);
+}
+.prize-card--feature {
+  grid-column: 1 / -1;
+  border-color: rgba(124, 245, 180, .5);
+}
+.prize-media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  display: grid;
+  place-items: center;
+}
+.prize-card--feature .prize-media { aspect-ratio: 16 / 9; }
+.prize-media img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.prize-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--mint);
+  color: #16104A;
+  font-weight: 900;
+  font-size: 9.5px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+}
+.prize-copy { padding: 12px 14px 14px; }
+.prize-sponsor {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 4px;
+}
+.prize-copy h3 {
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.25;
+  color: #fff;
+}
+
+@media (min-width: 960px) {
+  .prize-banner { padding: 40px 38px 36px; }
+  .prize-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+    align-items: start; /* don't stretch short cards to the feature's height */
+  }
+  .prize-card--feature { grid-column: span 2; }
+  .prize-card--feature .prize-media { aspect-ratio: 16 / 9; }
+  .prize-blurb { font-size: 15px; }
+  .prize-copy h3 { font-size: 15px; }
+}

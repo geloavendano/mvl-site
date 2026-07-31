@@ -6,7 +6,40 @@
    person per game day; this file only reports what the server said.
    ========================================================================== */
 
-const { teams, games } = window.MVL_DATA;
+const { teams, games, raffle } = window.MVL_DATA;
+
+// ---- prize showcase ----------------------------------------------------------
+// Rendered from MVL_DATA.raffle so prizes are content, not markup. Tiles without
+// an image fall back to a striped placeholder, so partial data still looks right.
+(() => {
+  const showcase = document.getElementById('prizeShowcase');
+  const grid = document.getElementById('prizeGrid');
+  const prizes = raffle?.prizes || [];
+  if (!showcase || !grid || !prizes.length) return;
+
+  const esc = (v = '') => String(v).replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
+  }[c]));
+
+  if (raffle.headline) showcase.querySelector('#prizeHeadline').textContent = raffle.headline;
+  if (raffle.blurb) showcase.querySelector('.prize-blurb').textContent = raffle.blurb;
+
+  grid.innerHTML = prizes.map((prize) => `
+    <article class="prize-card${prize.tag ? ' prize-card--feature' : ''}">
+      <div class="prize-media${prize.image ? '' : ' placeholder'}">
+        ${prize.image ? `<img src="${esc(prize.image)}" alt="${esc(prize.name)}" loading="lazy">` : '<span class="ph-note">prize photo</span>'}
+        ${prize.tag ? `<span class="prize-tag">${esc(prize.tag)}</span>` : ''}
+      </div>
+      <div class="prize-copy">
+        ${prize.sponsor ? `<p class="prize-sponsor">${esc(prize.sponsor)}</p>` : ''}
+        <h3>${esc(prize.name)}</h3>
+      </div>
+    </article>
+  `).join('');
+
+  showcase.classList.remove('is-hidden');
+})();
+
 const supabase = window.MVL_SUPABASE;
 
 // Gameville Ball Park row in mvl.venues (seeded UUID)

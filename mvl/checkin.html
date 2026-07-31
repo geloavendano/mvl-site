@@ -34,6 +34,17 @@
     <h1 class="section-title">Raffle <em>Check-In</em></h1>
   </section>
 
+  <!-- prize showcase — rendered from MVL_DATA.raffle in js/league-data.js -->
+  <section class="prize-showcase is-hidden" id="prizeShowcase" aria-labelledby="prizeHeadline">
+    <div class="prize-banner">
+      <p class="section-kicker section-kicker--teal">Game-Day Raffle</p>
+      <h2 id="prizeHeadline"></h2>
+      <p class="prize-blurb"></p>
+      <a class="cta cta--primary prize-cta" href="#enterRaffle">Check In to Enter</a>
+    </div>
+    <div class="prize-grid" id="prizeGrid"></div>
+  </section>
+
   <div class="waiver-copy">
     <p>Watching the games at Gameville Ball Park? Check in below to join the game-day raffle — prizes are drawn and claimed at the venue.</p>
     <p>You can enter once per game day. Use your full name, and use the same name every day so your entries match.</p>
@@ -54,7 +65,7 @@
 
   <!-- entry form -->
   <form class="waiver-form is-hidden" id="raffleForm" novalidate>
-    <section class="form-panel">
+    <section class="form-panel" id="enterRaffle">
       <div class="form-panel-head">
         <p class="section-kicker section-kicker--teal">Join Today's Draw</p>
         <h2>Enter the Raffle</h2>

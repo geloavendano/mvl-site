@@ -44,6 +44,25 @@ window.MVL_DATA = {
     { name: 'Potato Corner', tier: 'Minor Sponsor', order: 2, logo: '/mvl/assets/Sponsor Logos/Minor Sponsors/Potato Corner PPS Logo.png' },
   ],
 
+  // ---- Raffle prizes (shown on /checkin) -----------------------------------
+  // Drop real prizes in here — no layout work needed. Each entry:
+  //   name    required. The prize itself.
+  //   sponsor optional. Shown as the small label above the name.
+  //   image   optional. Path under /mvl/assets/. Omit and the tile falls back
+  //           to a striped placeholder, so half-filled data still looks fine.
+  //   tag     optional. Small pill, e.g. 'Grand Prize' or 'Daily'.
+  // Set to [] to hide the prize section entirely.
+  raffle: {
+    headline: 'Win big just for showing up',
+    blurb: 'Check in at the venue on any game day and you are in the draw. Winners are announced and claimed on-site.',
+    prizes: [
+      { name: 'Grand Prize', sponsor: 'TBA', image: '', tag: 'Grand Prize' },
+      { name: 'Prize TBA', sponsor: 'TBA', image: '' },
+      { name: 'Prize TBA', sponsor: 'TBA', image: '' },
+      { name: 'Prize TBA', sponsor: 'TBA', image: '' },
+    ],
+  },
+
   games: [
     {
       id: 'g1',
