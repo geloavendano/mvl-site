@@ -181,7 +181,7 @@ if (homeScheduleList && homeScheduleTitle) {
       <article class="home-match">
         <div>
           <p class="home-match-time">${score}</p>
-          <h4>${teamA.name} <span>vs</span> ${teamB.name}</h4>
+          <h4><span class="home-match-team"><span class="standing-team-mark" style="--team-a:${teamA.grad[0]}; --team-b:${teamA.grad[1]}"></span>${teamA.name}</span> <span class="home-match-vs">vs</span> <span class="home-match-team"><span class="standing-team-mark" style="--team-a:${teamB.grad[0]}; --team-b:${teamB.grad[1]}"></span>${teamB.name}</span></h4>
           <p>${game.court}</p>
         </div>
         <span class="home-status home-status--${game.status}">${status}</span>
@@ -194,35 +194,77 @@ if (homeStandingsList) {
   homeStandingsList.innerHTML = buildStandingsPreview().map((team, index) => `
     <div class="home-standing-row">
       <span>${String(index + 1).padStart(2, '0')}</span>
-      <strong>${team.name}</strong>
-      <em>${team.wins}W</em>
+      <strong><span class="standing-team-mark" style="--team-a:${team.grad[0]}; --team-b:${team.grad[1]}"></span>${team.name}</strong>
+      <em>${team.wins}<i>W</i>&thinsp;-&thinsp;${team.losses}<i>L</i></em>
     </div>
   `).join('');
 }
 
 // ---- render: past game cards ----------------------------------------------
-const completedGames = GAMES
-  .filter((game) => game.status === 'final')
+// ---- render: recent game videos --------------------------------------------
+// Only games that actually have a playable recording, newest first, capped at
+// six. Cards are click-to-play embeds, matching the Videos library.
+const validYouTubeId = (value) => typeof value === 'string' && /^[\w-]{11}$/.test(value.trim());
+
+const gameVideos = (game) => {
+  if (Array.isArray(game.videos)) return game.videos.filter((v) => validYouTubeId(v.youtubeId));
+  return validYouTubeId(game.youtubeId)
+    ? [{ youtubeId: game.youtubeId, label: game.videoLabel || 'Full Game', duration: game.duration || '' }]
+    : [];
+};
+
+const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (c) => ({
+  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
+}[c]));
+
+const recentVideos = [...GAMES]
   .sort((a, b) => new Date(b.startsAt) - new Date(a.startsAt))
+  .flatMap((game) => gameVideos(game).map((video, index) => ({ game, video, index })))
   .slice(0, 6);
 
-const gameCard = (game) => {
-  const teamA = gameTeam(game, 'A');
-  const teamB = gameTeam(game, 'B');
-  const videos = Array.isArray(game.videos) ? game.videos : (game.youtubeId ? [{ label: 'Full Game' }] : []);
-  const href = videos.length ? `/mvl/videos.html#game-${game.id}` : '/mvl/schedule.html';
-  return `
-  <a class="video-card reveal" href="${href}">
-    <div class="video-thumb ${videos.length ? '' : 'placeholder'}">
-      <span class="play-btn play-btn--sm" aria-hidden="true"></span>
-    </div>
-    <p class="video-title">${teamA.name} vs ${teamB.name}</p>
-    <p class="video-meta">${videos.length ? `${videos.length} ${videos.length === 1 ? 'Video' : 'Videos'}` : 'Result'} &middot; ${videos[0]?.label || 'Pending video'}</p>
-  </a>
-`;
-};
-document.getElementById('pastSide').innerHTML = completedGames.slice(0, 2).map(gameCard).join('');
-document.getElementById('pastBottom').innerHTML = completedGames.slice(2, 6).map(gameCard).join('');
+const recentVideosEl = document.getElementById('recentVideos');
+const recentVideosEmpty = document.getElementById('recentVideosEmpty');
+
+if (recentVideosEl) {
+  recentVideosEmpty?.classList.toggle('is-hidden', recentVideos.length > 0);
+  recentVideosEl.innerHTML = recentVideos.map(({ game, video, index }) => {
+    const teamA = gameTeam(game, 'A');
+    const teamB = gameTeam(game, 'B');
+    const label = video.label || `Video ${index + 1}`;
+    return `
+      <article class="home-video-card reveal">
+        <div class="home-video-player">
+          <button type="button" data-play-video="${video.youtubeId}" data-video-label="${escapeHtml(label)}"
+                  aria-label="Play ${escapeHtml(label)}: ${escapeHtml(teamA.name)} versus ${escapeHtml(teamB.name)}">
+            <img src="https://i.ytimg.com/vi/${video.youtubeId}/hqdefault.jpg" alt="" loading="lazy">
+            <span class="play-btn play-btn--sm" aria-hidden="true"></span>
+          </button>
+        </div>
+        <p class="video-title">
+          <span class="home-match-team"><span class="standing-team-mark" style="--team-a:${teamA.grad[0]}; --team-b:${teamA.grad[1]}"></span>${escapeHtml(teamA.name)}</span>
+          <span class="home-match-vs">vs</span>
+          <span class="home-match-team"><span class="standing-team-mark" style="--team-a:${teamB.grad[0]}; --team-b:${teamB.grad[1]}"></span>${escapeHtml(teamB.name)}</span>
+        </p>
+        <p class="video-meta">${escapeHtml(label)}${video.duration ? ` &middot; ${escapeHtml(video.duration)}` : ''}</p>
+      </article>
+    `;
+  }).join('');
+
+  recentVideosEl.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-play-video]');
+    if (!button) return;
+    const videoId = button.dataset.playVideo;
+    if (!validYouTubeId(videoId)) return;
+    button.outerHTML = `
+      <iframe
+        src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1"
+        title="${escapeHtml(button.dataset.videoLabel || 'MVL game video')}"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerpolicy="strict-origin-when-cross-origin"
+        allowfullscreen></iframe>
+    `;
+  });
+}
 
 // ---- render: sponsor marquees (list duplicated for the seamless loop) ------
 const sponsorTierOrder = ['Official Partner', 'Co-presenter', 'Major Sponsor', 'Minor Sponsor'];

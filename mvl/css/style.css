@@ -3343,3 +3343,122 @@ body:not(.admin-page) .video-filter select:focus-visible {
     padding-left: 0;
   }
 }
+
+/* ==========================================================================
+   Gametime preview refinements
+   ========================================================================== */
+/* team colour marks in the match list (same language as /schedule) */
+.home-match h4 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px 6px;
+}
+.home-match-team {
+  display: inline-flex;
+  align-items: center;
+}
+.home-match-team .standing-team-mark {
+  width: 9px;
+  height: 9px;
+  margin-right: 6px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+.home-match h4 .home-match-vs {
+  margin: 0 2px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--mint);
+}
+
+/* standings preview: colour mark + win-loss */
+.home-standing-row { grid-template-columns: 42px minmax(0, 1fr) 60px; }
+.home-standing-row strong {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.home-standing-row strong .standing-team-mark {
+  width: 10px;
+  height: 10px;
+  margin-right: 0;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+.home-standing-row em { white-space: nowrap; text-align: right; }
+.home-standing-row em i {
+  font-style: normal;
+  opacity: .62;
+  font-size: .92em;
+}
+
+/* Rules FAQ: breathing room either side of the summary row */
+.rules-preview .faq-item summary {
+  padding-left: 16px;
+  padding-right: 52px;
+}
+.rules-preview .faq-item summary::after { right: 18px; }
+.rules-preview .faq-item p {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+/* recent game videos on /gametime — click-to-play embeds */
+.home-video-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+.home-video-card { min-width: 0; }
+.home-video-player {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--control-radius, 12px);
+  overflow: hidden;
+  background: rgba(4, 9, 15, .55);
+  border: 1px solid rgba(124, 245, 180, .2);
+}
+.home-video-player button {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  background: none;
+  cursor: pointer;
+}
+.home-video-player img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.home-video-player .play-btn { position: relative; z-index: 1; }
+.home-video-player iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.home-video-card:hover .home-video-player { border-color: rgba(124, 245, 180, .55); }
+.home-video-card .video-title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px 6px;
+  margin-top: 10px;
+}
+.home-video-empty {
+  color: var(--ink-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+@media (min-width: 960px) {
+  .home-video-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+}
