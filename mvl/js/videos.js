@@ -32,6 +32,13 @@ const gameTeamName = (game, side) => {
   const label = side === 'A' ? game.teamALabel : game.teamBLabel;
   return label || teamById[id]?.name || 'TBD';
 };
+// Same team-colour language as /gametime and /schedule.
+const gameTeam = (game, side) => {
+  const id = side === 'A' ? game.teamA : game.teamB;
+  return teamById[id] || { id, grad: ['#4338CA', '#16104A'] };
+};
+const teamMark = (team) =>
+  `<span class="standing-team-mark" style="--team-a:${team.grad[0]}; --team-b:${team.grad[1]}"></span>`;
 const formatDate = (iso) => new Intl.DateTimeFormat('en-PH', {
   timeZone: 'Asia/Manila',
   month: 'short',
@@ -71,7 +78,10 @@ const renderLatestGame = () => {
   featurePoster.onerror = () => {
     if (featurePoster.src !== fallbackPoster) featurePoster.src = fallbackPoster;
   };
-  featureMatchup.textContent = `${teamA} vs ${teamB}`;
+  featureMatchup.innerHTML =
+    `<span class="video-team">${teamMark(gameTeam(latestGame, 'A'))}${escapeHtml(teamA)}</span>` +
+    ` <span class="video-vs">vs</span> ` +
+    `<span class="video-team">${teamMark(gameTeam(latestGame, 'B'))}${escapeHtml(teamB)}</span>`;
   featureMeta.textContent = `Day ${latestGame.day} · ${formatDate(latestGame.startsAt)} · ${formatTime(latestGame.startsAt)}`;
   featureResult.textContent = `${winner ? `Winner: ${winner}` : 'Result pending'} · ${label}${latestVideo.duration ? ` · ${latestVideo.duration}` : ''}`;
   featurePlay.disabled = false;
@@ -123,7 +133,7 @@ const renderVideos = () => {
         </div>
         <div class="library-video-copy">
           <p class="video-library-meta">Day ${game.day} · ${formatDate(game.startsAt)} · ${formatTime(game.startsAt)}</p>
-          <h3>${escapeHtml(teamA)} <em>vs</em> ${escapeHtml(teamB)}</h3>
+          <h3><span class="video-team">${teamMark(gameTeam(game, 'A'))}${escapeHtml(teamA)}</span> <em>vs</em> <span class="video-team">${teamMark(gameTeam(game, 'B'))}${escapeHtml(teamB)}</span></h3>
           <p>${escapeHtml(game.court)}${winner ? ` · Winner: ${escapeHtml(winner)}` : ''}</p>
           <div class="library-video-actions">
             <span>${escapeHtml(label)}${video.duration ? ` · ${escapeHtml(video.duration)}` : ''}</span>

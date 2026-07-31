@@ -3583,3 +3583,82 @@ body:not(.admin-page) .video-filter select:focus-visible {
   .prize-blurb { font-size: 15px; }
   .prize-copy h3 { font-size: 15px; }
 }
+
+/* team colour marks on the Videos page */
+.video-team {
+  display: inline-flex;
+  align-items: center;
+}
+.video-team .standing-team-mark {
+  width: 10px;
+  height: 10px;
+  margin-right: 7px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+.videos-feature-matchup,
+.library-video-copy h3 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px 6px;
+}
+.videos-feature-matchup .video-vs {
+  font-family: var(--mono);
+  font-size: .62em;
+  color: var(--mint);
+}
+
+/* ==========================================================================
+   Waiver form — accents follow the selected team
+   --accent / --accent-soft / --accent-ink are set by js/waiver.js once a team
+   is chosen. They default to the house mint/teal so the form looks correct
+   before any selection and if JS never runs.
+   ========================================================================== */
+.waiver-page {
+  --accent: var(--mint);
+  --accent-2: var(--teal);
+  --accent-soft: rgba(124, 245, 180, .14);
+  --accent-ink: var(--navy);
+}
+.waiver-page .section-kicker,
+.waiver-page .section-kicker--teal,
+.waiver-page .field span,
+.waiver-page .waiver-copy h2,
+.waiver-page .release-copy h3 {
+  color: var(--accent-2);
+  transition: color .25s ease;
+}
+.waiver-page .field input:focus,
+.waiver-page .field select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.waiver-page .waiver-check input { accent-color: var(--accent); }
+.waiver-page .form-status.is-success { color: var(--accent); }
+/* must out-specify `body:not(.admin-page) button.cta.cta--primary` */
+body.waiver-page .form-actions button.cta.cta--primary {
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  color: var(--accent-ink);
+  transition: background .25s ease, color .25s ease, filter .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+body.waiver-page .form-actions button.cta.cta--primary:focus-visible {
+  box-shadow:
+    0 0 0 2px var(--accent),
+    0 0 0 6px var(--accent-soft),
+    0 0 22px var(--accent-soft);
+}
+/* the team select itself carries a dot of its own colour */
+.waiver-page .field--team { position: relative; }
+.waiver-page .team-swatch {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: -1px;
+  background: linear-gradient(135deg, var(--team-a, var(--mint)), var(--team-b, var(--teal)));
+  opacity: 0;
+  transition: opacity .25s ease;
+}
+.waiver-page .team-swatch.is-on { opacity: 1; }

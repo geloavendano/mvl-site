@@ -18,6 +18,47 @@ teams.forEach((team) => {
   teamSelect.append(option);
 });
 
+// ---- accent theming ----------------------------------------------------------
+// The form's accents adopt the selected team's colour. Raw team colours are too
+// dark to read as text on the navy background (e.g. #2E00A8), so the text accent
+// is a lightened tint; the button keeps the fuller colour and picks black or
+// white ink by luminance so it stays legible for every team.
+const teamById = Object.fromEntries(teams.map((t) => [t.id, t]));
+const teamSwatch = document.getElementById('teamSwatch');
+
+const luminance = (hex) => {
+  const m = /^#?([\da-f]{6})$/i.exec(hex.trim());
+  if (!m) return 0;
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(m[1].slice(i, i + 2), 16) / 255);
+  const lin = (c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+};
+
+const applyTeamAccent = () => {
+  const team = teamById[teamSelect.value];
+  const root = document.body;
+  if (!team) {
+    ['--accent', '--accent-2', '--accent-soft', '--accent-ink']
+      .forEach((prop) => root.style.removeProperty(prop));
+    teamSwatch?.classList.remove('is-on');
+    return;
+  }
+  const [light, deep] = team.grad;
+  root.style.setProperty('--accent', `color-mix(in srgb, ${light} 82%, #ffffff)`);
+  root.style.setProperty('--accent-2', `color-mix(in srgb, ${light} 62%, #ffffff)`);
+  root.style.setProperty('--accent-soft', `color-mix(in srgb, ${light} 22%, transparent)`);
+  // the button gradient runs light -> deep; judge ink against the darker end
+  root.style.setProperty('--accent-ink', luminance(deep) > 0.42 ? '#0B0730' : '#ffffff');
+  if (teamSwatch) {
+    teamSwatch.style.setProperty('--team-a', light);
+    teamSwatch.style.setProperty('--team-b', deep);
+    teamSwatch.classList.add('is-on');
+  }
+};
+
+teamSelect.addEventListener('change', applyTeamAccent);
+applyTeamAccent();
+
 const setPlayerOptions = (message, players = []) => {
   playerSelect.replaceChildren();
   const placeholder = document.createElement('option');
