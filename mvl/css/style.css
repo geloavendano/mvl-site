@@ -3662,3 +3662,25 @@ body.waiver-page .form-actions button.cta.cta--primary:focus-visible {
   transition: opacity .25s ease;
 }
 .waiver-page .team-swatch.is-on { opacity: 1; }
+
+/* ==========================================================================
+   Team cards — per-team background artwork
+   The 2026 team art already carries the jersey shapes, texture and colour, so
+   the CSS oval/shard decoration is suppressed on cards that have artwork.
+   Falls back to the gradient treatment for any team without a `bg`.
+   ========================================================================== */
+.team-card--art {
+  background-image:
+    /* just enough to hold the team name; lets the artwork stay vivid */
+    linear-gradient(100deg, rgba(4, 9, 15, .82) 0 18%, rgba(4, 9, 15, .34) 44%, rgba(4, 9, 15, 0) 72%),
+    var(--team-art);
+  background-size: cover, cover;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+}
+.team-card--art .team-card-oval,
+.team-card--art .team-card-shards { display: none; }
+/* The stock player is a single generic cutout in a green jersey — it repeats
+   across all eight cards and fights the team artwork. Hidden until real
+   per-team player cutouts exist; restoring it is one rule. */
+.team-card--art .team-card-photo { display: none; }
