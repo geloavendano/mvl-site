@@ -3652,16 +3652,18 @@ body.waiver-page .form-actions button.cta.cta--primary:focus-visible {
 .waiver-page .field--team { position: relative; }
 .waiver-page .team-swatch {
   display: inline-block;
-  width: 11px;
+  /* collapsed until a team is picked, otherwise it indents the TEAM label
+     out of line with its sibling field labels */
+  width: 0;
   height: 11px;
   border-radius: 50%;
-  margin-right: 8px;
+  margin-right: 0;
+  transition: width .2s ease, margin-right .2s ease, opacity .25s ease;
   vertical-align: -1px;
   background: linear-gradient(135deg, var(--team-a, var(--mint)), var(--team-b, var(--teal)));
   opacity: 0;
-  transition: opacity .25s ease;
 }
-.waiver-page .team-swatch.is-on { opacity: 1; }
+.waiver-page .team-swatch.is-on { opacity: 1; width: 11px; margin-right: 8px; }
 
 /* ==========================================================================
    Team cards — per-team background artwork
@@ -3684,3 +3686,21 @@ body.waiver-page .form-actions button.cta.cta--primary:focus-visible {
    across all eight cards and fights the team artwork. Hidden until real
    per-team player cutouts exist; restoring it is one rule. */
 .team-card--art .team-card-photo { display: none; }
+
+/* ==========================================================================
+   Select fields — custom chevron
+   The native select arrow is pinned to the control's right edge and ignores
+   padding, so it sat much further out than the text inset on the left. This
+   replaces it with a chevron positioned to match. Scoped away from the admin
+   console, which has its own light-theme field styling.
+   ========================================================================== */
+body:not(.admin-page) .field select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-opacity='0.6' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 18px 18px;
+  /* room so long option text never runs under the chevron */
+  padding-right: 44px;
+}
