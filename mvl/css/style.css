@@ -3419,15 +3419,32 @@ body:not(.admin-page) .video-filter select:focus-visible {
 
 /* recent game videos on /gametime — click-to-play embeds */
 .home-video-grid {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
   gap: 16px;
-  justify-items: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 16px;
+  padding: 0 16px 12px 0;
+  margin-right: -16px;
+  -webkit-overflow-scrolling: touch;
+}
+.home-video-grid::-webkit-scrollbar {
+  height: 7px;
+}
+.home-video-grid::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, .08);
+}
+.home-video-grid::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(84, 240, 187, .72);
 }
 .home-video-card {
-  width: 100%;
-  max-width: 640px;
+  flex: 0 0 clamp(260px, 78vw, 430px);
+  width: clamp(260px, 78vw, 430px);
+  max-width: 430px;
   min-width: 0;
+  scroll-snap-align: start;
   padding: 10px 10px 12px;
   border: 1px solid rgba(156, 240, 227, .32);
   border-radius: 22px;
@@ -3493,12 +3510,16 @@ body:not(.admin-page) .video-filter select:focus-visible {
 
 @media (min-width: 960px) {
   .home-video-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 20px;
-    max-width: 1120px;
-    margin: 0 auto;
+    max-width: none;
+    margin: 0 -48px 0 0;
+    padding-right: 48px;
   }
-  .home-video-card { max-width: 540px; }
+  .home-video-card {
+    flex-basis: clamp(340px, 32vw, 430px);
+    width: clamp(340px, 32vw, 430px);
+    max-width: 430px;
+  }
 }
 
 /* ==========================================================================
@@ -4076,4 +4097,86 @@ body.gametime-v3 .rules-preview {
     radial-gradient(circle at 82% 10%, rgba(84, 240, 187, .5) 0%, transparent 30%),
     radial-gradient(circle at 16% 82%, rgba(34, 174, 233, .42) 0%, transparent 34%),
     linear-gradient(144deg, var(--poster-midnight) 0%, var(--poster-court-blue) 56%, var(--poster-teal-main) 100%);
+}
+
+/* ==========================================================================
+   V3 poster palette for supporting pages
+   Applies the main-poster navy/blue/teal/mint direction to core pages without
+   changing their content structure.
+   ========================================================================== */
+.schedule-page,
+.videos-page,
+.waiver-page,
+.raffle-page {
+  --poster-deep: #100836;
+  --poster-midnight: #18104d;
+  --poster-court-blue: #244fa6;
+  --poster-cyan: #22aee9;
+  --poster-teal-main: #20cfbd;
+  --poster-mint-main: #54f0bb;
+  --poster-ice: #dfffee;
+  background:
+    radial-gradient(circle at 82% 10%, rgba(84, 240, 187, .38) 0%, transparent 30%),
+    radial-gradient(circle at 8% 48%, rgba(34, 174, 233, .34) 0%, transparent 34%),
+    linear-gradient(145deg, var(--poster-deep) 0%, var(--poster-court-blue) 52%, var(--poster-teal-main) 100%);
+}
+.schedule-page .page-nav,
+.videos-page .page-nav,
+.waiver-page .page-nav,
+.raffle-page .page-nav {
+  background:
+    linear-gradient(90deg, rgba(16, 8, 54, .96), rgba(24, 16, 77, .9) 58%, rgba(36, 79, 166, .9));
+  border-bottom-color: rgba(84, 240, 187, .26);
+}
+.schedule-page .section-title em,
+.videos-page .section-title em,
+.waiver-page .section-title em,
+.raffle-page .section-title em,
+.schedule-page .schedule-video-link,
+.waiver-page .waiver-copy h2,
+.raffle-page .waiver-copy h2 {
+  color: var(--poster-mint-main);
+}
+.standings-panel,
+.schedule-board,
+.video-library,
+.library-video-card,
+.waiver-page .waiver-copy,
+.raffle-page .waiver-copy,
+.waiver-page .form-panel,
+.raffle-page .form-panel,
+.prize-banner,
+.prize-card {
+  border-color: rgba(84, 240, 187, .28);
+  background:
+    radial-gradient(circle at 96% 0%, rgba(34, 174, 233, .16), transparent 36%),
+    rgba(16, 8, 54, .78);
+  box-shadow: 0 20px 56px rgba(16, 8, 54, .32);
+}
+.videos-feature {
+  background:
+    radial-gradient(circle at 82% 18%, rgba(84, 240, 187, .28) 0%, transparent 34%),
+    linear-gradient(145deg, var(--poster-deep) 0%, var(--poster-court-blue) 58%, var(--poster-teal-main) 100%);
+}
+.videos-feature-scrim {
+  background:
+    linear-gradient(90deg, rgba(16, 8, 54, .9) 0%, rgba(16, 8, 54, .58) 52%, rgba(36, 79, 166, .5) 100%),
+    linear-gradient(180deg, rgba(16, 8, 54, .25), rgba(16, 8, 54, .86));
+}
+.videos-feature-panel {
+  border-color: rgba(84, 240, 187, .28);
+  background: rgba(16, 8, 54, .64);
+}
+.day-tabs button[aria-selected='true'],
+.cta.cta--primary.prize-cta,
+body.waiver-page .form-actions button.cta.cta--primary {
+  background: linear-gradient(135deg, var(--poster-mint-main), var(--poster-teal-main));
+  color: var(--poster-deep);
+}
+.waiver-page .field input:focus,
+.waiver-page .field select:focus,
+.raffle-page .field input:focus,
+.raffle-page .field select:focus {
+  border-color: var(--poster-mint-main);
+  box-shadow: 0 0 0 3px rgba(84, 240, 187, .16);
 }
