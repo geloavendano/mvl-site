@@ -1,4 +1,13 @@
 const { teams } = window.MVL_DATA;
+const waiverTeams = [
+  ...teams,
+  {
+    id: 'organizer',
+    name: 'Organizer',
+    tag: 'Testing',
+    grad: ['#D6D8E2', '#666A78'],
+  },
+];
 
 const form = document.getElementById('waiverForm');
 const teamSelect = document.getElementById('teamSelect');
@@ -11,7 +20,7 @@ const formStatus = document.getElementById('formStatus');
 const supabase = window.MVL_SUPABASE;
 let playerLoadId = 0;
 
-teams.forEach((team) => {
+waiverTeams.forEach((team) => {
   const option = document.createElement('option');
   option.value = team.id;
   option.textContent = team.name;
@@ -23,7 +32,7 @@ teams.forEach((team) => {
 // dark to read as text on the navy background (e.g. #2E00A8), so the text accent
 // is a lightened tint; the button keeps the fuller colour and picks black or
 // white ink by luminance so it stays legible for every team.
-const teamById = Object.fromEntries(teams.map((t) => [t.id, t]));
+const teamById = Object.fromEntries(waiverTeams.map((t) => [t.id, t]));
 const teamSwatch = document.getElementById('teamSwatch');
 
 const luminance = (hex) => {
