@@ -3866,8 +3866,129 @@ body.waiver-page .form-actions button.cta.cta--primary:focus-visible {
   }
 }
 
+/* Teams fold: bento composition. Size classes are shuffled on each load by
+   js/main.js, while team order remains stable for scanning. */
+.teams-grid {
+  grid-auto-flow: dense;
+  align-items: stretch;
+}
+.team-card--art {
+  aspect-ratio: auto;
+  height: 100%;
+}
+.team-card--bento-compact,
+.team-card--bento-wide,
+.team-card--bento-tall,
+.team-card--bento-hero {
+  translate: 0;
+}
+.teams-grid .team-card--art:nth-child(4n + 3),
+.teams-grid .team-card--art:nth-child(4n + 4),
+.teams-grid .team-card--art:nth-child(n + 5) {
+  translate: 0;
+}
+
+@media (max-width: 719px) {
+  .teams-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-rows: clamp(78px, 21vw, 104px);
+    gap: 16px 12px;
+    max-width: 620px;
+    padding: 0 16px;
+  }
+  .team-card--art {
+    --team-card-rail: 32px;
+    border-radius: 0 30px 0 30px;
+    grid-column: span 2;
+    grid-row: span 3;
+  }
+  .team-card--bento-wide,
+  .team-card--bento-hero {
+    grid-column: span 4;
+    grid-row: span 3;
+  }
+  .team-card--bento-tall {
+    grid-column: span 2;
+    grid-row: span 4;
+  }
+  .team-card--art .team-card-copy {
+    border-radius: 0 30px 0 0;
+    padding-bottom: 20px;
+  }
+}
+
+@media (min-width: 720px) and (max-width: 959px) {
+  .teams-grid {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-auto-rows: clamp(58px, 8vw, 76px);
+    max-width: 1160px;
+    gap: 20px;
+    padding: 0 28px;
+  }
+  .team-card--art {
+    --team-card-rail: 34px;
+    border-radius: 0 34px 0 34px;
+    grid-column: span 2;
+    grid-row: span 4;
+  }
+  .team-card--bento-wide {
+    grid-column: span 4;
+    grid-row: span 3;
+  }
+  .team-card--bento-tall {
+    grid-column: span 2;
+    grid-row: span 5;
+  }
+  .team-card--bento-hero {
+    grid-column: span 4;
+    grid-row: span 4;
+  }
+  .team-card--art .team-card-copy {
+    border-radius: 0 34px 0 0;
+    padding-bottom: 24px;
+  }
+  .team-card--art .team-card-name {
+    font-size: clamp(11px, 1.55vw, 14px);
+  }
+}
+
+@media (min-width: 960px) {
+  .teams-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-auto-rows: clamp(58px, 5.1vw, 74px);
+    max-width: 1180px;
+    gap: 24px;
+    padding: 0 48px;
+  }
+  .team-card--art {
+    --team-card-rail: 42px;
+    border-radius: 0 44px 0 44px;
+    grid-column: span 3;
+    grid-row: span 4;
+  }
+  .team-card--bento-wide {
+    grid-column: span 5;
+    grid-row: span 3;
+  }
+  .team-card--bento-tall {
+    grid-column: span 3;
+    grid-row: span 5;
+  }
+  .team-card--bento-hero {
+    grid-column: span 6;
+    grid-row: span 5;
+  }
+  .team-card--art .team-card-copy {
+    border-radius: 0 44px 0 0;
+    padding-bottom: 30px;
+  }
+  .team-card--art .team-card-name {
+    font-size: clamp(14px, 1vw, 19px);
+  }
+}
+
 /* ==========================================================================
-   Select fields — custom chevron
+  Select fields — custom chevron
    The native select arrow is pinned to the control's right edge and ignores
    padding, so it sat much further out than the text inset on the left. This
    replaces it with a chevron positioned to match. Scoped away from the admin

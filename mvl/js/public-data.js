@@ -1,7 +1,9 @@
 (async () => {
   const fallback = window.MVL_DATA;
   const config = window.MVL_SUPABASE;
-  const entry = document.currentScript.dataset.entry;
+  const loaderScript = document.currentScript;
+  const entry = loaderScript.dataset.entry;
+  const version = loaderScript.dataset.version || '';
   const normalizeGames = (games = []) => games.map((game) => {
     const videos = Array.isArray(game.videos) && game.videos.length
       ? game.videos
@@ -43,6 +45,6 @@
     };
   }
   const script = document.createElement('script');
-  script.src = `/mvl/js/${entry}.js`;
+  script.src = `/mvl/js/${entry}.js${version ? `?v=${encodeURIComponent(version)}` : ''}`;
   document.body.appendChild(script);
 })();
