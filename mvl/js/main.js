@@ -35,6 +35,7 @@ if (teamsGrid) {
   <article class="team-card reveal${team.bg ? ' team-card--art' : ''}"
            style="--team-a:${team.grad[0]}; --team-b:${team.grad[1]}; ${team.bg ? `--team-art:url('${team.bg}'); ` : ''}--oval-x:${ovalPositions[i % ovalPositions.length][0]}; --oval-y:${ovalPositions[i % ovalPositions.length][1]}; --oval-rot:${ovalPositions[i % ovalPositions.length][2]}; --d:${(i % 4) * 55}ms">
     <div class="team-card-oval" aria-hidden="true"></div>
+    <div class="team-card-player-slot" aria-hidden="true"></div>
     <div class="team-card-photo" aria-hidden="true"></div>
     <div class="team-card-shards" aria-hidden="true"></div>
     <div class="team-card-copy">
