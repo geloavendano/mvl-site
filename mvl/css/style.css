@@ -3737,3 +3737,49 @@ body:not(.admin-page) .field select {
     linear-gradient(260deg, rgba(4, 9, 15, .9) 0 38%, rgba(4, 9, 15, .52) 68%, rgba(4, 9, 15, .28) 100%),
     var(--team-art);
 }
+
+/* ==========================================================================
+   Hero title presenter ("Presented by" Mizuno)
+   Sits below the nav, above the hero artwork, and joins the scroll sequence
+   just behind the MVL mark. Uses the same --layer-* props as .hero-layer so
+   the reduced-motion branch reveals it like every other layer.
+   ========================================================================== */
+.hero-presenter {
+  position: absolute;
+  top: calc(var(--nav-h) + 14px);
+  left: 50%;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+  will-change: transform, opacity, filter;
+  opacity: var(--layer-opacity, 0);
+  transform:
+    translate3d(calc(-50% + var(--layer-x, 0px)), var(--layer-y, 0px), 0)
+    scale(var(--layer-scale, 1));
+  filter: blur(var(--layer-blur, 0));
+  transition: opacity .16s linear, transform .16s linear, filter .16s linear;
+}
+.hero-presenter span {
+  font-family: var(--ui);
+  font-weight: 800;
+  font-size: 9.5px;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, .78);
+  white-space: nowrap;
+}
+.hero-presenter img {
+  height: 20px;
+  width: auto;
+  filter: drop-shadow(0 3px 12px rgba(4, 2, 20, .55));
+}
+/* make room for it: the artwork shifts down and loses a little scale */
+.hero-sequence .hero-mark { translate: 0 -4svh; }
+
+@media (min-width: 960px) {
+  .hero-presenter { top: calc(var(--nav-h) + 20px); gap: 14px; }
+  .hero-presenter span { font-size: 11px; letter-spacing: 2.8px; }
+  .hero-presenter img { height: 28px; }
+}

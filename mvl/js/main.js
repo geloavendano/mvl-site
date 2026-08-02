@@ -6,7 +6,7 @@
 
 // ---- state ---------------------------------------------------------------
 // ---- data ----------------------------------------------------------------
-const { teams: TEAMS, sponsors: SPONSORS, games: GAMES, livestream } = window.MVL_DATA;
+const { teams: TEAMS, sponsors: SPONSORS, games: GAMES, livestream, titlePresenter: TITLE_PRESENTER } = window.MVL_DATA;
 const isLive = Boolean(livestream.isLive);
 const teamById = Object.fromEntries(TEAMS.map((team) => [team.id, team]));
 const playoffGameIds = new Set(['qf1', 'qf2', 'qf3', 'qf4', 'sf1', 'sf2', 'bronze', 'final']);
@@ -269,26 +269,51 @@ if (recentVideosEl) {
 }
 
 // ---- render: sponsor marquees (list duplicated for the seamless loop) ------
+// Each strip declares which tier it shows via data-marquee. "all" runs the
+// full roster led by the title presenter; a tier name shows just that tier.
 const sponsorTierOrder = ['Official Partner', 'Co-presenter', 'Major Sponsor', 'Minor Sponsor'];
 const sortedSponsors = [...SPONSORS].sort((a, b) =>
   sponsorTierOrder.indexOf(a.tier) - sponsorTierOrder.indexOf(b.tier) ||
   a.order - b.order ||
   a.name.localeCompare(b.name)
 );
-const sponsorMarkup = sortedSponsors.map((sponsor, index, list) => {
-  const tierChanged = index === 0 || sponsor.tier !== list[index - 1].tier;
-  return `
-    ${tierChanged ? `<span class="marquee-tier">${sponsor.tier}</span>` : ''}
+
+const sponsorChip = (sponsor) => `
     <span class="marquee-item marquee-item--logo" title="${sponsor.name}">
       <img src="${sponsor.logo}" alt="${sponsor.name}" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.style.display='inline';">
       <span class="marquee-fallback">${sponsor.name}</span>
     </span>
     <span class="marquee-sep">&#9670;</span>
   `;
-}).join('');
+
+const buildMarquee = (filter) => {
+  const showAll = !filter || filter === 'all';
+  const list = showAll ? sortedSponsors : sortedSponsors.filter((s) => s.tier === filter);
+  if (!list.length) return '';
+
+  // the full strip opens with the title presenter
+  let markup = '';
+  if (showAll && TITLE_PRESENTER) {
+    markup += `
+      <span class="marquee-tier">Presented by</span>
+      ${sponsorChip(TITLE_PRESENTER)}`;
+  }
+  markup += list.map((sponsor, index, arr) => {
+    // label each tier only when the strip actually mixes tiers
+    const tierChanged = showAll && (index === 0 || sponsor.tier !== arr[index - 1].tier);
+    return `${tierChanged ? `<span class="marquee-tier">${sponsor.tier}</span>` : ''}${sponsorChip(sponsor)}`;
+  }).join('');
+  return markup;
+};
 
 document.querySelectorAll('[data-marquee]').forEach((track) => {
-  track.innerHTML = sponsorMarkup + sponsorMarkup;
+  const markup = buildMarquee(track.dataset.marquee);
+  if (!markup) {
+    // nothing in this tier — drop the strip rather than leave an empty bar
+    track.closest('.marquee')?.remove();
+    return;
+  }
+  track.innerHTML = markup + markup;
 });
 
 // auto-advancing scroll container: users can swipe (touch) or drag (mouse)
@@ -391,6 +416,7 @@ const heroLayers = {
   star: document.querySelector('[data-hero-layer="star"]'),
   player: document.querySelector('[data-hero-layer="player"]'),
   logo: document.querySelector('[data-hero-layer="logo"]'),
+  presenter: document.querySelector('[data-hero-layer="presenter"]'),
 };
 const heroCopy = document.querySelector('[data-hero-copy]');
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -445,6 +471,8 @@ const updateHeroSequence = () => {
   const star = easeOut(progressBetween(progress, 0.18, 0.42));
   const player = easeOut(progressBetween(progress, 0.38, 0.66));
   const logo = easeOut(progressBetween(progress, 0.62, 0.84));
+  // the title presenter lands just behind the MVL mark
+  const presenter = easeOut(progressBetween(progress, 0.72, 0.90));
   const copy = easeOut(progressBetween(progress, 0.78, 0.96));
   const logoHandoff = easeOut(progressBetween(progress, 0.976, 0.999));
   nav.classList.toggle('hero-ready', copy > .98);
@@ -482,6 +510,14 @@ const updateHeroSequence = () => {
     '--layer-scale': lerp(.78, 1, logo).toFixed(3),
     '--layer-rotate': `${lerp(4, 0, logo).toFixed(2)}deg`,
     '--layer-blur': `${lerp(8, 0, logo).toFixed(1)}px`,
+  });
+  setLayer(heroLayers.presenter, {
+    '--layer-opacity': presenter,
+    '--layer-x': '0px',
+    '--layer-y': `${lerp(-14, 0, presenter).toFixed(1)}px`,
+    '--layer-scale': lerp(.92, 1, presenter).toFixed(3),
+    '--layer-rotate': '0deg',
+    '--layer-blur': `${lerp(5, 0, presenter).toFixed(1)}px`,
   });
 
   if (heroLayers.logo && logoHandoff > 0 && logoHandoff < .995 && isPinned) {
