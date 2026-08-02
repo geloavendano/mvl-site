@@ -4387,8 +4387,7 @@ body.gametime-v3 .rules-preview {
   padding: 0;
 }
 .day-tabs button[aria-selected='true'],
-.cta.cta--primary.prize-cta,
-body.waiver-page .form-actions button.cta.cta--primary {
+.cta.cta--primary.prize-cta {
   background: linear-gradient(135deg, var(--poster-mint-main), var(--poster-teal-main));
   color: var(--poster-deep);
 }
@@ -4398,4 +4397,35 @@ body.waiver-page .form-actions button.cta.cta--primary {
 .raffle-page .field select:focus {
   border-color: var(--poster-mint-main);
   box-shadow: 0 0 0 3px rgba(84, 240, 187, .16);
+}
+
+.waiver-page {
+  --waiver-bg-a: var(--poster-mint-main);
+  --waiver-bg-b: var(--poster-cyan);
+  background:
+    radial-gradient(circle at 82% 10%, color-mix(in srgb, var(--waiver-bg-a) 42%, transparent) 0%, transparent 30%),
+    radial-gradient(circle at 10% 46%, color-mix(in srgb, var(--waiver-bg-b) 34%, transparent) 0%, transparent 36%),
+    radial-gradient(circle at 78% 82%, color-mix(in srgb, var(--waiver-bg-a) 18%, transparent) 0%, transparent 32%),
+    linear-gradient(145deg,
+      color-mix(in srgb, var(--waiver-bg-b) 16%, var(--poster-deep)) 0%,
+      color-mix(in srgb, var(--waiver-bg-b) 28%, var(--poster-court-blue)) 54%,
+      color-mix(in srgb, var(--waiver-bg-a) 32%, var(--poster-teal-main)) 100%);
+}
+.waiver-page .page-nav {
+  background:
+    linear-gradient(90deg,
+      rgba(16, 8, 54, .96),
+      color-mix(in srgb, var(--waiver-bg-b) 18%, rgba(24, 16, 77, .92)) 58%,
+      color-mix(in srgb, var(--waiver-bg-a) 18%, rgba(36, 79, 166, .9)));
+}
+.waiver-page .form-panel {
+  border-color: color-mix(in srgb, var(--waiver-bg-a) 34%, rgba(255, 255, 255, .16));
+}
+.waiver-page .section-title em {
+  color: var(--accent-2);
+}
+.waiver-page .field input:focus,
+.waiver-page .field select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }

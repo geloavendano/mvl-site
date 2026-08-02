@@ -38,7 +38,7 @@ const applyTeamAccent = () => {
   const team = teamById[teamSelect.value];
   const root = document.body;
   if (!team) {
-    ['--accent', '--accent-2', '--accent-soft', '--accent-ink']
+    ['--accent', '--accent-2', '--accent-soft', '--accent-ink', '--waiver-bg-a', '--waiver-bg-b']
       .forEach((prop) => root.style.removeProperty(prop));
     teamSwatch?.classList.remove('is-on');
     return;
@@ -47,6 +47,8 @@ const applyTeamAccent = () => {
   root.style.setProperty('--accent', `color-mix(in srgb, ${light} 82%, #ffffff)`);
   root.style.setProperty('--accent-2', `color-mix(in srgb, ${light} 62%, #ffffff)`);
   root.style.setProperty('--accent-soft', `color-mix(in srgb, ${light} 22%, transparent)`);
+  root.style.setProperty('--waiver-bg-a', light);
+  root.style.setProperty('--waiver-bg-b', deep);
   // the button gradient runs light -> deep; judge ink against the darker end
   root.style.setProperty('--accent-ink', luminance(deep) > 0.42 ? '#0B0730' : '#ffffff');
   if (teamSwatch) {
