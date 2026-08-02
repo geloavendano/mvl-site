@@ -3682,6 +3682,14 @@ body.waiver-page .form-actions button.cta.cta--primary:focus-visible {
 }
 .team-card--art .team-card-oval,
 .team-card--art .team-card-shards { display: none; }
+/* the artwork supplies its own texture — drop the starfield dots and the
+   diagonal streak "rain", keeping only the team accent bar and base vignette */
+.team-card--art::before { display: none; }
+.team-card--art::after {
+  background:
+    linear-gradient(180deg, var(--team-a) 0 4px, transparent 4px 100%),
+    linear-gradient(180deg, transparent 55%, rgba(0, 0, 0, .28) 100%);
+}
 /* The stock player is a single generic cutout in a green jersey — it repeats
    across all eight cards and fights the team artwork. Hidden until real
    per-team player cutouts exist; restoring it is one rule. */
@@ -3703,4 +3711,24 @@ body:not(.admin-page) .field select {
   background-size: 18px 18px;
   /* room so long option text never runs under the chevron */
   padding-right: 44px;
+}
+
+/* ==========================================================================
+   Schedule match-ups — per-team artwork
+   Same treatment as the gametime team cards. The scrim mirrors for the
+   right-hand team so the darkest part always sits under its text, which is
+   right-aligned there.
+   ========================================================================== */
+.match-team--art {
+  background-image:
+    linear-gradient(100deg, rgba(4, 9, 15, .9) 0 38%, rgba(4, 9, 15, .52) 68%, rgba(4, 9, 15, .28) 100%),
+    var(--team-art);
+  background-size: cover, cover;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+}
+.match-team--right.match-team--art {
+  background-image:
+    linear-gradient(260deg, rgba(4, 9, 15, .9) 0 38%, rgba(4, 9, 15, .52) 68%, rgba(4, 9, 15, .28) 100%),
+    var(--team-art);
 }

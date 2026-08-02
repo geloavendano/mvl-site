@@ -216,13 +216,13 @@ const renderMatches = () => {
         </div>
 
         <div class="match-teams">
-          <div class="match-team" style="--team-a:${teamA.grad[0]}; --team-b:${teamA.grad[1]}">
+          <div class="match-team${teamA.bg ? ' match-team--art' : ''}" style="--team-a:${teamA.grad[0]}; --team-b:${teamA.grad[1]}${teamA.bg ? `; --team-art:url('${teamA.bg}')` : ''}">
             <small>${winner?.id === teamA.id ? 'Winner' : '&nbsp;'}</small>
             <p>${teamA.name}</p>
             <div class="match-score">${scoreLine(game, game.teamA)}</div>
           </div>
           <span class="match-vs">VS</span>
-          <div class="match-team match-team--right" style="--team-a:${teamB.grad[0]}; --team-b:${teamB.grad[1]}">
+          <div class="match-team match-team--right${teamB.bg ? ' match-team--art' : ''}" style="--team-a:${teamB.grad[0]}; --team-b:${teamB.grad[1]}${teamB.bg ? `; --team-art:url('${teamB.bg}')` : ''}">
             <small>${winner?.id === teamB.id ? 'Winner' : '&nbsp;'}</small>
             <p>${teamB.name}</p>
             <div class="match-score">${scoreLine(game, game.teamB)}</div>
