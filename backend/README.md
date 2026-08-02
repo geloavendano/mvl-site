@@ -69,6 +69,49 @@ js/supabase-config.js
 
 The anon key is safe to ship in browser code; access is controlled by row-level security.
 
+## Waiver Confirmation Email
+
+After `public.mvl_submit_player_waiver(...)` returns the new waiver submission
+id, the browser calls this Supabase Edge Function:
+
+```text
+send-waiver-confirmation
+```
+
+The function calls `public.mvl_get_waiver_confirmation_email_payload(...)`
+with the service role key, then sends the player a confirmation email through
+Resend. That RPC returns only the fields needed for the email and is not
+granted to anon or authenticated users. The email includes:
+
+- MVL registration confirmation and team name
+- Google Calendar links for both MVL weekends
+- `MVL-2026-Save-the-Dates.ics` as an Apple/Outlook/device calendar attachment
+- Instagram and website announcement links
+- the full Data Privacy, consent, waiver, and release text agreed to on submit
+
+Set these function secrets before relying on email delivery:
+
+```bash
+supabase secrets set RESEND_API_KEY=re_...
+supabase secrets set MVL_EMAIL_FROM="MVL 2026 <registration@metaricevolley.ph>"
+supabase secrets set MVL_SITE_URL="https://metaricevolley.ph"
+```
+
+Apply the RPC migration with:
+
+```bash
+supabase db query --linked --file supabase/migrations/20260802000200_waiver_confirmation_email_payload.sql
+```
+
+Deploy the function with:
+
+```bash
+supabase functions deploy send-waiver-confirmation
+```
+
+`registration@metaricevolley.ph` must be configured on a verified Resend domain
+before Resend will send from it in production.
+
 ## Score Entry
 
 Use this playbook for admin score entry in Supabase SQL Editor:

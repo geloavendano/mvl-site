@@ -156,7 +156,6 @@ const submitWaiver = async (payload) => {
       apikey: supabase.anonKey,
       Authorization: `Bearer ${supabase.anonKey}`,
       'Content-Type': 'application/json',
-      Prefer: 'return=minimal',
     },
     body: JSON.stringify(payload),
   });
@@ -166,6 +165,33 @@ const submitWaiver = async (payload) => {
     try {
       const error = await response.json();
       message = error.message || error.details || message;
+    } catch (_) {
+      message = response.statusText || message;
+    }
+    throw new Error(message);
+  }
+
+  return response.json();
+};
+
+const sendConfirmationEmail = async (submissionId) => {
+  if (!submissionId) throw new Error('Missing waiver confirmation id.');
+
+  const response = await fetch(`${supabase.url}/functions/v1/send-waiver-confirmation`, {
+    method: 'POST',
+    headers: {
+      apikey: supabase.anonKey,
+      Authorization: `Bearer ${supabase.anonKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ submissionId }),
+  });
+
+  if (!response.ok) {
+    let message = 'Unable to send confirmation email.';
+    try {
+      const error = await response.json();
+      message = error.message || error.error || message;
     } catch (_) {
       message = response.statusText || message;
     }
@@ -211,7 +237,13 @@ form.addEventListener('submit', async (event) => {
   formStatus.textContent = 'Submitting waiver...';
 
   try {
-    await submitWaiver(payload);
+    const submissionId = await submitWaiver(payload);
+    formStatus.textContent = 'Sending confirmation email...';
+    try {
+      await sendConfirmationEmail(submissionId);
+    } catch (emailError) {
+      console.warn('Waiver saved, but confirmation email was not sent.', emailError);
+    }
     window.location.assign('/mvl/waiver-confirmation.html');
   } catch (error) {
     formStatus.textContent = error.message;
