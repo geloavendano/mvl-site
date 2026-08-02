@@ -3,6 +3,12 @@ const authClient = window.supabase.createClient(cfg.url, cfg.anonKey);
 let session = null;
 let data;
 let activeAdminDay = 1;
+let readinessRequest = 0;
+const readinessTeamFilter = document.getElementById('readinessTeamFilter');
+const readinessDayFilter = document.getElementById('readinessDayFilter');
+const readinessSummary = document.getElementById('readinessSummary');
+const readinessTable = document.getElementById('readinessTable');
+const unmatchedCheckins = document.getElementById('unmatchedCheckins');
 const teams = Object.fromEntries(window.MVL_DATA.teams.map((t) => [t.id, t]));
 const gameTeamName = (game, side) => {
   const id = side === 'A' ? game.teamA : game.teamB;
@@ -71,6 +77,84 @@ const videoRow = (video = {}) => `
 const formatAdminDay = (iso) => new Intl.DateTimeFormat('en-PH', {
   timeZone: 'Asia/Manila', month: 'short', day: 'numeric', weekday: 'short',
 }).format(new Date(iso));
+const formatReadinessDay = (iso) => new Intl.DateTimeFormat('en-PH', {
+  timeZone: 'Asia/Manila', month: 'short', day: 'numeric', weekday: 'short',
+}).format(new Date(`${iso}T12:00:00+08:00`));
+const formatAdminDate = (iso) => new Intl.DateTimeFormat('en-PH', {
+  timeZone: 'Asia/Manila', month: 'short', day: 'numeric', weekday: 'short',
+}).format(new Date(iso));
+const formatAdminTime = (iso) => iso ? new Intl.DateTimeFormat('en-PH', {
+  timeZone: 'Asia/Manila', hour: 'numeric', minute: '2-digit',
+}).format(new Date(iso)) : '';
+const renderReadiness = (readiness) => {
+  const selectedDay = readiness.selectedDay;
+  const availableDays = [...readiness.days];
+  if (!availableDays.some((day) => day.date === selectedDay)) {
+    availableDays.push({ date: selectedDay, dayNumber: null });
+    availableDays.sort((a, b) => a.date.localeCompare(b.date));
+  }
+  readinessTeamFilter.innerHTML = readiness.teams.map((team) => (
+    `<option value="${escapeHtml(team.id)}" ${team.id === readiness.selectedTeam ? 'selected' : ''}>${escapeHtml(team.name)}</option>`
+  )).join('');
+  readinessDayFilter.innerHTML = availableDays.map((day) => {
+    const prefix = day.dayNumber ? `Day ${day.dayNumber} · ` : '';
+    return `<option value="${escapeHtml(day.date)}" ${day.date === selectedDay ? 'selected' : ''}>${prefix}${escapeHtml(formatReadinessDay(day.date))}</option>`;
+  }).join('');
+
+  const players = readiness.players || [];
+  const waiverCount = players.filter((player) => player.waiverCompleted).length;
+  const checkinCount = players.filter((player) => player.checkinStatus === 'checked_in').length;
+  readinessSummary.textContent = `${waiverCount} of ${players.length} waivers complete · ${checkinCount} of ${players.length} players checked in`;
+
+  if (!players.length) {
+    readinessTable.innerHTML = '<p class="admin-readiness-empty">No rostered players found for this team.</p>';
+  } else {
+    readinessTable.innerHTML = `<table class="admin-readiness-table">
+      <thead><tr><th>Player</th><th>Waiver</th><th>Daily check-in</th></tr></thead>
+      <tbody>${players.map((player) => {
+        const checkinLabel = player.checkinStatus === 'checked_in'
+          ? 'Checked in'
+          : player.checkinStatus === 'outside_radius' ? 'Outside venue' : 'Not checked in';
+        const checkinClass = player.checkinStatus === 'checked_in'
+          ? 'is-complete'
+          : player.checkinStatus === 'outside_radius' ? 'is-warning' : '';
+        const checkinTime = player.checkedInAt || player.checkinAttemptedAt;
+        return `<tr>
+          <td class="admin-player-name"><strong>${escapeHtml(player.name)}</strong><span>${player.jerseyNumber ? `#${escapeHtml(player.jerseyNumber)}` : 'No jersey number'}</span></td>
+          <td><span class="admin-status-badge ${player.waiverCompleted ? 'is-complete' : ''}">${player.waiverCompleted ? 'Complete' : 'Pending'}</span>${player.waiverSubmittedAt ? `<span class="admin-status-detail">${escapeHtml(formatAdminDate(player.waiverSubmittedAt))}</span>` : ''}</td>
+          <td><span class="admin-status-badge ${checkinClass}">${checkinLabel}</span>${checkinTime ? `<span class="admin-status-detail">${escapeHtml(formatAdminTime(checkinTime))}</span>` : ''}</td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>`;
+  }
+
+  const unmatched = readiness.unmatchedCheckins || [];
+  if (unmatched.length) {
+    unmatchedCheckins.innerHTML = `<strong>Unmatched check-ins (${unmatched.length})</strong><p>These names do not match a player on this team's roster. Review spelling before using them as player attendance.</p><ul>${unmatched.map((entry) => `<li>${escapeHtml(entry.name)} · ${entry.status === 'checked_in' ? 'checked in' : 'outside venue'}</li>`).join('')}</ul>`;
+    unmatchedCheckins.classList.remove('is-hidden');
+  } else {
+    unmatchedCheckins.innerHTML = '';
+    unmatchedCheckins.classList.add('is-hidden');
+  }
+};
+const loadReadiness = async (teamId = null, day = null) => {
+  const request = ++readinessRequest;
+  readinessSummary.textContent = 'Loading player status…';
+  readinessTable.innerHTML = '';
+  try {
+    const readiness = await rpc('mvl_admin_get_player_readiness', {
+      p_team_id: teamId || null,
+      p_day: day || null,
+    });
+    if (request !== readinessRequest) return;
+    renderReadiness(readiness);
+  } catch (error) {
+    if (request !== readinessRequest) return;
+    readinessSummary.textContent = 'Player readiness could not be loaded.';
+    readinessTable.innerHTML = `<p class="form-status is-error">${escapeHtml(error.message)}</p>`;
+    unmatchedCheckins.classList.add('is-hidden');
+  }
+};
 const findPlayer = async (form, game) => {
   const winner = form.elements.winner.value;
   const lookup = form.elements.playerLookup.value.trim();
@@ -127,6 +211,7 @@ const show = async () => {
     const live = data.publicData.livestream, form = livestreamForm.elements;
     form.isLive.checked = live.is_live; form.youtubeUrl.value = live.youtube_url || '';
     render();
+    await loadReadiness();
   } catch (e) {
     session = null;
     authClient.auth.signOut();
@@ -143,6 +228,12 @@ googleSignInBtn.addEventListener('click', async () => {
 });
 livestreamForm.addEventListener('submit', async (e) => { e.preventDefault(); const s = e.target.querySelector('.form-status'), f = e.target.elements; status(s, 'Saving…'); try { const id = youtubeId(f.youtubeUrl.value) || ''; await rpc('mvl_admin_update_livestream', { p_is_live: f.isLive.checked, p_youtube_url: f.youtubeUrl.value, p_youtube_id: id }); status(s, 'Livestream updated.', 'success'); } catch (err) { status(s, err.message, 'error'); } });
 adminDayFilter.addEventListener('change', () => { activeAdminDay = Number(adminDayFilter.value); render(); });
+readinessTeamFilter.addEventListener('change', () => {
+  loadReadiness(readinessTeamFilter.value, readinessDayFilter.value);
+});
+readinessDayFilter.addEventListener('change', () => {
+  loadReadiness(readinessTeamFilter.value, readinessDayFilter.value);
+});
 adminGameList.addEventListener('change', (e) => {
   if (!e.target.matches('[name="winner"]')) return;
   const form = e.target.closest('[data-id]');

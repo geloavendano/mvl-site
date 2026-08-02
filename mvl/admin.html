@@ -7,14 +7,24 @@
 <link rel="stylesheet" href="/mvl/css/style.css">
 </head>
 <body class="admin-page">
-<header class="admin-topbar"><a href="/mvl/index.html"><img src="/mvl/assets/hero-mvl-2026-logo.png" alt="MVL 2026"></a><button id="signOutBtn" class="admin-link is-hidden">Sign out</button></header>
+<header class="admin-topbar"><a href="/mvl/index.html"><img src="/mvl/assets/hero-mvl-2026-logo.png" alt="MVL 2026"></a><button id="signOutBtn" class="admin-link is-hidden" type="button">Sign out</button></header>
 <main class="admin-main">
   <section id="loginPanel" class="admin-panel admin-login"><p class="games-label">Restricted access</p><h1>MVL Admin</h1>
     <div class="admin-form"><p class="admin-login-copy">Continue with an allowlisted Google account.</p><button id="googleSignInBtn" class="cta cta--primary" type="button">Continue with Google</button><p id="loginStatus" class="form-status"></p></div>
   </section>
   <section id="dashboard" class="is-hidden">
-    <div class="admin-heading"><div><h1>MVL Admin</h1><p>Manage the livestream, schedule, matchups, and results.</p></div><p id="adminIdentity"></p></div>
-    <form id="livestreamForm" class="admin-panel admin-form"><div class="admin-panel-head"><div><h2>Livestream</h2><p>Controls the livestream state on the homepage.</p></div><label class="admin-switch"><input name="isLive" type="checkbox"> Live now</label></div><label class="field"><span>YouTube livestream link</span><input name="youtubeUrl" type="url" placeholder="https://youtube.com/watch?v=..."></label><div class="admin-form-actions"><button class="cta cta--primary">Save livestream</button><p class="form-status"></p></div></form>
+    <div class="admin-heading"><div><h1>MVL Admin</h1><p>Manage the livestream, player readiness, and game results.</p></div><p id="adminIdentity"></p></div>
+    <form id="livestreamForm" class="admin-panel admin-form"><div class="admin-panel-head"><div><h2>Livestream</h2><p>Controls the livestream state on the homepage.</p></div><label class="admin-switch"><input name="isLive" type="checkbox"> Live now</label></div><label class="field"><span>YouTube livestream link</span><input name="youtubeUrl" type="url" placeholder="https://youtube.com/watch?v=..."></label><div class="admin-form-actions"><button class="cta cta--primary" type="submit">Save livestream</button><p class="form-status"></p></div></form>
+    <section class="admin-panel admin-readiness" aria-labelledby="readinessTitle">
+      <div class="admin-panel-head"><div><h2 id="readinessTitle">Player readiness</h2><p>Waiver completion and venue check-ins for every rostered player.</p></div></div>
+      <div class="admin-readiness-filters">
+        <label class="field"><span>Team</span><select id="readinessTeamFilter"></select></label>
+        <label class="field"><span>Game day</span><select id="readinessDayFilter"></select></label>
+      </div>
+      <p id="readinessSummary" class="admin-readiness-summary" aria-live="polite">Loading player status…</p>
+      <div id="readinessTable" class="admin-readiness-table-wrap"></div>
+      <div id="unmatchedCheckins" class="admin-unmatched is-hidden"></div>
+    </section>
     <div class="admin-games-toolbar"><div><h2>Games</h2><p id="adminDaySummary"></p></div><label class="admin-day-filter"><span>Match day</span><select id="adminDayFilter"></select></label></div>
     <div id="adminGameList"></div>
   </section>
