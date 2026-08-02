@@ -3,7 +3,7 @@
 // a stub stands in for the Deno globals; everything below Deno.serve is cut
 // away since only the builders are needed.
 //
-//   node supabase/functions/send-waiver-confirmation/preview.mjs [team-id] [Team Name]
+//   node scripts/preview-waiver-email.mjs [team-id] [Team Name]
 //
 // Writes tmp/waiver-confirmation-email-preview.{html,txt} and the .ics.
 import fs from 'node:fs';
@@ -12,9 +12,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const repo = path.resolve(here, '../../..');
+const repo = path.resolve(here, '..');
 
-const src = fs.readFileSync(path.join(here, 'index.ts'), 'utf8');
+const src = fs.readFileSync(path.join(repo, 'supabase/functions/send-waiver-confirmation/index.ts'), 'utf8');
 const builders =
   'globalThis.Deno = { env: { get: () => undefined } };\n' +
   src.replace(/Deno\.serve\([\s\S]*$/, '') +
