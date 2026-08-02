@@ -69,6 +69,21 @@ js/supabase-config.js
 
 The anon key is safe to ship in browser code; access is controlled by row-level security.
 
+## Admin Google OAuth
+
+MVL and Bonado share the Supabase Auth project. Keep Bonado's Auth `Site URL`
+unchanged, and keep these exact MVL URLs in Auth's additional redirect allowlist:
+
+```text
+https://www.metaricevolley.ph/mvl/admin
+https://metaricevolley.ph/mvl/admin
+```
+
+The admin client sends the current origin plus `/mvl/admin` as its OAuth
+`redirectTo`. The shorter `/admin` aliases are not sufficient: when the exact
+callback is absent, Supabase discards it and falls back to the shared project's
+Bonado Site URL.
+
 ## Waiver Confirmation Email
 
 After `public.mvl_submit_player_waiver(...)` returns the new waiver submission
