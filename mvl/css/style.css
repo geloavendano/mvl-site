@@ -119,27 +119,6 @@ img { display: block; max-width: 100%; }
   box-shadow: 0 8px 30px rgba(4, 2, 20, .45);
 }
 
-@media (max-width: 760px) {
-  body:where(
-    .schedule-page,
-    .videos-page,
-    .waiver-page,
-    .raffle-page,
-    .rules-page,
-    .confirmation-page,
-    .gametime-version
-  )::before {
-    content: "";
-    position: fixed;
-    inset: 0 0 auto;
-    z-index: 99;
-    height: calc(var(--nav-h) + max(28px, env(safe-area-inset-top)));
-    pointer-events: none;
-    background:
-      linear-gradient(90deg, rgba(16, 8, 54, .98), rgba(24, 16, 77, .96) 58%, rgba(36, 79, 166, .96));
-  }
-}
-
 .nav-logo {
   display: flex;
   align-items: center;
