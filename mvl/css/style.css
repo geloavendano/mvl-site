@@ -3877,3 +3877,119 @@ body:not(.admin-page) .field select {
   .hero-presenter span { font-size: 11px; letter-spacing: 2.8px; }
   .hero-presenter img { height: 28px; }
 }
+
+/* ==========================================================================
+   Gametime fold gradients — poster palette refresh
+   Removes image-backed section atmospheres and replaces them with abstract
+   gradients sampled from the MVL 2026 palette.
+   ========================================================================== */
+body:not(.teaser-page) {
+  --poster-violet: #5300C0;
+  --poster-mint: #3ADFB4;
+  --poster-blue: #5D50FF;
+  --poster-navy: #2A1F66;
+  --poster-lavender: #8C83FA;
+  --poster-electric: #460CEC;
+  --poster-magenta: #FF46FF;
+  --poster-green: #66FDA2;
+  --poster-aqua: #9CF0E3;
+  --poster-lime: #CFF665;
+  --poster-pink: #F238A7;
+  --poster-red: #FF4733;
+}
+
+.schedule-preview,
+.games,
+.teams,
+.rules-preview {
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.schedule-preview {
+  background:
+    radial-gradient(circle at 96% 94%, rgba(242, 56, 167, .54) 0 16%, transparent 38%),
+    radial-gradient(circle at 18% 6%, rgba(156, 240, 227, .72) 0 17%, transparent 42%),
+    linear-gradient(132deg, var(--poster-mint) 0%, #45BEE8 34%, var(--poster-blue) 64%, var(--poster-violet) 100%);
+}
+.schedule-preview::before {
+  opacity: .54;
+  background:
+    linear-gradient(118deg, transparent 0 16%, rgba(255, 255, 255, .7) 16.2% 17.2%, transparent 17.4% 100%),
+    repeating-linear-gradient(118deg, transparent 0 82px, rgba(58, 223, 180, .32) 82px 89px, transparent 89px 176px);
+}
+
+.games {
+  background:
+    radial-gradient(circle at 84% 20%, rgba(255, 70, 255, .7) 0 13%, transparent 34%),
+    radial-gradient(circle at 2% 86%, rgba(255, 71, 51, .64) 0 18%, transparent 42%),
+    linear-gradient(145deg, var(--poster-violet) 0%, var(--poster-electric) 45%, var(--poster-pink) 100%);
+}
+.games-bg {
+  display: none;
+}
+.games::before {
+  content: '';
+  position: absolute;
+  inset: -8%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: .38;
+  background:
+    radial-gradient(circle at 80% 10%, rgba(255, 255, 255, .62) 0 9%, transparent 9.4%),
+    linear-gradient(112deg, transparent 0 58%, rgba(140, 131, 250, .72) 58.2% 60%, transparent 60.2% 100%),
+    linear-gradient(28deg, transparent 0 66%, rgba(207, 246, 101, .38) 66.2% 69%, transparent 69.2% 100%);
+}
+.games-inner {
+  position: relative;
+  z-index: 1;
+}
+
+.teams {
+  background:
+    radial-gradient(circle at 16% 10%, rgba(102, 253, 162, .7) 0 16%, transparent 38%),
+    radial-gradient(circle at 92% 72%, rgba(255, 70, 255, .42) 0 18%, transparent 42%),
+    linear-gradient(135deg, var(--poster-blue) 0%, var(--poster-violet) 52%, #2B0C8F 100%);
+}
+.teams::before {
+  opacity: .46;
+  background:
+    radial-gradient(circle at 7% 2%, rgba(207, 246, 101, .72) 0 5%, transparent 5.4%),
+    radial-gradient(circle at 94% 92%, rgba(242, 56, 167, .7) 0 13%, transparent 13.5%),
+    repeating-linear-gradient(118deg, transparent 0 74px, rgba(58, 223, 180, .32) 74px 81px, transparent 81px 154px),
+    repeating-linear-gradient(32deg, transparent 0 104px, rgba(255, 255, 255, .11) 104px 106px, transparent 106px 190px);
+}
+
+.rules-preview {
+  background:
+    radial-gradient(circle at 92% 12%, rgba(140, 131, 250, .78) 0 18%, transparent 42%),
+    radial-gradient(circle at 20% 88%, rgba(58, 223, 180, .55) 0 20%, transparent 45%),
+    linear-gradient(144deg, var(--poster-magenta) 0%, var(--poster-violet) 56%, var(--poster-blue) 100%);
+}
+.rules-preview::before {
+  content: '';
+  position: absolute;
+  inset: -6%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: .32;
+  background:
+    radial-gradient(circle at 74% 18%, rgba(255, 255, 255, .7) 0 8%, transparent 8.5%),
+    linear-gradient(116deg, transparent 0 48%, rgba(255, 255, 255, .48) 48.2% 49.2%, transparent 49.4% 100%),
+    linear-gradient(24deg, transparent 0 70%, rgba(255, 71, 51, .52) 70.2% 74%, transparent 74.2% 100%);
+}
+.rules-preview .section-head,
+.rules-preview-list,
+.rules-preview .section-link {
+  position: relative;
+  z-index: 1;
+}
+
+.preview-panel,
+.live-frame,
+.rules-preview-list {
+  border-color: rgba(255, 255, 255, .2);
+  background: rgba(13, 8, 54, .5);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
