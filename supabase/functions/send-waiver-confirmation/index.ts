@@ -450,9 +450,23 @@ const createEmailHtml = (submission: WaiverSubmission, teamName: string) => {
             </td>
           </tr>
 
+          <!-- Mingu sits to the right of the sign-off. The asset is served at
+               2x and sized down in the markup so it stays sharp on retina;
+               width/height are attributes as well as CSS because Outlook sizes
+               from the attributes. align="top" keeps him level with the first
+               line if a client refuses to align the columns. -->
           <tr>
             <td style="padding:22px 6px 8px;border-top:1px solid ${c.hairline};">
-              <p class="x-fine" style="margin:0;color:${c.inkFaint};font:400 11px/1.6 ${uiFont};">Metarice Volleyball League 2026 &middot; ${venue}<br>You're getting this because you signed the MVL 2026 player waiver. This is an automated confirmation email, so please do not reply. For official announcements, visit <a class="x-fine-lead" href="${mvlUrl}" style="color:${c.inkMuted};">${mvlUrl}</a> or follow <a class="x-fine-lead" href="${instagramUrl}" style="color:${c.inkMuted};">@metaricevolley</a>.</p>
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td valign="top" style="padding-right:14px;">
+                    <p class="x-fine" style="margin:0;color:${c.inkFaint};font:400 11px/1.6 ${uiFont};">Metarice Volleyball League 2026 &middot; ${venue}<br>You're getting this because you signed the MVL 2026 player waiver. This is an automated confirmation email, so please do not reply. For official announcements, visit <a class="x-fine-lead" href="${mvlUrl}" style="color:${c.inkMuted};">${mvlUrl}</a> or follow <a class="x-fine-lead" href="${instagramUrl}" style="color:${c.inkMuted};">@metaricevolley</a>.</p>
+                  </td>
+                  <td width="88" valign="bottom" align="right" style="width:88px;">
+                    <img src="${siteUrl}/mvl/mascot/Mingu-Hooray-email.png" width="88" height="119" alt="" style="display:block;width:88px;height:119px;border:0;">
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
         </table>
