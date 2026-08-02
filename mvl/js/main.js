@@ -298,8 +298,10 @@ const buildMarquee = (filter) => {
       <span class="marquee-tier">Presented by</span>
       ${sponsorChip(TITLE_PRESENTER)}`;
   }
+  // a single-tier strip is labelled once at the head of each loop; the full
+  // strip labels every tier as it changes
+  if (!showAll) markup += `<span class="marquee-tier">${filter}</span>`;
   markup += list.map((sponsor, index, arr) => {
-    // label each tier only when the strip actually mixes tiers
     const tierChanged = showAll && (index === 0 || sponsor.tier !== arr[index - 1].tier);
     return `${tierChanged ? `<span class="marquee-tier">${sponsor.tier}</span>` : ''}${sponsorChip(sponsor)}`;
   }).join('');
