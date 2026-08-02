@@ -35,43 +35,22 @@ const c = {
 // midpoint, which is what Outlook's Word engine shows since it drops gradients
 // outright. Panel fills are translucent so they read against the whole ramp,
 // each with an opaque bgcolor twin for the same reason.
-// The block's ramp, sampled into one solid step per content row.
-//
-// A real linear-gradient would be a background-image, and that is precisely
-// what a client forcing its own dark theme leaves untouched while it still
-// darkens the text — which is how Gmail iOS painted grey headlines onto an
-// unchanged violet block. Solid background-colors get inverted along with the
-// text, so the block stays legible there. Enough steps and the seams stop
-// reading as bands; this is a gradient approximation, not a design choice.
-const RAMP = [[0x1D, 0x4E, 0xD8], [0x6D, 0x28, 0xD9], [0xA2, 0x1C, 0xAF]];
-const RAMP_MID = 0.52;
-
-const toHex = (rgb: number[]) =>
-  `#${rgb.map((v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('').toUpperCase()}`;
-const mix = (a: number[], b: number[], t: number) => a.map((v, i) => v + (b[i] - v) * t);
-const scale = (hex: string, f: number) =>
-  toHex([1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) * f));
-
-// one band per row: kicker, headline, team, lede, panel, calendar heading,
-// three calendar rows, cta, closing
-const BAND_COUNT = 11;
-const bands = Array.from({ length: BAND_COUNT }, (_, i) => {
-  const t = i / (BAND_COUNT - 1);
-  return toHex(t <= RAMP_MID
-    ? mix(RAMP[0], RAMP[1], t / RAMP_MID)
-    : mix(RAMP[1], RAMP[2], (t - RAMP_MID) / (1 - RAMP_MID)));
-});
-
-// panels and chips sit on their own band, darkened so they read as recessed
-const band = (i: number) => bands[i];
-const panelOf = (i: number) => scale(bands[i], 0.56);
-const edgeOf = (i: number) => scale(bands[i], 1.34);
-
+// The block's key-art ramp. A real linear-gradient, so it is a background-image
+// — which a client forcing its own dark theme leaves untouched while it still
+// darkens the text. That asymmetry is accepted here: every string inside the
+// block is pure white, so a forced theme lands on black-on-gradient, which is
+// legible if not ideal, rather than the muddy mid-tones a tinted grey inverts
+// to. `solid` is the ramp's midpoint, shown by Outlook, which drops gradients.
 const g = {
-  bands,
+  ramp: 'linear-gradient(160deg,#1D4ED8 0%,#6D28D9 52%,#A21CAF 100%)',
+  solid: '#6D28D9',
+  panelFill: 'rgba(9,5,42,.32)',
+  panelSolid: '#3E2192',
+  chipFill: 'rgba(9,5,42,.24)',
+  chipSolid: '#5C1EA9',
+  edge: 'rgba(255,255,255,.28)',
+  chipEdge: 'rgba(255,255,255,.36)',
   ink: '#FFFFFF',
-  inkMuted: '#E4DCFF',
-  inkFaint: '#C3B6EE',
 };
 
 const uiFont = "'Archivo','Helvetica Neue',Helvetica,Arial,sans-serif";
@@ -320,31 +299,16 @@ const createEmailHtml = (submission: WaiverSubmission, teamName: string) => {
   const safeTeam = escapeHtml(teamName);
   const [teamA] = teamColors[submission.team_id] ?? [c.mint];
 
-  const calendarRows = calendarLinks.map((link, i) => {
-    const b = 6 + i; // bands 6-8 continue the ramp through the calendar rows
-    const last = i === calendarLinks.length - 1;
-    return `
+  const calendarRows = calendarLinks.map((link) => `
               <tr>
-                <td class="x-b${b}" bgcolor="${band(b)}" style="background-color:${band(b)};padding:0 28px ${last ? 14 : 8}px;">
-                  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-                    <tr>
-                      <td class="x-c${i}" bgcolor="${panelOf(b)}" style="background-color:${panelOf(b)};border:1px solid ${edgeOf(b)};">
-                        <a href="${link.href}" style="display:block;padding:13px 16px;text-decoration:none;">
-                          <span class="x-ink" style="display:block;color:${g.ink};font:800 13px/1.3 ${uiFont};letter-spacing:.4px;">${link.title} &rarr;</span>
-                          <span class="x-faint" style="display:block;margin-top:3px;color:${g.inkFaint};font:400 11px/1.4 ${uiFont};">${link.note}</span>
-                        </a>
-                      </td>
-                    </tr>
-                  </table>
+                <td class="x-chip" bgcolor="${g.chipSolid}" style="background-color:${g.chipFill};border:1px solid ${g.chipEdge};">
+                  <a href="${link.href}" style="display:block;padding:13px 16px;text-decoration:none;">
+                    <span class="x-ink" style="display:block;color:${g.ink};font:800 13px/1.3 ${uiFont};letter-spacing:.4px;">${link.title} &rarr;</span>
+                    <span class="x-ink" style="display:block;margin-top:3px;color:${g.ink};font:400 11px/1.4 ${uiFont};">${link.note}</span>
+                  </a>
                 </td>
-              </tr>`;
-  }).join('');
-
-  // the lock has to name every band, so build those rules alongside them
-  const bandLock = bands.map((hex, i) => `    .x-b${i} { background-color: ${hex} !important; }`).join('\n');
-  const bandLockOgsb = bands.map((hex, i) => `  [data-ogsb] .x-b${i} { background-color: ${hex} !important; }`).join('\n');
-  const chipLock = calendarLinks.map((_, i) => `    .x-c${i} { background-color: ${panelOf(6 + i)} !important; }`).join('\n');
-  const chipLockOgsb = calendarLinks.map((_, i) => `  [data-ogsb] .x-c${i} { background-color: ${panelOf(6 + i)} !important; }`).join('\n');
+              </tr>
+              <tr><td height="8" style="height:8px;line-height:8px;font-size:0;">&nbsp;</td></tr>`).join('');
 
   return `<!doctype html>
 <html lang="en">
@@ -368,34 +332,28 @@ const createEmailHtml = (submission: WaiverSubmission, teamName: string) => {
      inline style, which is the only lever left. */
   @media (prefers-color-scheme: dark) {
     .x-page  { background-color: ${c.page} !important; }
-${bandLock}
-${chipLock}
-    .x-panel { background-color: ${panelOf(4)} !important; }
+    .x-block { background-color: ${g.solid} !important; background-image: ${g.ramp} !important; }
+    .x-panel { background-color: ${g.panelFill} !important; }
+    .x-chip  { background-color: ${g.chipFill} !important; }
     .x-cta   { background-color: ${c.mint} !important; }
-    .x-dot   { background-color: ${teamA} !important; }
     .x-cta a { color: ${c.page} !important; }
-    .x-ink, .x-ink a           { color: ${g.ink} !important; }
-    .x-muted, .x-muted a       { color: ${g.inkMuted} !important; }
-    .x-faint                   { color: ${g.inkFaint} !important; }
-    .x-mint, .x-mint a         { color: ${c.mint} !important; }
-    .x-fine                    { color: ${c.inkFaint} !important; }
-    .x-fine-lead               { color: ${c.inkMuted} !important; }
+    .x-dot   { background-color: ${teamA} !important; }
+    .x-ink, .x-ink a { color: ${g.ink} !important; }
+    .x-fine          { color: ${c.inkFaint} !important; }
+    .x-fine-lead     { color: ${c.inkMuted} !important; }
   }
 
   /* Outlook's apps stamp data-ogsc/data-ogsb on elements as they swap the
      original colour and background out. Those attributes are the only hook
      they expose for putting the values back. */
-  [data-ogsc] .x-ink, [data-ogsc] .x-ink a     { color: ${g.ink} !important; }
-  [data-ogsc] .x-muted, [data-ogsc] .x-muted a { color: ${g.inkMuted} !important; }
-  [data-ogsc] .x-faint                         { color: ${g.inkFaint} !important; }
-  [data-ogsc] .x-mint, [data-ogsc] .x-mint a   { color: ${c.mint} !important; }
-  [data-ogsc] .x-fine                          { color: ${c.inkFaint} !important; }
-  [data-ogsc] .x-fine-lead                     { color: ${c.inkMuted} !important; }
-  [data-ogsc] .x-cta a                         { color: ${c.page} !important; }
+  [data-ogsc] .x-ink, [data-ogsc] .x-ink a { color: ${g.ink} !important; }
+  [data-ogsc] .x-fine                      { color: ${c.inkFaint} !important; }
+  [data-ogsc] .x-fine-lead                 { color: ${c.inkMuted} !important; }
+  [data-ogsc] .x-cta a                     { color: ${c.page} !important; }
   [data-ogsb] .x-page  { background-color: ${c.page} !important; }
-${bandLockOgsb}
-${chipLockOgsb}
-  [data-ogsb] .x-panel { background-color: ${panelOf(4)} !important; }
+  [data-ogsb] .x-block { background-color: ${g.solid} !important; }
+  [data-ogsb] .x-panel { background-color: ${g.panelSolid} !important; }
+  [data-ogsb] .x-chip  { background-color: ${g.chipSolid} !important; }
   [data-ogsb] .x-cta   { background-color: ${c.mint} !important; }
   [data-ogsb] .x-dot   { background-color: ${teamA} !important; }
 </style>
@@ -414,52 +372,43 @@ ${chipLockOgsb}
             </td>
           </tr>
 
-          <!-- confirmation block: the key-art ramp, one solid step per row -->
+          <!-- confirmation block: the key-art gradient, hard edges throughout.
+               Every string in here is pure white — a forced dark theme darkens
+               text but not the gradient, and black on the ramp still reads,
+               where a tinted grey would inverts to mud. -->
           <tr>
-            <td bgcolor="${band(0)}" style="background-color:${band(0)};">
+            <td class="x-block" bgcolor="${g.solid}" style="background-color:${g.solid};background-image:${g.ramp};">
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                 <tr>
-                  <td class="x-b0" bgcolor="${band(0)}" style="background-color:${band(0)};padding:32px 28px 12px;">
-                    <p class="x-mint" style="margin:0;color:${c.mint};font:700 10px/1 ${monoFont};letter-spacing:2.4px;text-transform:uppercase;">Registration confirmed</p>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="x-b1" bgcolor="${band(1)}" style="background-color:${band(1)};padding:0 28px 18px;">
+                  <td style="padding:32px 28px 26px;">
+                    <p class="x-ink" style="margin:0 0 12px;color:${g.ink};font:700 10px/1 ${monoFont};letter-spacing:2.4px;text-transform:uppercase;">Registration confirmed</p>
                     <!-- 34px uppercase leaves ~319px of content box on a 375px
                          client; a long surname is one unbreakable word wider
                          than that, so let it split rather than push the block.
                          word-wrap is the alias Outlook's Word engine reads. -->
-                    <h1 class="x-ink" style="margin:0;color:${g.ink};font:800 34px/1.04 ${uiFont};letter-spacing:-.6px;text-transform:uppercase;overflow-wrap:break-word;word-wrap:break-word;">You're in,<br>${safeName}</h1>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="x-b2" bgcolor="${band(2)}" style="background-color:${band(2)};padding:0 28px 18px;">
+                    <h1 class="x-ink" style="margin:0 0 18px;color:${g.ink};font:800 34px/1.04 ${uiFont};letter-spacing:-.6px;text-transform:uppercase;overflow-wrap:break-word;word-wrap:break-word;">You're in,<br>${safeName}</h1>
                     <table role="presentation" cellspacing="0" cellpadding="0" border="0">
                       <tr>
                         <td class="x-dot" width="11" bgcolor="${teamA}" style="width:11px;height:11px;line-height:11px;font-size:0;background-color:${teamA};border-radius:999px;">&nbsp;</td>
                         <td class="x-ink" style="padding-left:9px;color:${g.ink};font:800 11px/1 ${uiFont};letter-spacing:2px;text-transform:uppercase;white-space:nowrap;">${safeTeam}</td>
                       </tr>
                     </table>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="x-b3" bgcolor="${band(3)}" style="background-color:${band(3)};padding:0 28px 26px;">
-                    <p class="x-muted" style="margin:0;color:${g.inkMuted};font:400 15px/1.6 ${uiFont};">Your waiver is signed and your slot in the 2026 Metarice Volleyball League is locked in. Here's everything you need before the first whistle.</p>
+                    <p class="x-ink" style="margin:18px 0 0;color:${g.ink};font:400 15px/1.6 ${uiFont};">Your waiver is signed and your slot in the 2026 Metarice Volleyball League is locked in. Here's everything you need before the first whistle.</p>
                   </td>
                 </tr>
 
                 <!-- when & where -->
                 <tr>
-                  <td class="x-b4" bgcolor="${band(4)}" style="background-color:${band(4)};padding:0 28px 26px;">
-                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" class="x-panel" bgcolor="${panelOf(4)}" style="background-color:${panelOf(4)};border:1px solid ${edgeOf(4)};">
+                  <td style="padding:0 28px 26px;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" class="x-panel" bgcolor="${g.panelSolid}" style="background-color:${g.panelFill};border:1px solid ${g.edge};">
                       <tr>
                         <td style="padding:20px;">
-                          <p class="x-mint" style="margin:0 0 10px;color:${c.mint};font:700 10px/1 ${monoFont};letter-spacing:2px;text-transform:uppercase;">Save the dates</p>
+                          <p class="x-ink" style="margin:0 0 10px;color:${g.ink};font:700 10px/1 ${monoFont};letter-spacing:2px;text-transform:uppercase;">Save the dates</p>
                           <p class="x-ink" style="margin:0 0 4px;color:${g.ink};font:800 22px/1.22 ${uiFont};letter-spacing:-.2px;text-transform:uppercase;">Aug 29, 30, 31</p>
                           <p class="x-ink" style="margin:0 0 14px;color:${g.ink};font:800 22px/1.22 ${uiFont};letter-spacing:-.2px;text-transform:uppercase;">Sep 5, 6 &middot; 2026</p>
-                          <p class="x-muted" style="margin:0;padding-top:14px;border-top:1px solid ${edgeOf(4)};color:${g.inkMuted};font:400 13px/1.5 ${uiFont};">
+                          <p class="x-ink" style="margin:0;padding-top:14px;border-top:1px solid ${g.edge};color:${g.ink};font:400 13px/1.5 ${uiFont};">
                             <span class="x-ink" style="color:${g.ink};font-weight:800;letter-spacing:1px;text-transform:uppercase;">${venue}</span><br>
-                            <span class="x-faint" style="color:${g.inkFaint};font-size:12px;">Use the links below for official MVL announcements.</span>
+                            <span class="x-ink" style="color:${g.ink};font-size:12px;">Use the links below for official MVL announcements.</span>
                           </p>
                         </td>
                       </tr>
@@ -469,14 +418,16 @@ ${chipLockOgsb}
 
                 <!-- calendar -->
                 <tr>
-                  <td class="x-b5" bgcolor="${band(5)}" style="background-color:${band(5)};padding:0 28px 12px;">
-                    <p class="x-muted" style="margin:0;color:${g.inkMuted};font:700 10px/1 ${monoFont};letter-spacing:2px;text-transform:uppercase;">Add to your calendar</p>
+                  <td style="padding:0 28px 12px;">
+                    <p class="x-ink" style="margin:0 0 12px;color:${g.ink};font:700 10px/1 ${monoFont};letter-spacing:2px;text-transform:uppercase;">Add to your calendar</p>
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">${calendarRows}
+                    </table>
                   </td>
-                </tr>${calendarRows}
+                </tr>
 
                 <!-- next step -->
                 <tr>
-                  <td class="x-b9" bgcolor="${band(9)}" style="background-color:${band(9)};padding:8px 28px 18px;">
+                  <td style="padding:8px 28px 32px;">
                     <table role="presentation" cellspacing="0" cellpadding="0" border="0">
                       <tr>
                         <td class="x-cta" bgcolor="${c.mint}" style="background-color:${c.mint};">
@@ -484,11 +435,7 @@ ${chipLockOgsb}
                         </td>
                       </tr>
                     </table>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="x-b10" bgcolor="${band(10)}" style="background-color:${band(10)};padding:0 28px 32px;">
-                    <p class="x-muted" style="margin:0;color:${g.inkMuted};font:400 13px/1.6 ${uiFont};">Schedules, standings and game-day announcements land on <a href="${mvlUrl}" class="x-mint" style="color:${c.mint};font-weight:700;text-decoration:none;">metaricevolley.ph</a> and <a href="${instagramUrl}" class="x-mint" style="color:${c.mint};font-weight:700;text-decoration:none;">@metaricevolley</a>.</p>
+                    <p class="x-ink" style="margin:18px 0 0;color:${g.ink};font:400 13px/1.6 ${uiFont};">Schedules, standings and game-day announcements land on <a class="x-ink" href="${mvlUrl}" style="color:${g.ink};font-weight:700;text-decoration:underline;">metaricevolley.ph</a> and <a class="x-ink" href="${instagramUrl}" style="color:${g.ink};font-weight:700;text-decoration:underline;">@metaricevolley</a>.</p>
                   </td>
                 </tr>
               </table>
