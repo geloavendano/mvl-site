@@ -27,6 +27,29 @@ const c = {
   inkFaint: '#7F7C9B',
 };
 
+// The confirmation block follows the 2026 key art instead of the site chrome:
+// hard-edged rectangles over a blue → violet → magenta ramp. Every stop is
+// dark enough to hold white type (7:1 or better), and `solid` is the ramp's
+// midpoint, which is what Outlook's Word engine shows since it drops gradients
+// outright. Panel fills are translucent so they read against the whole ramp,
+// each with an opaque bgcolor twin for the same reason.
+const g = {
+  ramp: 'linear-gradient(160deg,#1D4ED8 0%,#6D28D9 52%,#A21CAF 100%)',
+  solid: '#6D28D9',
+  // Both fills darken rather than lighten. A white-tinted chip raised the
+  // background faster than the ink could follow — 11px note text bottomed out
+  // at 2.9:1 against it, and even a near-white ink only reached 4.3:1.
+  panelFill: 'rgba(9,5,42,.32)',
+  panelSolid: '#3E2192',
+  chipFill: 'rgba(9,5,42,.24)',
+  chipSolid: '#5C1EA9',
+  edge: 'rgba(255,255,255,.26)',
+  chipEdge: 'rgba(255,255,255,.34)',
+  ink: '#FFFFFF',
+  inkMuted: '#E4DCFF',
+  inkFaint: '#C3B6EE',
+};
+
 const uiFont = "'Archivo','Helvetica Neue',Helvetica,Arial,sans-serif";
 const monoFont = "ui-monospace,'SF Mono',Menlo,Consolas,monospace";
 
@@ -273,14 +296,12 @@ const createEmailHtml = (submission: WaiverSubmission, teamName: string) => {
   const safeTeam = escapeHtml(teamName);
   const [teamA, teamB] = teamColors[submission.team_id] ?? [c.mint, c.teal];
 
-  // Every fill carries a bgcolor twin: Outlook's Word engine drops gradients
-  // outright, and a lost background here means white text on white.
   const calendarRows = calendarLinks.map((link) => `
               <tr>
-                <td bgcolor="${c.tonal}" style="background-color:${c.tonal};border:1px solid ${c.hairline};border-radius:12px;">
+                <td bgcolor="${g.chipSolid}" style="background-color:${g.chipFill};border:1px solid ${g.chipEdge};">
                   <a href="${link.href}" style="display:block;padding:13px 16px;text-decoration:none;">
-                    <span style="display:block;color:${c.mint};font:700 13px/1.3 ${uiFont};letter-spacing:.4px;">${link.title}</span>
-                    <span style="display:block;margin-top:3px;color:${c.inkFaint};font:400 11px/1.4 ${uiFont};">${link.note}</span>
+                    <span style="display:block;color:${g.ink};font:800 13px/1.3 ${uiFont};letter-spacing:.4px;">${link.title} &rarr;</span>
+                    <span style="display:block;margin-top:3px;color:${g.inkFaint};font:400 11px/1.4 ${uiFont};">${link.note}</span>
                   </a>
                 </td>
               </tr>
@@ -309,42 +330,40 @@ const createEmailHtml = (submission: WaiverSubmission, teamName: string) => {
             </td>
           </tr>
 
-          <!-- confirmation card, capped by the player's team colour -->
+          <!-- confirmation block: key-art gradient, hard edges throughout -->
           <tr>
-            <td bgcolor="${c.card}" style="background-color:${c.card};border-radius:24px;">
+            <td bgcolor="${g.solid}" style="background-color:${g.solid};background-image:${g.ramp};">
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                 <tr>
-                  <td style="padding:30px 28px 26px;">
+                  <td style="padding:32px 28px 26px;">
                     <p style="margin:0 0 12px;color:${c.mint};font:700 10px/1 ${monoFont};letter-spacing:2.4px;text-transform:uppercase;">Registration confirmed</p>
-                    <h1 style="margin:0 0 16px;color:#FFFFFF;font:800 32px/1.08 ${uiFont};letter-spacing:-.4px;">You're in, ${safeName}.</h1>
-                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" bgcolor="${c.tonal}" style="background-color:${c.tonal};border:1px solid ${c.hairline};border-radius:999px;">
+                    <!-- 34px uppercase leaves ~319px of content box on a 375px
+                         client; a long surname is one unbreakable word wider
+                         than that, so let it split rather than push the card.
+                         word-wrap is the alias Outlook's Word engine reads. -->
+                    <h1 style="margin:0 0 18px;color:${g.ink};font:800 34px/1.04 ${uiFont};letter-spacing:-.6px;text-transform:uppercase;overflow-wrap:break-word;word-wrap:break-word;">You're in,<br>${safeName}</h1>
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0">
                       <tr>
-                        <td style="padding:8px 15px 8px 12px;">
-                          <table role="presentation" cellspacing="0" cellpadding="0" border="0">
-                            <tr>
-                              <td width="12" bgcolor="${teamA}" style="width:12px;height:12px;line-height:12px;font-size:0;background-color:${teamA};background-image:linear-gradient(135deg,${teamA},${teamB});border-radius:4px;">&nbsp;</td>
-                              <td style="padding-left:9px;color:#FFFFFF;font:800 11px/1 ${uiFont};letter-spacing:1.8px;text-transform:uppercase;white-space:nowrap;">${safeTeam}</td>
-                            </tr>
-                          </table>
-                        </td>
+                        <td width="11" bgcolor="${teamA}" style="width:11px;height:11px;line-height:11px;font-size:0;background-color:${teamA};background-image:linear-gradient(135deg,${teamA},${teamB});border-radius:999px;">&nbsp;</td>
+                        <td style="padding-left:9px;color:${g.ink};font:800 11px/1 ${uiFont};letter-spacing:2px;text-transform:uppercase;white-space:nowrap;">${safeTeam}</td>
                       </tr>
                     </table>
-                    <p style="margin:16px 0 0;color:${c.inkMuted};font:400 15px/1.6 ${uiFont};">Your waiver is signed and your slot in the 2026 Metarice Volleyball League is locked in. Here's everything you need before the first whistle.</p>
+                    <p style="margin:18px 0 0;color:${g.inkMuted};font:400 15px/1.6 ${uiFont};">Your waiver is signed and your slot in the 2026 Metarice Volleyball League is locked in. Here's everything you need before the first whistle.</p>
                   </td>
                 </tr>
 
                 <!-- when & where -->
                 <tr>
                   <td style="padding:0 28px 26px;">
-                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="${c.tonal}" style="background-color:${c.tonal};border:1px solid ${c.hairline};border-radius:16px;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="${g.panelSolid}" style="background-color:${g.panelFill};border:1px solid ${g.edge};">
                       <tr>
                         <td style="padding:20px;">
-                          <p style="margin:0 0 8px;color:${c.teal};font:700 10px/1 ${monoFont};letter-spacing:2px;text-transform:uppercase;">Save the dates</p>
-                          <p style="margin:0 0 4px;color:#FFFFFF;font:800 21px/1.25 ${uiFont};letter-spacing:-.2px;">Aug 29, 30, 31</p>
-                          <p style="margin:0 0 14px;color:#FFFFFF;font:800 21px/1.25 ${uiFont};letter-spacing:-.2px;">Sep 5, 6 &middot; 2026</p>
-                          <p style="margin:0;padding-top:14px;border-top:1px solid ${c.hairline};color:${c.inkMuted};font:400 13px/1.5 ${uiFont};">
-                            <span style="color:${c.mint};font-weight:700;text-decoration:none;">${venue}</span><br>
-                            <span style="color:${c.inkFaint};font-size:12px;">Use the links below for official MVL announcements.</span>
+                          <p style="margin:0 0 10px;color:${c.mint};font:700 10px/1 ${monoFont};letter-spacing:2px;text-transform:uppercase;">Save the dates</p>
+                          <p style="margin:0 0 4px;color:${g.ink};font:800 22px/1.22 ${uiFont};letter-spacing:-.2px;text-transform:uppercase;">Aug 29, 30, 31</p>
+                          <p style="margin:0 0 14px;color:${g.ink};font:800 22px/1.22 ${uiFont};letter-spacing:-.2px;text-transform:uppercase;">Sep 5, 6 &middot; 2026</p>
+                          <p style="margin:0;padding-top:14px;border-top:1px solid ${g.edge};color:${g.inkMuted};font:400 13px/1.5 ${uiFont};">
+                            <span style="color:${g.ink};font-weight:800;letter-spacing:1px;text-transform:uppercase;">${venue}</span><br>
+                            <span style="color:${g.inkFaint};font-size:12px;">Use the links below for official MVL announcements.</span>
                           </p>
                         </td>
                       </tr>
@@ -355,7 +374,7 @@ const createEmailHtml = (submission: WaiverSubmission, teamName: string) => {
                 <!-- calendar -->
                 <tr>
                   <td style="padding:0 28px 12px;">
-                    <p style="margin:0 0 12px;color:${c.inkMuted};font:700 10px/1 ${monoFont};letter-spacing:2px;text-transform:uppercase;">Add to your calendar</p>
+                    <p style="margin:0 0 12px;color:${g.inkMuted};font:700 10px/1 ${monoFont};letter-spacing:2px;text-transform:uppercase;">Add to your calendar</p>
                     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">${calendarRows}
                     </table>
                   </td>
@@ -363,15 +382,15 @@ const createEmailHtml = (submission: WaiverSubmission, teamName: string) => {
 
                 <!-- next step -->
                 <tr>
-                  <td style="padding:8px 28px 30px;">
+                  <td style="padding:8px 28px 32px;">
                     <table role="presentation" cellspacing="0" cellpadding="0" border="0">
                       <tr>
-                        <td bgcolor="${c.mint}" style="background-color:${c.mint};border-radius:999px;">
-                          <a href="${siteUrl}/mvl/rules" style="display:block;padding:14px 26px;color:${c.page};font:800 12px/1 ${uiFont};letter-spacing:1.6px;text-transform:uppercase;text-decoration:none;">Read the rules</a>
+                        <td bgcolor="${c.mint}" style="background-color:${c.mint};">
+                          <a href="${siteUrl}/mvl/rules" style="display:block;padding:15px 28px;color:${c.page};font:800 12px/1 ${uiFont};letter-spacing:1.8px;text-transform:uppercase;text-decoration:none;">Read the rules</a>
                         </td>
                       </tr>
                     </table>
-                    <p style="margin:18px 0 0;color:${c.inkMuted};font:400 13px/1.6 ${uiFont};">Schedules, standings and game-day announcements land on <a href="${mvlUrl}" style="color:${c.mint};font-weight:700;text-decoration:none;">metaricevolley.ph</a> and <a href="${instagramUrl}" style="color:${c.mint};font-weight:700;text-decoration:none;">@metaricevolley</a>.</p>
+                    <p style="margin:18px 0 0;color:${g.inkMuted};font:400 13px/1.6 ${uiFont};">Schedules, standings and game-day announcements land on <a href="${mvlUrl}" style="color:${c.mint};font-weight:700;text-decoration:none;">metaricevolley.ph</a> and <a href="${instagramUrl}" style="color:${c.mint};font-weight:700;text-decoration:none;">@metaricevolley</a>.</p>
                   </td>
                 </tr>
               </table>
