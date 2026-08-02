@@ -3701,12 +3701,13 @@ body.waiver-page .form-actions button.cta.cta--primary:focus-visible {
    Falls back to the gradient treatment for any team without a `bg`.
    ========================================================================== */
 .team-card--art {
+  --team-card-rail: 46px;
   min-height: 0;
   aspect-ratio: .82;
   border: 0;
   border-radius: 0 44px 0 44px;
   background-image:
-    linear-gradient(90deg, rgba(255, 255, 255, 0) 0 calc(100% - 58px), #f5f7f2 calc(100% - 58px) 100%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0) 0 calc(100% - var(--team-card-rail)), #f5f7f2 calc(100% - var(--team-card-rail)) 100%),
     linear-gradient(180deg, rgba(255, 255, 255, 0) 48%, color-mix(in srgb, var(--team-a) 42%, transparent) 100%),
     var(--team-art);
   background-size: cover, cover, cover;
@@ -3719,7 +3720,7 @@ body.waiver-page .form-actions button.cta.cta--primary:focus-visible {
    diagonal streak "rain", keeping only the team accent bar and base vignette */
 .team-card--art::before { display: none; }
 .team-card--art::after {
-  background: linear-gradient(90deg, transparent 0 calc(100% - 58px), rgba(255, 255, 255, .72) calc(100% - 58px) 100%);
+  background: linear-gradient(90deg, transparent 0 calc(100% - var(--team-card-rail)), rgba(255, 255, 255, .72) calc(100% - var(--team-card-rail)) 100%);
 }
 /* The stock player is a single generic cutout in a green jersey — it repeats
    across all eight cards and fights the team artwork. Hidden until real
@@ -3735,7 +3736,7 @@ body.waiver-page .form-actions button.cta.cta--primary:focus-visible {
   position: absolute;
   inset: 0 0 0 auto;
   z-index: 4;
-  width: 58px;
+  width: var(--team-card-rail);
   min-height: 100%;
   display: flex;
   align-items: center;
@@ -3759,54 +3760,48 @@ body.waiver-page .form-actions button.cta.cta--primary:focus-visible {
 @media (max-width: 959px) {
   .teams-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px 10px;
-    padding: 0 14px;
+    gap: 24px 18px;
+    width: 100%;
+    padding: 0 30px 0 14px;
   }
   .team-card--art {
+    --team-card-rail: 36px;
     border-radius: 0 36px 0 36px;
   }
   .team-card--art:nth-child(4n + 3),
   .team-card--art:nth-child(4n + 4) {
-    translate: 10px 0;
+    translate: 22px 0;
   }
   .team-card--art .team-card-copy {
-    width: 48px;
     border-radius: 0 36px 0 0;
   }
   .team-card--art .team-card-name {
-    font-size: clamp(13px, 3.65vw, 16px);
-    letter-spacing: .7px;
+    font-size: clamp(12px, 3.35vw, 15px);
+    letter-spacing: .55px;
   }
 }
 
 @media (min-width: 960px) {
   .teams-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    max-width: 1040px;
+    max-width: 920px;
     margin: 0 auto;
-    gap: 22px 18px;
+    gap: 32px 28px;
   }
   .team-card--art {
+    --team-card-rail: 50px;
     min-height: 0;
     aspect-ratio: .82;
     border-radius: 0 52px 0 52px;
-    background-image:
-      linear-gradient(90deg, rgba(255, 255, 255, 0) 0 calc(100% - 64px), #f5f7f2 calc(100% - 64px) 100%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0) 48%, color-mix(in srgb, var(--team-a) 42%, transparent) 100%),
-      var(--team-art);
-  }
-  .team-card--art::after {
-    background: linear-gradient(90deg, transparent 0 calc(100% - 64px), rgba(255, 255, 255, .72) calc(100% - 64px) 100%);
   }
   .team-card--art .team-card-copy {
-    width: 64px;
     border-radius: 0 52px 0 0;
   }
   .team-card--art .team-card-name {
-    font-size: clamp(18px, 1.6vw, 24px);
+    font-size: clamp(16px, 1.35vw, 21px);
   }
   .team-card--art:nth-child(n + 5) {
-    translate: clamp(48px, 6vw, 80px) 0;
+    translate: clamp(72px, 8vw, 112px) 0;
   }
 }
 
