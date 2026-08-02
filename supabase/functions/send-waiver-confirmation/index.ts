@@ -303,9 +303,6 @@ const createEmailHtml = (submission: WaiverSubmission, teamName: string) => {
             <td bgcolor="${c.card}" style="background-color:${c.card};border-radius:24px;">
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                 <tr>
-                  <td bgcolor="${teamA}" height="5" style="height:5px;line-height:5px;font-size:0;background-color:${teamA};background-image:linear-gradient(90deg,${teamA},${teamB});border-radius:24px 24px 0 0;">&nbsp;</td>
-                </tr>
-                <tr>
                   <td style="padding:30px 28px 26px;">
                     <p style="margin:0 0 12px;color:${c.mint};font:700 10px/1 ${monoFont};letter-spacing:2.4px;text-transform:uppercase;">Registration confirmed</p>
                     <h1 style="margin:0 0 16px;color:#FFFFFF;font:800 32px/1.08 ${uiFont};letter-spacing:-.4px;">You're in, ${safeName}.</h1>
@@ -454,6 +451,13 @@ Deno.serve(async (req) => {
     const resendApiKey = Deno.env.get('RESEND_API_KEY');
     const serviceRoleKey = getServiceRoleKey();
     const from = Deno.env.get('MVL_EMAIL_FROM') ?? defaultFrom;
+    // A monitored mailbox for replies and an unsubscribe path both lift
+    // deliverability, and the unsubscribe address is the standards-based
+    // version of the "stop hearing from our sponsors" promise in the privacy
+    // clause. Both stay off unless a real address is configured — inventing
+    // one that bounces would cost more reputation than it earns.
+    const replyTo = Deno.env.get('MVL_EMAIL_REPLY_TO');
+    const unsubscribeTo = Deno.env.get('MVL_EMAIL_UNSUBSCRIBE_TO');
 
     if (!resendApiKey) throw new Error('RESEND_API_KEY is not configured.');
     if (!serviceRoleKey) throw new Error('Supabase service role key is not configured.');
@@ -478,9 +482,17 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         from,
         to: submission.email,
-        subject: 'You are registered for MVL 2026',
+        ...(replyTo ? { reply_to: replyTo } : {}),
+        subject: `You're in — MVL 2026 with ${teamName}`,
         html: createEmailHtml(submission, teamName),
         text: createEmailText(submission, teamName),
+        ...(unsubscribeTo
+          ? {
+            headers: {
+              'List-Unsubscribe': `<mailto:${unsubscribeTo}?subject=Unsubscribe%20${submission.id}>`,
+            },
+          }
+          : {}),
         attachments: [
           {
             filename: 'MVL-2026-Save-the-Dates.ics',
