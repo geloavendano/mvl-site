@@ -4348,8 +4348,6 @@ body.gametime-v3 .rules-preview {
 .schedule-board,
 .video-library,
 .library-video-card,
-.waiver-page .waiver-copy,
-.raffle-page .waiver-copy,
 .waiver-page .form-panel,
 .raffle-page .form-panel,
 .prize-banner,
@@ -4373,6 +4371,20 @@ body.gametime-v3 .rules-preview {
 .videos-feature-panel {
   border-color: rgba(84, 240, 187, .28);
   background: rgba(16, 8, 54, .64);
+}
+.waiver-page .waiver-copy,
+.raffle-page .waiver-copy {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.raffle-page .raffle-privacy {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
 }
 .day-tabs button[aria-selected='true'],
 .cta.cta--primary.prize-cta,
