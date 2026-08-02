@@ -197,6 +197,7 @@ form.addEventListener('submit', async (event) => {
     p_player_id: formData.player_id,
     p_contact_number: formData.contact_number.trim(),
     p_email: formData.email.trim(),
+    p_fur_parent: formData.fur_parent,
     p_emergency_contact_name: formData.emergency_contact_name.trim(),
     p_emergency_contact_number: formData.emergency_contact_number.trim(),
     p_relationship: formData.relationship,

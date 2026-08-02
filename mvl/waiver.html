@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/mvl/css/style.css?v=waiver-team-gradient">
+<link rel="stylesheet" href="/mvl/css/style.css?v=waiver-furparent">
 <script src="/mvl/js/site-config.js"></script>
 <script src="/mvl/js/nav.js"></script>
 </head>
@@ -82,6 +82,19 @@
         <label class="field">
           <span>Email Address</span>
           <input name="email" type="email" autocomplete="email" required>
+        </label>
+
+        <label class="field field--wide">
+          <span>Are you a furparent?</span>
+          <select name="fur_parent" required>
+            <option value="">Select one</option>
+            <option value="dog">Yes, dog parent</option>
+            <option value="cat">Yes, cat parent</option>
+            <option value="dog_cat">Yes, dog and cat parent</option>
+            <option value="other_pet">Yes, other pet parent</option>
+            <option value="not_now">Not right now</option>
+          </select>
+          <small>This helps us match pet-related raffle perks and sponsor treats.</small>
         </label>
       </div>
     </section>
@@ -185,6 +198,6 @@
 
 <script src="/mvl/js/league-data.js"></script>
 <script src="/mvl/js/supabase-config.js"></script>
-<script src="/mvl/js/waiver.js?v=waiver-team-gradient"></script>
+<script src="/mvl/js/waiver.js?v=waiver-furparent"></script>
 </body>
 </html>
