@@ -460,10 +460,10 @@ button.cta--secondary { border: 2px solid var(--mint); color: var(--mint); }
 /* ==========================================================================
    Sponsor marquee
    ========================================================================== */
-/* swipeable: a real scroll container auto-advanced by JS (see setupMarquee) */
+/* the track is panned by JS transform (see setupMarquee), not by scrolling —
+   an unbounded offset is what lets the loop wrap in both directions */
 .marquee {
-  overflow-x: auto;
-  scrollbar-width: none;
+  overflow: hidden;
   background: var(--navy-deep);
   border-top: 1px solid rgba(124, 245, 180, .2);
   border-bottom: 1px solid rgba(124, 245, 180, .2);
@@ -471,14 +471,15 @@ button.cta--secondary { border: 2px solid var(--mint); color: var(--mint); }
   cursor: grab;
   user-select: none;
   -webkit-user-select: none;
+  touch-action: pan-y; /* horizontal drags are ours; the page still scrolls */
 }
-.marquee::-webkit-scrollbar { display: none; }
 .marquee.is-dragging { cursor: grabbing; }
 .marquee-track {
   display: flex;
   align-items: center;
   gap: 20px;
   width: max-content;
+  will-change: transform;
 }
 .marquee-item {
   display: inline-flex;

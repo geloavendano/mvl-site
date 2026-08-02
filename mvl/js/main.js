@@ -268,7 +268,7 @@ if (recentVideosEl) {
   });
 }
 
-// ---- render: sponsor marquees (list duplicated for the seamless loop) ------
+// ---- render: sponsor marquees (unit repeated for the seamless loop) --------
 // Each strip declares which tier it shows via data-marquee. "all" runs the
 // full roster led by the title presenter; a tier name shows just that tier.
 const sponsorTierOrder = ['Official Partner', 'Co-presenter', 'Major Sponsor', 'Minor Sponsor'];
@@ -278,9 +278,11 @@ const sortedSponsors = [...SPONSORS].sort((a, b) =>
   a.name.localeCompare(b.name)
 );
 
+// not lazy-loaded: the track is overflow:hidden, so a lazy image parked outside
+// the clip would never intersect the viewport and never load.
 const sponsorChip = (sponsor) => `
     <span class="marquee-item marquee-item--logo" title="${sponsor.name}">
-      <img src="${sponsor.logo}" alt="${sponsor.name}" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.style.display='inline';">
+      <img src="${sponsor.logo}" alt="${sponsor.name}" onerror="this.hidden=true;this.nextElementSibling.style.display='inline';">
       <span class="marquee-fallback">${sponsor.name}</span>
     </span>
     <span class="marquee-sep">&#9670;</span>
@@ -308,6 +310,11 @@ const buildMarquee = (filter) => {
   return markup;
 };
 
+// the unit is one pass of the tier; setupMarquee repeats it as many times as
+// the strip needs to stay seamless (a short tier like Minor Sponsor repeats a
+// lot more than a twelve-logo one).
+const marqueeUnits = new WeakMap();
+
 document.querySelectorAll('[data-marquee]').forEach((track) => {
   const markup = buildMarquee(track.dataset.marquee);
   if (!markup) {
@@ -315,85 +322,102 @@ document.querySelectorAll('[data-marquee]').forEach((track) => {
     track.closest('.marquee')?.remove();
     return;
   }
-  track.innerHTML = markup + markup;
+  marqueeUnits.set(track, markup);
+  track.innerHTML = markup;
 });
 
-// auto-advancing scroll container: users can swipe (touch) or drag (mouse)
-// through the sponsors; the loop wraps seamlessly on the duplicated half.
+// Auto-panning sponsor strip. It pans left on its own, holds while the cursor
+// is over it, and follows a drag or touch — releasing resumes the pan from
+// wherever the user left it. Position is a plain unbounded number applied as a
+// transform, so the wrap is a modulo and works in both directions; a scroll
+// container would clamp at 0 and stop a backwards drag dead.
 const marqueeReduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const MARQUEE_SPEED = 36; // px per second, time-based so 60Hz and 120Hz match
 
 const setupMarquee = (marquee) => {
   const track = marquee.querySelector('[data-marquee]');
-  if (!track) return;
-  marquee.querySelectorAll('img').forEach((img) => { img.draggable = false; });
+  const unit = marqueeUnits.get(track);
+  if (!track || !unit) return;
+  track.querySelectorAll('img').forEach((img) => { img.draggable = false; });
 
-  let paused = false;
-  let resumeTimer = 0;
-  const pause = () => {
-    paused = true;
-    window.clearTimeout(resumeTimer);
-  };
-  const resumeSoon = () => {
-    window.clearTimeout(resumeTimer);
-    resumeTimer = window.setTimeout(() => { paused = false; }, 2200);
+  let pos = 0;
+  let unitWidth = 0;
+  let copies = 1;
+
+  // Enough copies that the visible window is always covered: the offset stays
+  // inside one unit, so the strip must be at least a unit wider than the frame.
+  // A tier with only a handful of logos gets extra passes on top of that, so
+  // there is something to pan through rather than the same three marks.
+  const measure = () => {
+    const width = track.scrollWidth / copies;
+    if (!width) return;
+    const perUnit = track.querySelectorAll('.marquee-item--logo').length / copies;
+    const needed = Math.max(
+      perUnit < 6 ? 5 : 2,
+      Math.ceil(marquee.clientWidth / width) + 2
+    );
+    if (needed > copies) {
+      track.insertAdjacentHTML('beforeend', unit.repeat(needed - copies));
+      track.querySelectorAll('img').forEach((img) => { img.draggable = false; });
+      copies = needed;
+    }
+    unitWidth = track.scrollWidth / copies;
   };
 
-  // mouse drag-to-scroll (touch gets native swipe from overflow-x: auto)
+  const render = () => {
+    if (unitWidth > 0) pos = ((pos % unitWidth) + unitWidth) % unitWidth;
+    track.style.transform = `translate3d(${-pos}px, 0, 0)`;
+  };
+
+  measure();
+  // logo widths are unknown until they decode, so re-measure as they arrive
+  track.querySelectorAll('img').forEach((img) => {
+    if (!img.complete) img.addEventListener('load', measure, { once: true });
+  });
+  window.addEventListener('resize', measure);
+
+  let hovering = false;
   let dragging = false;
   let dragStartX = 0;
-  let dragStartScroll = 0;
+  let dragStartPos = 0;
+
+  marquee.addEventListener('pointerenter', (e) => {
+    if (e.pointerType === 'mouse') hovering = true;
+  });
+  marquee.addEventListener('pointerleave', (e) => {
+    if (e.pointerType === 'mouse') hovering = false;
+  });
   marquee.addEventListener('pointerdown', (e) => {
-    pause();
-    if (e.pointerType !== 'mouse') return;
     dragging = true;
     dragStartX = e.clientX;
-    dragStartScroll = marquee.scrollLeft;
+    dragStartPos = pos;
     marquee.classList.add('is-dragging');
-    marquee.setPointerCapture(e.pointerId);
+    // capture keeps the drag alive past the strip's edges; it throws if the
+    // pointer is already gone, which just means there is nothing to capture
+    try { marquee.setPointerCapture(e.pointerId); } catch { /* no active pointer */ }
   });
   marquee.addEventListener('pointermove', (e) => {
     if (!dragging) return;
-    marquee.scrollLeft = dragStartScroll - (e.clientX - dragStartX);
+    pos = dragStartPos - (e.clientX - dragStartX);
+    render();
   });
-  const endDrag = () => {
+  const endDrag = (e) => {
+    if (!dragging) return;
     dragging = false;
+    // a touch that lifts leaves no cursor behind, so the pan resumes at once
+    if (e.pointerType !== 'mouse') hovering = false;
     marquee.classList.remove('is-dragging');
-    resumeSoon();
   };
   marquee.addEventListener('pointerup', endDrag);
   marquee.addEventListener('pointercancel', endDrag);
-  marquee.addEventListener('mouseenter', pause);
-  marquee.addEventListener('mouseleave', () => { if (!dragging) resumeSoon(); });
-  marquee.addEventListener('touchend', resumeSoon, { passive: true });
-  marquee.addEventListener('wheel', () => { pause(); resumeSoon(); }, { passive: true });
 
-  // position accumulates in JS (scrollLeft readback rounds to device pixels,
-  // which would stall sub-pixel advances); only written while auto-advancing.
-  // speed is time-based so it's identical on 60Hz and 120Hz displays.
-  const SPEED = 36; // px per second
-  let pos = 0;
   let lastTime = 0;
   const tick = (now) => {
     const dt = lastTime ? Math.min((now - lastTime) / 1000, .1) : 0;
     lastTime = now;
-    const half = track.scrollWidth / 2;
-    if (half > 0) {
-      if (paused) {
-        // follow the user's swipe/drag; wrap on the duplicated half
-        pos = marquee.scrollLeft;
-        if (pos >= half) {
-          pos -= half;
-          marquee.scrollLeft = pos;
-          if (dragging) dragStartScroll -= half;
-        } else if (pos < 1 && !dragging) {
-          pos += half;
-          marquee.scrollLeft = pos;
-        }
-      } else if (!marqueeReduceMotion) {
-        pos += SPEED * dt;
-        if (pos >= half) pos -= half;
-        marquee.scrollLeft = pos;
-      }
+    if (!hovering && !dragging && !marqueeReduceMotion) {
+      pos += MARQUEE_SPEED * dt;
+      render();
     }
     requestAnimationFrame(tick);
   };
