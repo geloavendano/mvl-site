@@ -281,7 +281,7 @@ const sortedSponsors = [...SPONSORS].sort((a, b) =>
 // not lazy-loaded: the track is overflow:hidden, so a lazy image parked outside
 // the clip would never intersect the viewport and never load.
 const sponsorChip = (sponsor) => `
-    <span class="marquee-item marquee-item--logo" title="${sponsor.name}">
+    <span class="marquee-item marquee-item--logo${sponsor.logoBg ? ` marquee-item--bg-${sponsor.logoBg}` : ''}" title="${sponsor.name}">
       <img src="${sponsor.logo}" alt="${sponsor.name}" onerror="this.hidden=true;this.nextElementSibling.style.display='inline';">
       <span class="marquee-fallback">${sponsor.name}</span>
     </span>

@@ -510,6 +510,14 @@ button.cta--secondary { border: 2px solid var(--mint); color: var(--mint); }
   height: 44px;
   padding: 4px 8px;
 }
+.marquee-item--logo.marquee-item--bg-mint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 12px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(124, 245, 180, .96), rgba(32, 207, 202, .92));
+}
 .marquee-item--logo img {
   width: auto;
   max-width: 150px;
