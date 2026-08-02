@@ -231,18 +231,18 @@ const calendarLinks = [
 // waiver.html and must stay that way — only the typography is set down to
 // fineprint, since this is a receipt to keep rather than something to read.
 const finePara = (body: string, lead?: string) =>
-  `<p style="margin:0 0 9px;color:${c.inkFaint};font:400 11px/1.55 ${uiFont};">` +
-  (lead ? `<strong style="color:${c.inkMuted};font-weight:700;">${lead}</strong> ` : '') +
+  `<p class="x-fine" style="margin:0 0 9px;color:${c.inkFaint};font:400 11px/1.55 ${uiFont};">` +
+  (lead ? `<strong class="x-fine-lead" style="color:${c.inkMuted};font-weight:700;">${lead}</strong> ` : '') +
   `${body}</p>`;
 
 const fineHeading = (label: string) =>
-  `<p style="margin:16px 0 8px;color:${c.inkMuted};font:700 9px/1 ${monoFont};letter-spacing:1.6px;text-transform:uppercase;">${label}</p>`;
+  `<p class="x-fine-lead" style="margin:16px 0 8px;color:${c.inkMuted};font:700 9px/1 ${monoFont};letter-spacing:1.6px;text-transform:uppercase;">${label}</p>`;
 
 const consentAndWaiverHtml = [
   fineHeading('Data Privacy'),
   finePara('Your details help us run the tournament: setting the schedule, keeping you posted on your games, and reaching your emergency contact if anything happens on court.'),
   finePara('MVL runs on the support of our official partners and sponsors, the same ones behind your jerseys, the raffle prizes, and the game-day giveaways. As part of joining, we share your name and email address with requesting sponsors so they can send you their offers, promos, and player perks.'),
-  finePara(`You stay in control. Message us anytime at <a href="https://instagram.com/metaricevolley" style="color:${c.inkMuted};">@metaricevolley</a> to access, correct, or delete your information, or to stop hearing from our sponsors.`),
+  finePara(`You stay in control. Message us anytime at <a class="x-fine-lead" href="https://instagram.com/metaricevolley" style="color:${c.inkMuted};">@metaricevolley</a> to access, correct, or delete your information, or to stop hearing from our sponsors.`),
   finePara('By submitting the form, you consent to this use of your data.'),
   fineHeading('Waiver and Release of Liability'),
   finePara('In consideration of being allowed to participate in the 2026 Metarice Volleyball League, I acknowledge, appreciate, and agree to the following:'),
@@ -298,10 +298,10 @@ const createEmailHtml = (submission: WaiverSubmission, teamName: string) => {
 
   const calendarRows = calendarLinks.map((link) => `
               <tr>
-                <td bgcolor="${g.chipSolid}" style="background-color:${g.chipFill};border:1px solid ${g.chipEdge};">
+                <td class="x-chip" bgcolor="${g.chipSolid}" style="background-color:${g.chipFill};border:1px solid ${g.chipEdge};">
                   <a href="${link.href}" style="display:block;padding:13px 16px;text-decoration:none;">
-                    <span style="display:block;color:${g.ink};font:800 13px/1.3 ${uiFont};letter-spacing:.4px;">${link.title} &rarr;</span>
-                    <span style="display:block;margin-top:3px;color:${g.inkFaint};font:400 11px/1.4 ${uiFont};">${link.note}</span>
+                    <span class="x-ink" style="display:block;color:${g.ink};font:800 13px/1.3 ${uiFont};letter-spacing:.4px;">${link.title} &rarr;</span>
+                    <span class="x-faint" style="display:block;margin-top:3px;color:${g.inkFaint};font:400 11px/1.4 ${uiFont};">${link.note}</span>
                   </a>
                 </td>
               </tr>
@@ -312,13 +312,58 @@ const createEmailHtml = (submission: WaiverSubmission, teamName: string) => {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="color-scheme" content="dark">
-<meta name="supported-color-schemes" content="dark">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
 <title>You're in — MVL 2026</title>
+<style>
+  :root { color-scheme: light dark; supported-color-schemes: light dark; }
+
+  /* The mail is dark by design, so a client that forces its own dark theme
+     makes it worse, not better: it flips the page to light and the type to
+     near-black, while leaving background-image gradients untouched — which is
+     how white headlines end up unreadable on the violet block.
+
+     Declaring both schemes above stops Apple Mail and Outlook.com. The rest
+     force it anyway by rewriting the inline style attributes, so the palette
+     is restated here: a stylesheet rule with !important outranks a rewritten
+     inline style, which is the only lever left. */
+  @media (prefers-color-scheme: dark) {
+    .x-page  { background-color: ${c.page} !important; }
+    .x-block { background-color: ${g.solid} !important; background-image: ${g.ramp} !important; }
+    .x-panel { background-color: ${g.panelFill} !important; }
+    .x-chip  { background-color: ${g.chipFill} !important; }
+    .x-cta   { background-color: ${c.mint} !important; }
+    .x-dot   { background-color: ${teamA} !important; background-image: linear-gradient(135deg,${teamA},${teamB}) !important; }
+    .x-cta a { color: ${c.page} !important; }
+    .x-ink, .x-ink a           { color: ${g.ink} !important; }
+    .x-muted, .x-muted a       { color: ${g.inkMuted} !important; }
+    .x-faint                   { color: ${g.inkFaint} !important; }
+    .x-mint, .x-mint a         { color: ${c.mint} !important; }
+    .x-fine                    { color: ${c.inkFaint} !important; }
+    .x-fine-lead               { color: ${c.inkMuted} !important; }
+  }
+
+  /* Outlook's apps stamp data-ogsc/data-ogsb on elements as they swap the
+     original colour and background out. Those attributes are the only hook
+     they expose for putting the values back. */
+  [data-ogsc] .x-ink, [data-ogsc] .x-ink a     { color: ${g.ink} !important; }
+  [data-ogsc] .x-muted, [data-ogsc] .x-muted a { color: ${g.inkMuted} !important; }
+  [data-ogsc] .x-faint                         { color: ${g.inkFaint} !important; }
+  [data-ogsc] .x-mint, [data-ogsc] .x-mint a   { color: ${c.mint} !important; }
+  [data-ogsc] .x-fine                          { color: ${c.inkFaint} !important; }
+  [data-ogsc] .x-fine-lead                     { color: ${c.inkMuted} !important; }
+  [data-ogsc] .x-cta a                         { color: ${c.page} !important; }
+  [data-ogsb] .x-page  { background-color: ${c.page} !important; }
+  [data-ogsb] .x-block { background-color: ${g.solid} !important; }
+  [data-ogsb] .x-panel { background-color: ${g.panelSolid} !important; }
+  [data-ogsb] .x-chip  { background-color: ${g.chipSolid} !important; }
+  [data-ogsb] .x-cta   { background-color: ${c.mint} !important; }
+  [data-ogsb] .x-dot   { background-color: ${teamA} !important; }
+</style>
 </head>
-<body style="margin:0;padding:0;width:100%;background-color:${c.page};color:${c.ink};font-family:${uiFont};">
+<body class="x-page" style="margin:0;padding:0;width:100%;background-color:${c.page};color:${c.ink};font-family:${uiFont};">
   <div style="display:none;max-height:0;overflow:hidden;font-size:0;line-height:0;opacity:0;">You're in with ${safeTeam}. Save the dates — Aug 29, 30, 31 and Sep 5, 6 at ${venue}.</div>
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="${c.page}" style="background-color:${c.page};">
+  <table role="presentation" class="x-page" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="${c.page}" style="background-color:${c.page};">
     <tr>
       <td align="center" style="padding:28px 12px;">
         <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:600px;">
@@ -332,38 +377,38 @@ const createEmailHtml = (submission: WaiverSubmission, teamName: string) => {
 
           <!-- confirmation block: key-art gradient, hard edges throughout -->
           <tr>
-            <td bgcolor="${g.solid}" style="background-color:${g.solid};background-image:${g.ramp};">
+            <td class="x-block" bgcolor="${g.solid}" style="background-color:${g.solid};background-image:${g.ramp};">
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                 <tr>
                   <td style="padding:32px 28px 26px;">
-                    <p style="margin:0 0 12px;color:${c.mint};font:700 10px/1 ${monoFont};letter-spacing:2.4px;text-transform:uppercase;">Registration confirmed</p>
+                    <p class="x-mint" style="margin:0 0 12px;color:${c.mint};font:700 10px/1 ${monoFont};letter-spacing:2.4px;text-transform:uppercase;">Registration confirmed</p>
                     <!-- 34px uppercase leaves ~319px of content box on a 375px
                          client; a long surname is one unbreakable word wider
                          than that, so let it split rather than push the card.
                          word-wrap is the alias Outlook's Word engine reads. -->
-                    <h1 style="margin:0 0 18px;color:${g.ink};font:800 34px/1.04 ${uiFont};letter-spacing:-.6px;text-transform:uppercase;overflow-wrap:break-word;word-wrap:break-word;">You're in,<br>${safeName}</h1>
+                    <h1 class="x-ink" style="margin:0 0 18px;color:${g.ink};font:800 34px/1.04 ${uiFont};letter-spacing:-.6px;text-transform:uppercase;overflow-wrap:break-word;word-wrap:break-word;">You're in,<br>${safeName}</h1>
                     <table role="presentation" cellspacing="0" cellpadding="0" border="0">
                       <tr>
-                        <td width="11" bgcolor="${teamA}" style="width:11px;height:11px;line-height:11px;font-size:0;background-color:${teamA};background-image:linear-gradient(135deg,${teamA},${teamB});border-radius:999px;">&nbsp;</td>
-                        <td style="padding-left:9px;color:${g.ink};font:800 11px/1 ${uiFont};letter-spacing:2px;text-transform:uppercase;white-space:nowrap;">${safeTeam}</td>
+                        <td class="x-dot" width="11" bgcolor="${teamA}" style="width:11px;height:11px;line-height:11px;font-size:0;background-color:${teamA};background-image:linear-gradient(135deg,${teamA},${teamB});border-radius:999px;">&nbsp;</td>
+                        <td class="x-ink" style="padding-left:9px;color:${g.ink};font:800 11px/1 ${uiFont};letter-spacing:2px;text-transform:uppercase;white-space:nowrap;">${safeTeam}</td>
                       </tr>
                     </table>
-                    <p style="margin:18px 0 0;color:${g.inkMuted};font:400 15px/1.6 ${uiFont};">Your waiver is signed and your slot in the 2026 Metarice Volleyball League is locked in. Here's everything you need before the first whistle.</p>
+                    <p class="x-muted" style="margin:18px 0 0;color:${g.inkMuted};font:400 15px/1.6 ${uiFont};">Your waiver is signed and your slot in the 2026 Metarice Volleyball League is locked in. Here's everything you need before the first whistle.</p>
                   </td>
                 </tr>
 
                 <!-- when & where -->
                 <tr>
                   <td style="padding:0 28px 26px;">
-                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="${g.panelSolid}" style="background-color:${g.panelFill};border:1px solid ${g.edge};">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" class="x-panel" bgcolor="${g.panelSolid}" style="background-color:${g.panelFill};border:1px solid ${g.edge};">
                       <tr>
                         <td style="padding:20px;">
-                          <p style="margin:0 0 10px;color:${c.mint};font:700 10px/1 ${monoFont};letter-spacing:2px;text-transform:uppercase;">Save the dates</p>
-                          <p style="margin:0 0 4px;color:${g.ink};font:800 22px/1.22 ${uiFont};letter-spacing:-.2px;text-transform:uppercase;">Aug 29, 30, 31</p>
-                          <p style="margin:0 0 14px;color:${g.ink};font:800 22px/1.22 ${uiFont};letter-spacing:-.2px;text-transform:uppercase;">Sep 5, 6 &middot; 2026</p>
-                          <p style="margin:0;padding-top:14px;border-top:1px solid ${g.edge};color:${g.inkMuted};font:400 13px/1.5 ${uiFont};">
-                            <span style="color:${g.ink};font-weight:800;letter-spacing:1px;text-transform:uppercase;">${venue}</span><br>
-                            <span style="color:${g.inkFaint};font-size:12px;">Use the links below for official MVL announcements.</span>
+                          <p class="x-mint" style="margin:0 0 10px;color:${c.mint};font:700 10px/1 ${monoFont};letter-spacing:2px;text-transform:uppercase;">Save the dates</p>
+                          <p class="x-ink" style="margin:0 0 4px;color:${g.ink};font:800 22px/1.22 ${uiFont};letter-spacing:-.2px;text-transform:uppercase;">Aug 29, 30, 31</p>
+                          <p class="x-ink" style="margin:0 0 14px;color:${g.ink};font:800 22px/1.22 ${uiFont};letter-spacing:-.2px;text-transform:uppercase;">Sep 5, 6 &middot; 2026</p>
+                          <p class="x-muted" style="margin:0;padding-top:14px;border-top:1px solid ${g.edge};color:${g.inkMuted};font:400 13px/1.5 ${uiFont};">
+                            <span class="x-ink" style="color:${g.ink};font-weight:800;letter-spacing:1px;text-transform:uppercase;">${venue}</span><br>
+                            <span class="x-faint" style="color:${g.inkFaint};font-size:12px;">Use the links below for official MVL announcements.</span>
                           </p>
                         </td>
                       </tr>
@@ -374,7 +419,7 @@ const createEmailHtml = (submission: WaiverSubmission, teamName: string) => {
                 <!-- calendar -->
                 <tr>
                   <td style="padding:0 28px 12px;">
-                    <p style="margin:0 0 12px;color:${g.inkMuted};font:700 10px/1 ${monoFont};letter-spacing:2px;text-transform:uppercase;">Add to your calendar</p>
+                    <p class="x-muted" style="margin:0 0 12px;color:${g.inkMuted};font:700 10px/1 ${monoFont};letter-spacing:2px;text-transform:uppercase;">Add to your calendar</p>
                     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">${calendarRows}
                     </table>
                   </td>
@@ -385,12 +430,12 @@ const createEmailHtml = (submission: WaiverSubmission, teamName: string) => {
                   <td style="padding:8px 28px 32px;">
                     <table role="presentation" cellspacing="0" cellpadding="0" border="0">
                       <tr>
-                        <td bgcolor="${c.mint}" style="background-color:${c.mint};">
+                        <td class="x-cta" bgcolor="${c.mint}" style="background-color:${c.mint};">
                           <a href="${siteUrl}/mvl/rules" style="display:block;padding:15px 28px;color:${c.page};font:800 12px/1 ${uiFont};letter-spacing:1.8px;text-transform:uppercase;text-decoration:none;">Read the rules</a>
                         </td>
                       </tr>
                     </table>
-                    <p style="margin:18px 0 0;color:${g.inkMuted};font:400 13px/1.6 ${uiFont};">Schedules, standings and game-day announcements land on <a href="${mvlUrl}" style="color:${c.mint};font-weight:700;text-decoration:none;">metaricevolley.ph</a> and <a href="${instagramUrl}" style="color:${c.mint};font-weight:700;text-decoration:none;">@metaricevolley</a>.</p>
+                    <p class="x-muted" style="margin:18px 0 0;color:${g.inkMuted};font:400 13px/1.6 ${uiFont};">Schedules, standings and game-day announcements land on <a href="${mvlUrl}" class="x-mint" style="color:${c.mint};font-weight:700;text-decoration:none;">metaricevolley.ph</a> and <a href="${instagramUrl}" class="x-mint" style="color:${c.mint};font-weight:700;text-decoration:none;">@metaricevolley</a>.</p>
                   </td>
                 </tr>
               </table>
@@ -400,14 +445,14 @@ const createEmailHtml = (submission: WaiverSubmission, teamName: string) => {
           <!-- the agreed record, kept as fineprint -->
           <tr>
             <td style="padding:22px 6px 0;">
-              <p style="margin:0 0 10px;color:${c.inkFaint};font:700 9px/1 ${monoFont};letter-spacing:1.6px;text-transform:uppercase;">Your copy of what you agreed to</p>
+              <p class="x-fine" style="margin:0 0 10px;color:${c.inkFaint};font:700 9px/1 ${monoFont};letter-spacing:1.6px;text-transform:uppercase;">Your copy of what you agreed to</p>
               ${consentAndWaiverHtml}
             </td>
           </tr>
 
           <tr>
             <td style="padding:22px 6px 8px;border-top:1px solid ${c.hairline};">
-              <p style="margin:0;color:${c.inkFaint};font:400 11px/1.6 ${uiFont};">Metarice Volleyball League 2026 &middot; ${venue}<br>You're getting this because you signed the MVL 2026 player waiver. This is an automated confirmation email, so please do not reply. For official announcements, visit <a href="${mvlUrl}" style="color:${c.inkMuted};">${mvlUrl}</a> or follow <a href="${instagramUrl}" style="color:${c.inkMuted};">@metaricevolley</a>.</p>
+              <p class="x-fine" style="margin:0;color:${c.inkFaint};font:400 11px/1.6 ${uiFont};">Metarice Volleyball League 2026 &middot; ${venue}<br>You're getting this because you signed the MVL 2026 player waiver. This is an automated confirmation email, so please do not reply. For official announcements, visit <a class="x-fine-lead" href="${mvlUrl}" style="color:${c.inkMuted};">${mvlUrl}</a> or follow <a class="x-fine-lead" href="${instagramUrl}" style="color:${c.inkMuted};">@metaricevolley</a>.</p>
             </td>
           </tr>
         </table>
