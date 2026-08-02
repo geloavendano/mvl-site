@@ -886,10 +886,14 @@ a.home-standing-row:hover {
   padding: 18px 16px;
 }
 .team-card-name {
-  font-family: var(--stretch);
+  /* matches the schedule match-ups: Archivo 900 uppercase, not the condensed
+     display face — so the size drops accordingly to keep names on one line */
+  font-family: var(--ui);
+  font-weight: 900;
   text-transform: uppercase;
-  font-size: clamp(42px, 14vw, 70px);
-  line-height: .78;
+  font-size: clamp(20px, 6.4vw, 30px);
+  line-height: 1.05;
+  letter-spacing: .4px;
   color: #fff;
   white-space: nowrap;
   text-shadow: 0 5px 22px rgba(0, 0, 0, .45);
@@ -2034,7 +2038,7 @@ html[data-phase='gameday'] .nav-links a[data-phase='registration'] { display: no
     min-height: clamp(124px, calc((100svh - 250px) / 2), 164px);
     padding: 20px;
   }
-  .team-card-name { font-size: clamp(48px, 4.7vw, 82px); }
+  .team-card-name { font-size: clamp(18px, 1.6vw, 28px); }
   .team-card-photo {
     inset: -54px -4px -38px 36%;
   }
@@ -3686,14 +3690,15 @@ body.waiver-page .form-actions button.cta.cta--primary:focus-visible {
    diagonal streak "rain", keeping only the team accent bar and base vignette */
 .team-card--art::before { display: none; }
 .team-card--art::after {
-  background:
-    linear-gradient(180deg, var(--team-a) 0 4px, transparent 4px 100%),
-    linear-gradient(180deg, transparent 55%, rgba(0, 0, 0, .28) 100%);
+  background: linear-gradient(180deg, transparent 55%, rgba(0, 0, 0, .28) 100%);
 }
 /* The stock player is a single generic cutout in a green jersey — it repeats
    across all eight cards and fights the team artwork. Hidden until real
    per-team player cutouts exist; restoring it is one rule. */
 .team-card--art .team-card-photo { display: none; }
+/* the cutout is gone on artwork cards, so the name no longer has to share
+   width with it — reclaim the full card so long names stay on one line */
+.team-card--art .team-card-copy { width: 100%; }
 
 /* ==========================================================================
    Select fields — custom chevron
