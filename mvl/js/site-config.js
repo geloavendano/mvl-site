@@ -5,4 +5,10 @@
 //                    Rules, Registration)
 //
 // Flipping this is one of the two game-day edits — see HANDOFF.md.
-window.MVL_SITE = { phase: 'registration' };
+//
+// Add the GA4 Measurement ID once the Google Analytics web stream is ready.
+// Example: gaMeasurementId: 'G-XXXXXXXXXX'
+window.MVL_SITE = {
+  phase: 'registration',
+  gaMeasurementId: 'G-4150LLQDCJ',
+};
