@@ -241,7 +241,7 @@ const fineHeading = (label: string) =>
 const consentAndWaiverHtml = [
   fineHeading('Data Privacy'),
   finePara('Your details help us run the tournament: setting the schedule, keeping you posted on your games, and reaching your emergency contact if anything happens on court.'),
-  finePara('MVL runs on the support of our official partners and sponsors, the same ones behind your jerseys, the raffle prizes, and the game-day giveaways. As part of joining, we share your name and email address with them so they can send you their offers, promos, and player perks.'),
+  finePara('MVL runs on the support of our official partners and sponsors, the same ones behind your jerseys, the raffle prizes, and the game-day giveaways. As part of joining, we share your name and email address with requesting sponsors so they can send you their offers, promos, and player perks.'),
   finePara(`You stay in control. Message us anytime at <a href="https://instagram.com/metaricevolley" style="color:${c.inkMuted};">@metaricevolley</a> to access, correct, or delete your information, or to stop hearing from our sponsors.`),
   finePara('By submitting the form, you consent to this use of your data.'),
   fineHeading('Waiver and Release of Liability'),
@@ -259,7 +259,7 @@ const consentAndWaiverText = `
 Data Privacy
 Your details help us run the tournament: setting the schedule, keeping you posted on your games, and reaching your emergency contact if anything happens on court.
 
-MVL runs on the support of our official partners and sponsors, the same ones behind your jerseys, the raffle prizes, and the game-day giveaways. As part of joining, we share your name and email address with them so they can send you their offers, promos, and player perks.
+MVL runs on the support of our official partners and sponsors, the same ones behind your jerseys, the raffle prizes, and the game-day giveaways. As part of joining, we share your name and email address with requesting sponsors so they can send you their offers, promos, and player perks.
 
 You stay in control. Message us anytime at @metaricevolley to access, correct, or delete your information, or to stop hearing from our sponsors.
 

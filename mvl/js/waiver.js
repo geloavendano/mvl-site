@@ -19,6 +19,7 @@ const relationshipOtherInput = document.getElementById('relationshipOtherInput')
 const formStatus = document.getElementById('formStatus');
 const supabase = window.MVL_SUPABASE;
 let playerLoadId = 0;
+const playerNotFoundValue = '__player_not_found__';
 
 waiverTeams.forEach((team) => {
   const option = document.createElement('option');
@@ -70,7 +71,7 @@ const applyTeamAccent = () => {
 teamSelect.addEventListener('change', applyTeamAccent);
 applyTeamAccent();
 
-const setPlayerOptions = (message, players = []) => {
+const setPlayerOptions = (message, players = [], { allowMissing = false } = {}) => {
   playerSelect.replaceChildren();
   const placeholder = document.createElement('option');
   placeholder.value = '';
@@ -86,7 +87,19 @@ const setPlayerOptions = (message, players = []) => {
     playerSelect.append(option);
   });
 
-  playerSelect.disabled = players.length === 0;
+  if (allowMissing) {
+    const missingOption = document.createElement('option');
+    missingOption.value = playerNotFoundValue;
+    missingOption.textContent = "I can't find my name";
+    playerSelect.append(missingOption);
+  }
+
+  playerSelect.disabled = players.length === 0 && !allowMissing;
+};
+
+const showPlayerNotFoundHint = () => {
+  playerSelectHint.textContent = 'Ask your Team Captain to add you to the official roster, then come back and submit your waiver.';
+  playerSelectHint.classList.add('is-error');
 };
 
 const loadTeamPlayers = async () => {
@@ -127,13 +140,13 @@ const loadTeamPlayers = async () => {
     if (requestId !== playerLoadId) return;
 
     if (!Array.isArray(players) || players.length === 0) {
-      setPlayerOptions('No registered players for this team');
-      playerSelectHint.textContent = 'Ask your team representative to add the player to the official roster.';
+      setPlayerOptions('Select an option', [], { allowMissing: true });
+      playerSelectHint.textContent = "Can't find yourself? Choose the option below for next steps.";
       return;
     }
 
-    setPlayerOptions('Select your name', players);
-    playerSelectHint.textContent = `${players.length} registered player${players.length === 1 ? '' : 's'} found.`;
+    setPlayerOptions('Select your name', players, { allowMissing: true });
+    playerSelectHint.textContent = `${players.length} registered player${players.length === 1 ? '' : 's'} found. If you can't find yourself, choose "I can't find my name."`;
   } catch (error) {
     if (requestId !== playerLoadId) return;
     setPlayerOptions('Unable to load players');
@@ -143,6 +156,14 @@ const loadTeamPlayers = async () => {
 };
 
 teamSelect.addEventListener('change', loadTeamPlayers);
+playerSelect.addEventListener('change', () => {
+  playerSelectHint.classList.remove('is-error');
+  if (playerSelect.value === playerNotFoundValue) {
+    showPlayerNotFoundHint();
+  } else if (teamSelect.value && !playerSelect.disabled) {
+    playerSelectHint.textContent = "Players are loaded from the selected team's registered roster.";
+  }
+});
 
 const syncRelationshipOther = () => {
   const needsOther = relationshipSelect.value === 'Other';
@@ -216,6 +237,14 @@ form.addEventListener('submit', async (event) => {
     formStatus.textContent = 'Select your team and your name from the registered player list.';
     formStatus.classList.add('is-error');
     (teamSelect.value && !playerSelect.disabled ? playerSelect : teamSelect).focus();
+    return;
+  }
+
+  if (playerSelect.value === playerNotFoundValue) {
+    showPlayerNotFoundHint();
+    formStatus.textContent = 'Ask your Team Captain to add you to the official roster before submitting your waiver.';
+    formStatus.classList.add('is-error');
+    playerSelect.focus();
     return;
   }
 
