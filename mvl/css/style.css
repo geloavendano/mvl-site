@@ -3908,10 +3908,9 @@ body:not(.teaser-page) {
 
 .schedule-preview {
   background:
-    conic-gradient(from 228deg at 86% 18%, rgba(255, 255, 255, .78) 0 12deg, transparent 12deg 360deg),
-    linear-gradient(118deg, rgba(156, 240, 227, .9) 0 24%, transparent 24.4% 100%),
-    linear-gradient(148deg, transparent 0 58%, rgba(207, 246, 101, .8) 58.4% 76%, transparent 76.4% 100%),
-    linear-gradient(132deg, var(--poster-mint) 0%, #48CBEA 36%, var(--poster-blue) 70%, var(--poster-navy) 100%);
+    radial-gradient(circle at 18% 14%, rgba(156, 240, 227, .72) 0%, transparent 34%),
+    radial-gradient(circle at 82% 88%, rgba(207, 246, 101, .46) 0%, transparent 36%),
+    linear-gradient(132deg, var(--poster-mint) 0%, #48CBEA 34%, var(--poster-blue) 68%, var(--poster-navy) 100%);
 }
 .schedule-preview::before {
   opacity: 0;
@@ -3920,9 +3919,9 @@ body:not(.teaser-page) {
 
 .games {
   background:
-    linear-gradient(112deg, transparent 0 54%, rgba(255, 71, 51, .86) 54.4% 100%),
-    linear-gradient(22deg, rgba(207, 246, 101, .76) 0 18%, transparent 18.4% 100%),
-    linear-gradient(145deg, var(--poster-aqua) 0%, var(--poster-green) 32%, var(--poster-blue) 68%, var(--poster-violet) 100%);
+    radial-gradient(circle at 16% 18%, rgba(207, 246, 101, .52) 0%, transparent 30%),
+    radial-gradient(circle at 88% 78%, rgba(255, 71, 51, .52) 0%, transparent 38%),
+    linear-gradient(145deg, var(--poster-aqua) 0%, var(--poster-green) 30%, var(--poster-blue) 66%, var(--poster-violet) 100%);
 }
 .games-bg {
   display: none;
@@ -3937,9 +3936,9 @@ body:not(.teaser-page) {
 
 .teams {
   background:
-    linear-gradient(90deg, rgba(207, 246, 101, .82) 0 18%, transparent 18.4% 100%),
-    linear-gradient(154deg, transparent 0 62%, rgba(156, 240, 227, .72) 62.4% 100%),
-    linear-gradient(135deg, var(--poster-blue) 0%, var(--poster-electric) 44%, var(--poster-mint) 100%);
+    radial-gradient(circle at 14% 12%, rgba(207, 246, 101, .5) 0%, transparent 32%),
+    radial-gradient(circle at 86% 82%, rgba(58, 223, 180, .58) 0%, transparent 38%),
+    linear-gradient(135deg, var(--poster-blue) 0%, var(--poster-electric) 45%, var(--poster-mint) 100%);
 }
 .teams::before {
   opacity: 0;
@@ -3948,9 +3947,9 @@ body:not(.teaser-page) {
 
 .rules-preview {
   background:
-    linear-gradient(90deg, transparent 0 54%, rgba(242, 56, 167, .72) 54.4% 100%),
-    linear-gradient(150deg, rgba(140, 131, 250, .86) 0 34%, transparent 34.4% 100%),
-    linear-gradient(144deg, var(--poster-navy) 0%, var(--poster-blue) 48%, var(--poster-aqua) 100%);
+    radial-gradient(circle at 18% 16%, rgba(140, 131, 250, .62) 0%, transparent 32%),
+    radial-gradient(circle at 84% 24%, rgba(242, 56, 167, .34) 0%, transparent 34%),
+    linear-gradient(144deg, var(--poster-navy) 0%, var(--poster-blue) 50%, var(--poster-aqua) 100%);
 }
 .rules-preview::before {
   content: none;
