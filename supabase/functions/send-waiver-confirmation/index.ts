@@ -152,7 +152,15 @@ const createIcs = () => {
   return `${lines.map(foldIcsLine).join('\r\n')}\r\n`;
 };
 
-const base64 = (value: string) => btoa(value);
+const base64 = (value: string) => {
+  const bytes = encoder.encode(value);
+  let binary = '';
+  const chunkSize = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+  }
+  return btoa(binary);
+};
 
 // dates keeps its literal "/" and spaces encode as %20, matching the links
 // already shipped on gametime.html. URLSearchParams would emit %2F and "+";
