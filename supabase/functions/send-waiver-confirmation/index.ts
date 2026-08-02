@@ -6,9 +6,10 @@ const corsHeaders = {
 
 const eventDates = 'August 29, 30, 31 and September 5, 6, 2026';
 const venue = 'Gameville Ball Park';
-const venueMapUrl = 'https://maps.app.goo.gl/sK1HuKBVwRSZPpHz9';
 const siteUrl = Deno.env.get('MVL_SITE_URL') ?? 'https://metaricevolley.ph';
-const defaultFrom = 'MVL 2026 <registration@metaricevolley.ph>';
+const mvlUrl = `${siteUrl}/mvl`;
+const instagramUrl = 'https://instagram.com/metaricevolley';
+const defaultFrom = 'MVL 2026 <mingu@metaricevolley.ph>';
 
 // Palette lifted from css/style.css :root so the email reads as the same
 // system as the site. Muted inks are pre-flattened against the card fill —
@@ -133,7 +134,8 @@ const createIcs = () => {
     'DTEND;VALUE=DATE:20260901',
     'SUMMARY:MVL 2026 Weekend 1',
     `LOCATION:${venue}`,
-    'DESCRIPTION:Metarice Volleyball League 2026 at Gameville Ball Park.',
+    `DESCRIPTION:Metarice Volleyball League 2026 — game days 1-3.\\nOfficial website: ${mvlUrl}\\nInstagram: ${instagramUrl}`,
+    `URL:${mvlUrl}`,
     'END:VEVENT',
     'BEGIN:VEVENT',
     'UID:mvl-2026-weekend-2@metaricevolley.ph',
@@ -142,7 +144,8 @@ const createIcs = () => {
     'DTEND;VALUE=DATE:20260907',
     'SUMMARY:MVL 2026 Weekend 2',
     `LOCATION:${venue}`,
-    'DESCRIPTION:Metarice Volleyball League 2026 at Gameville Ball Park.',
+    `DESCRIPTION:Metarice Volleyball League 2026 — game days 4-5.\\nOfficial website: ${mvlUrl}\\nInstagram: ${instagramUrl}`,
+    `URL:${mvlUrl}`,
     'END:VEVENT',
     'END:VCALENDAR',
   ];
@@ -161,7 +164,7 @@ const googleCalendarUrl = (label: string, dates: string, detail: string) => {
     `&text=${q(label)}` +
     `&dates=${dates}` +
     `&location=${q(venue)}` +
-    `&details=${q(`${detail}\nVenue: ${venueMapUrl}`)}`;
+    `&details=${q(`${detail}\nOfficial website: ${mvlUrl}\nInstagram: ${instagramUrl}`)}`;
 };
 
 const calendarLinks = [
@@ -332,8 +335,8 @@ const createEmailHtml = (submission: WaiverSubmission, teamName: string) => {
                           <p style="margin:0 0 4px;color:#FFFFFF;font:800 21px/1.25 ${uiFont};letter-spacing:-.2px;">Aug 29, 30, 31</p>
                           <p style="margin:0 0 14px;color:#FFFFFF;font:800 21px/1.25 ${uiFont};letter-spacing:-.2px;">Sep 5, 6 &middot; 2026</p>
                           <p style="margin:0;padding-top:14px;border-top:1px solid ${c.hairline};color:${c.inkMuted};font:400 13px/1.5 ${uiFont};">
-                            <a href="${venueMapUrl}" style="color:${c.mint};font-weight:700;text-decoration:none;">${venue} &rarr;</a><br>
-                            <span style="color:${c.inkFaint};font-size:12px;">Tap for directions on Google Maps</span>
+                            <span style="color:${c.mint};font-weight:700;text-decoration:none;">${venue}</span><br>
+                            <span style="color:${c.inkFaint};font-size:12px;">Use the links below for official MVL announcements.</span>
                           </p>
                         </td>
                       </tr>
@@ -360,7 +363,7 @@ const createEmailHtml = (submission: WaiverSubmission, teamName: string) => {
                         </td>
                       </tr>
                     </table>
-                    <p style="margin:18px 0 0;color:${c.inkMuted};font:400 13px/1.6 ${uiFont};">Schedules, standings and game-day announcements land on <a href="${siteUrl}/mvl" style="color:${c.mint};font-weight:700;text-decoration:none;">metaricevolley.ph</a> and <a href="https://instagram.com/metaricevolley" style="color:${c.mint};font-weight:700;text-decoration:none;">@metaricevolley</a>.</p>
+                    <p style="margin:18px 0 0;color:${c.inkMuted};font:400 13px/1.6 ${uiFont};">Schedules, standings and game-day announcements land on <a href="${mvlUrl}" style="color:${c.mint};font-weight:700;text-decoration:none;">metaricevolley.ph</a> and <a href="${instagramUrl}" style="color:${c.mint};font-weight:700;text-decoration:none;">@metaricevolley</a>.</p>
                   </td>
                 </tr>
               </table>
@@ -377,7 +380,7 @@ const createEmailHtml = (submission: WaiverSubmission, teamName: string) => {
 
           <tr>
             <td style="padding:22px 6px 8px;border-top:1px solid ${c.hairline};">
-              <p style="margin:0;color:${c.inkFaint};font:400 11px/1.6 ${uiFont};">Metarice Volleyball League 2026 &middot; ${venue}<br>You're getting this because you signed the MVL 2026 player waiver.</p>
+              <p style="margin:0;color:${c.inkFaint};font:400 11px/1.6 ${uiFont};">Metarice Volleyball League 2026 &middot; ${venue}<br>You're getting this because you signed the MVL 2026 player waiver. This is an automated confirmation email, so please do not reply. For official announcements, visit <a href="${mvlUrl}" style="color:${c.inkMuted};">${mvlUrl}</a> or follow <a href="${instagramUrl}" style="color:${c.inkMuted};">@metaricevolley</a>.</p>
             </td>
           </tr>
         </table>
@@ -400,14 +403,16 @@ SAVE THE DATES
 ${eventDates}
 
 ${venue}
-Directions: ${venueMapUrl}
 
 ADD TO YOUR CALENDAR
 ${calendarLinks.map((link) => `${link.plain}\n${link.href}`).join('\n\n')}
 
 Rules: ${siteUrl}/mvl/rules
-Site: ${siteUrl}/mvl
-Instagram: https://instagram.com/metaricevolley
+Site: ${mvlUrl}
+Instagram: ${instagramUrl}
+
+This is an automated confirmation email, so please do not reply. For official
+announcements, visit ${mvlUrl} or follow @metaricevolley.
 
 --
 YOUR COPY OF WHAT YOU AGREED TO

@@ -86,14 +86,15 @@ granted to anon or authenticated users. The email includes:
 - MVL registration confirmation and team name
 - Google Calendar links for both MVL weekends
 - `MVL-2026-Save-the-Dates.ics` as an Apple/Outlook/device calendar attachment
-- Instagram and website announcement links
+- Instagram and website announcement links in the email and calendar metadata
 - the full Data Privacy, consent, waiver, and release text agreed to on submit
+- an automated-email / no-reply note
 
 Set these function secrets before relying on email delivery:
 
 ```bash
 supabase secrets set RESEND_API_KEY=re_...
-supabase secrets set MVL_EMAIL_FROM="MVL 2026 <registration@metaricevolley.ph>"
+supabase secrets set MVL_EMAIL_FROM="MVL 2026 <mingu@metaricevolley.ph>"
 supabase secrets set MVL_SITE_URL="https://metaricevolley.ph"
 ```
 
@@ -109,7 +110,7 @@ Deploy the function with:
 supabase functions deploy send-waiver-confirmation
 ```
 
-`registration@metaricevolley.ph` must be configured on a verified Resend domain
+`mingu@metaricevolley.ph` must be configured on a verified Resend domain
 before Resend will send from it in production.
 
 ## Score Entry
