@@ -3685,7 +3685,8 @@ body.waiver-page .form-actions button.cta.cta--primary:focus-visible {
    Falls back to the gradient treatment for any team without a `bg`.
    ========================================================================== */
 .team-card--art {
-  min-height: 190px;
+  min-height: 0;
+  aspect-ratio: .82;
   border: 0;
   border-radius: 0 44px 0 44px;
   background-image:
@@ -3710,7 +3711,7 @@ body.waiver-page .form-actions button.cta.cta--primary:focus-visible {
 .team-card--art .team-card-photo { display: none; }
 .team-card-player-slot {
   position: absolute;
-  inset: 8px 50px 0 8px;
+  inset: 8px 48px 0 8px;
   z-index: 2;
   pointer-events: none;
 }
@@ -3739,9 +3740,39 @@ body.waiver-page .form-actions button.cta.cta--primary:focus-visible {
   transform: rotate(180deg);
 }
 
-@media (min-width: 960px) {
+@media (max-width: 959px) {
+  .teams-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 10px;
+    padding: 0 14px;
+  }
   .team-card--art {
-    min-height: clamp(168px, calc((100svh - 250px) / 2), 220px);
+    border-radius: 0 36px 0 36px;
+  }
+  .team-card--art:nth-child(4n + 3),
+  .team-card--art:nth-child(4n + 4) {
+    translate: 10px 0;
+  }
+  .team-card--art .team-card-copy {
+    width: 48px;
+    border-radius: 0 36px 0 0;
+  }
+  .team-card--art .team-card-name {
+    font-size: clamp(13px, 3.65vw, 16px);
+    letter-spacing: .7px;
+  }
+}
+
+@media (min-width: 960px) {
+  .teams-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    max-width: 1040px;
+    margin: 0 auto;
+    gap: 22px 18px;
+  }
+  .team-card--art {
+    min-height: 0;
+    aspect-ratio: .82;
     border-radius: 0 52px 0 52px;
     background-image:
       linear-gradient(90deg, rgba(255, 255, 255, 0) 0 calc(100% - 64px), #f5f7f2 calc(100% - 64px) 100%),
@@ -3757,6 +3788,9 @@ body.waiver-page .form-actions button.cta.cta--primary:focus-visible {
   }
   .team-card--art .team-card-name {
     font-size: clamp(18px, 1.6vw, 24px);
+  }
+  .team-card--art:nth-child(n + 5) {
+    translate: clamp(48px, 6vw, 80px) 0;
   }
 }
 
