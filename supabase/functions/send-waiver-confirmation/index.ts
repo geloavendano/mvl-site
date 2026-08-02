@@ -34,17 +34,17 @@ const c = {
 // outright. Panel fills are translucent so they read against the whole ramp,
 // each with an opaque bgcolor twin for the same reason.
 const g = {
-  ramp: 'linear-gradient(160deg,#1D4ED8 0%,#6D28D9 52%,#A21CAF 100%)',
-  solid: '#6D28D9',
-  // Both fills darken rather than lighten. A white-tinted chip raised the
-  // background faster than the ink could follow — 11px note text bottomed out
-  // at 2.9:1 against it, and even a near-white ink only reached 4.3:1.
-  panelFill: 'rgba(9,5,42,.32)',
-  panelSolid: '#3E2192',
-  chipFill: 'rgba(9,5,42,.24)',
-  chipSolid: '#5C1EA9',
-  edge: 'rgba(255,255,255,.26)',
-  chipEdge: 'rgba(255,255,255,.34)',
+  // The ramp is four solid bands, not a gradient. A background-image survives a
+  // client's forced dark theme while the text colour does not — which is exactly
+  // how Gmail iOS ended up painting grey headlines on untouched violet. Solid
+  // background-colors invert together with the text, so where the lock in the
+  // <style> block fails the block still reads: different colours, still legible.
+  // Sampled down the old blue → violet → magenta ramp, one per section.
+  band: ['#264AD8', '#5434D9', '#7C24CD', '#9B1EB4'],
+  panel: '#342086',
+  panelEdge: '#4B32A8',
+  chip: '#571A8F',
+  chipEdge: '#7040B0',
   ink: '#FFFFFF',
   inkMuted: '#E4DCFF',
   inkFaint: '#C3B6EE',
@@ -294,11 +294,11 @@ const createEmailHtml = (submission: WaiverSubmission, teamName: string) => {
   const fullName = `${submission.first_name} ${submission.last_name}`.trim();
   const safeName = escapeHtml(fullName || 'Metarice friend');
   const safeTeam = escapeHtml(teamName);
-  const [teamA, teamB] = teamColors[submission.team_id] ?? [c.mint, c.teal];
+  const [teamA] = teamColors[submission.team_id] ?? [c.mint];
 
   const calendarRows = calendarLinks.map((link) => `
               <tr>
-                <td class="x-chip" bgcolor="${g.chipSolid}" style="background-color:${g.chipFill};border:1px solid ${g.chipEdge};">
+                <td class="x-chip" bgcolor="${g.chip}" style="background-color:${g.chip};border:1px solid ${g.chipEdge};">
                   <a href="${link.href}" style="display:block;padding:13px 16px;text-decoration:none;">
                     <span class="x-ink" style="display:block;color:${g.ink};font:800 13px/1.3 ${uiFont};letter-spacing:.4px;">${link.title} &rarr;</span>
                     <span class="x-faint" style="display:block;margin-top:3px;color:${g.inkFaint};font:400 11px/1.4 ${uiFont};">${link.note}</span>
@@ -329,11 +329,14 @@ const createEmailHtml = (submission: WaiverSubmission, teamName: string) => {
      inline style, which is the only lever left. */
   @media (prefers-color-scheme: dark) {
     .x-page  { background-color: ${c.page} !important; }
-    .x-block { background-color: ${g.solid} !important; background-image: ${g.ramp} !important; }
-    .x-panel { background-color: ${g.panelFill} !important; }
-    .x-chip  { background-color: ${g.chipFill} !important; }
+    .x-b1    { background-color: ${g.band[0]} !important; }
+    .x-b2    { background-color: ${g.band[1]} !important; }
+    .x-b3    { background-color: ${g.band[2]} !important; }
+    .x-b4    { background-color: ${g.band[3]} !important; }
+    .x-panel { background-color: ${g.panel} !important; }
+    .x-chip  { background-color: ${g.chip} !important; }
     .x-cta   { background-color: ${c.mint} !important; }
-    .x-dot   { background-color: ${teamA} !important; background-image: linear-gradient(135deg,${teamA},${teamB}) !important; }
+    .x-dot   { background-color: ${teamA} !important; }
     .x-cta a { color: ${c.page} !important; }
     .x-ink, .x-ink a           { color: ${g.ink} !important; }
     .x-muted, .x-muted a       { color: ${g.inkMuted} !important; }
@@ -354,9 +357,12 @@ const createEmailHtml = (submission: WaiverSubmission, teamName: string) => {
   [data-ogsc] .x-fine-lead                     { color: ${c.inkMuted} !important; }
   [data-ogsc] .x-cta a                         { color: ${c.page} !important; }
   [data-ogsb] .x-page  { background-color: ${c.page} !important; }
-  [data-ogsb] .x-block { background-color: ${g.solid} !important; }
-  [data-ogsb] .x-panel { background-color: ${g.panelSolid} !important; }
-  [data-ogsb] .x-chip  { background-color: ${g.chipSolid} !important; }
+  [data-ogsb] .x-b1    { background-color: ${g.band[0]} !important; }
+  [data-ogsb] .x-b2    { background-color: ${g.band[1]} !important; }
+  [data-ogsb] .x-b3    { background-color: ${g.band[2]} !important; }
+  [data-ogsb] .x-b4    { background-color: ${g.band[3]} !important; }
+  [data-ogsb] .x-panel { background-color: ${g.panel} !important; }
+  [data-ogsb] .x-chip  { background-color: ${g.chip} !important; }
   [data-ogsb] .x-cta   { background-color: ${c.mint} !important; }
   [data-ogsb] .x-dot   { background-color: ${teamA} !important; }
 </style>
@@ -377,10 +383,10 @@ const createEmailHtml = (submission: WaiverSubmission, teamName: string) => {
 
           <!-- confirmation block: key-art gradient, hard edges throughout -->
           <tr>
-            <td class="x-block" bgcolor="${g.solid}" style="background-color:${g.solid};background-image:${g.ramp};">
+            <td bgcolor="${g.band[0]}" style="background-color:${g.band[0]};">
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                 <tr>
-                  <td style="padding:32px 28px 26px;">
+                  <td class="x-b1" bgcolor="${g.band[0]}" style="background-color:${g.band[0]};padding:32px 28px 26px;">
                     <p class="x-mint" style="margin:0 0 12px;color:${c.mint};font:700 10px/1 ${monoFont};letter-spacing:2.4px;text-transform:uppercase;">Registration confirmed</p>
                     <!-- 34px uppercase leaves ~319px of content box on a 375px
                          client; a long surname is one unbreakable word wider
@@ -389,7 +395,7 @@ const createEmailHtml = (submission: WaiverSubmission, teamName: string) => {
                     <h1 class="x-ink" style="margin:0 0 18px;color:${g.ink};font:800 34px/1.04 ${uiFont};letter-spacing:-.6px;text-transform:uppercase;overflow-wrap:break-word;word-wrap:break-word;">You're in,<br>${safeName}</h1>
                     <table role="presentation" cellspacing="0" cellpadding="0" border="0">
                       <tr>
-                        <td class="x-dot" width="11" bgcolor="${teamA}" style="width:11px;height:11px;line-height:11px;font-size:0;background-color:${teamA};background-image:linear-gradient(135deg,${teamA},${teamB});border-radius:999px;">&nbsp;</td>
+                        <td class="x-dot" width="11" bgcolor="${teamA}" style="width:11px;height:11px;line-height:11px;font-size:0;background-color:${teamA};border-radius:999px;">&nbsp;</td>
                         <td class="x-ink" style="padding-left:9px;color:${g.ink};font:800 11px/1 ${uiFont};letter-spacing:2px;text-transform:uppercase;white-space:nowrap;">${safeTeam}</td>
                       </tr>
                     </table>
@@ -399,14 +405,14 @@ const createEmailHtml = (submission: WaiverSubmission, teamName: string) => {
 
                 <!-- when & where -->
                 <tr>
-                  <td style="padding:0 28px 26px;">
-                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" class="x-panel" bgcolor="${g.panelSolid}" style="background-color:${g.panelFill};border:1px solid ${g.edge};">
+                  <td class="x-b2" bgcolor="${g.band[1]}" style="background-color:${g.band[1]};padding:0 28px 26px;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" class="x-panel" bgcolor="${g.panel}" style="background-color:${g.panel};border:1px solid ${g.panelEdge};">
                       <tr>
                         <td style="padding:20px;">
                           <p class="x-mint" style="margin:0 0 10px;color:${c.mint};font:700 10px/1 ${monoFont};letter-spacing:2px;text-transform:uppercase;">Save the dates</p>
                           <p class="x-ink" style="margin:0 0 4px;color:${g.ink};font:800 22px/1.22 ${uiFont};letter-spacing:-.2px;text-transform:uppercase;">Aug 29, 30, 31</p>
                           <p class="x-ink" style="margin:0 0 14px;color:${g.ink};font:800 22px/1.22 ${uiFont};letter-spacing:-.2px;text-transform:uppercase;">Sep 5, 6 &middot; 2026</p>
-                          <p class="x-muted" style="margin:0;padding-top:14px;border-top:1px solid ${g.edge};color:${g.inkMuted};font:400 13px/1.5 ${uiFont};">
+                          <p class="x-muted" style="margin:0;padding-top:14px;border-top:1px solid ${g.panelEdge};color:${g.inkMuted};font:400 13px/1.5 ${uiFont};">
                             <span class="x-ink" style="color:${g.ink};font-weight:800;letter-spacing:1px;text-transform:uppercase;">${venue}</span><br>
                             <span class="x-faint" style="color:${g.inkFaint};font-size:12px;">Use the links below for official MVL announcements.</span>
                           </p>
@@ -418,7 +424,7 @@ const createEmailHtml = (submission: WaiverSubmission, teamName: string) => {
 
                 <!-- calendar -->
                 <tr>
-                  <td style="padding:0 28px 12px;">
+                  <td class="x-b3" bgcolor="${g.band[2]}" style="background-color:${g.band[2]};padding:0 28px 12px;">
                     <p class="x-muted" style="margin:0 0 12px;color:${g.inkMuted};font:700 10px/1 ${monoFont};letter-spacing:2px;text-transform:uppercase;">Add to your calendar</p>
                     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">${calendarRows}
                     </table>
@@ -427,7 +433,7 @@ const createEmailHtml = (submission: WaiverSubmission, teamName: string) => {
 
                 <!-- next step -->
                 <tr>
-                  <td style="padding:8px 28px 32px;">
+                  <td class="x-b4" bgcolor="${g.band[3]}" style="background-color:${g.band[3]};padding:8px 28px 32px;">
                     <table role="presentation" cellspacing="0" cellpadding="0" border="0">
                       <tr>
                         <td class="x-cta" bgcolor="${c.mint}" style="background-color:${c.mint};">
