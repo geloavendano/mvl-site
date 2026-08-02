@@ -85,6 +85,12 @@
         </label>
 
         <label class="field field--wide">
+          <span>Instagram Handle <small>(optional)</small></span>
+          <input name="instagram_handle" type="text" inputmode="text" autocomplete="off" placeholder="@yourhandle" pattern="^@?[A-Za-z0-9._]{1,30}$" maxlength="31">
+          <small>Follow <a href="https://instagram.com/metaricevolley" target="_blank" rel="noopener">@metaricevolley</a> for official announcements, game-day updates, and highlights.</small>
+        </label>
+
+        <label class="field field--wide">
           <span>Are you a furparent?</span>
           <select name="fur_parent" required>
             <option value="">Select one</option>
@@ -198,6 +204,6 @@
 
 <script src="/mvl/js/league-data.js"></script>
 <script src="/mvl/js/supabase-config.js"></script>
-<script src="/mvl/js/waiver.js?v=waiver-organizer-test"></script>
+<script src="/mvl/js/waiver.js?v=waiver-instagram-handle"></script>
 </body>
 </html>
