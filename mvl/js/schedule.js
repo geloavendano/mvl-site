@@ -2,12 +2,12 @@ const { teams, games } = window.MVL_DATA;
 const teamById = Object.fromEntries(teams.map((team) => [team.id, team]));
 const playoffGameIds = new Set(['qf1', 'qf2', 'qf3', 'qf4', 'sf1', 'sf2', 'bronze', 'final']);
 const playoffNotes = {
-  qf1: { round: 'Quarter-Final 1', matchup: '3rd vs 6th' },
-  qf2: { round: 'Quarter-Final 2', matchup: '4th vs 5th' },
-  qf3: { round: 'Quarter-Final 3', matchup: '2nd vs 7th' },
-  qf4: { round: 'Quarter-Final 4', matchup: '1st vs 8th' },
-  sf1: { round: 'Semi-Final 1', matchup: 'Winner QF1 vs Winner QF4' },
-  sf2: { round: 'Semi-Final 2', matchup: 'Winner QF2 vs Winner QF3' },
+  qf1: { round: 'Quarterfinal 1', matchup: '3rd vs 6th' },
+  qf2: { round: 'Quarterfinal 2', matchup: '4th vs 5th' },
+  qf3: { round: 'Quarterfinal 3', matchup: '2nd vs 7th' },
+  qf4: { round: 'Quarterfinal 4', matchup: '1st vs 8th' },
+  sf1: { round: 'Semifinal 1', matchup: 'Winner QF1 vs Winner QF4' },
+  sf2: { round: 'Semifinal 2', matchup: 'Winner QF2 vs Winner QF3' },
   bronze: { round: 'Battle for Bronze', matchup: 'Loser SF1 vs Loser SF2' },
   final: { round: 'Championship Match', matchup: 'Winner SF1 vs Winner SF2' },
 };
