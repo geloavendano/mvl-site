@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/mvl/css/style.css?v=v3-carousel-pages">
+<link rel="stylesheet" href="/mvl/css/style.css?v=schedule-filter-dates">
 <script src="/mvl/js/site-config.js"></script>
 <script src="/mvl/js/analytics.js"></script>
 <script src="/mvl/js/nav.js"></script>
@@ -65,7 +65,10 @@
       <div>
         <h2 id="scheduleTitle">Games</h2>
       </div>
-      <a class="schedule-video-link" href="/mvl/videos.html">Latest Videos</a>
+      <label class="schedule-team-filter">
+        <span>Team Filter</span>
+        <select id="teamFilter" aria-label="Filter games by team"></select>
+      </label>
     </div>
 
     <div class="day-tabs" id="dayTabs" role="tablist" aria-label="Schedule days"></div>
@@ -94,6 +97,6 @@
 
 <script src="/mvl/js/league-data.js"></script>
 <script src="/mvl/js/supabase-config.js"></script>
-<script src="/mvl/js/public-data.js" data-entry="schedule"></script>
+<script src="/mvl/js/public-data.js?v=schedule-filter-dates" data-entry="schedule" data-version="schedule-filter-dates"></script>
 </body>
 </html>

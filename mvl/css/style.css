@@ -1599,8 +1599,7 @@ html[data-phase='gameday'] .nav-links a[data-phase='registration'] { display: no
   line-height: .82;
   text-transform: uppercase;
 }
-.schedule-note,
-.schedule-video-link {
+.schedule-note {
   max-width: 260px;
   font-family: var(--mono);
   font-size: 9px;
@@ -1609,9 +1608,29 @@ html[data-phase='gameday'] .nav-links a[data-phase='registration'] { display: no
   text-transform: uppercase;
   color: var(--ink-muted);
 }
-.schedule-video-link {
+.schedule-team-filter {
+  display: grid;
+  gap: 7px;
+  min-width: min(260px, 42vw);
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
   color: var(--mint);
-  text-align: right;
+  text-align: left;
+}
+.schedule-team-filter select {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid rgba(124, 245, 180, .22);
+  border-radius: var(--control-radius);
+  background: rgba(4, 9, 15, .56);
+  color: var(--ink);
+  font: 800 12px var(--ui);
+  letter-spacing: .4px;
+  padding: 0 38px 0 13px;
+  outline: none;
 }
 .schedule-note--mobile { display: none; }
 
@@ -1632,10 +1651,10 @@ html[data-phase='gameday'] .nav-links a[data-phase='registration'] { display: no
     margin-top: 10px;
     text-align: left;
   }
-  .schedule-video-link {
-    display: inline-flex;
-    margin-top: 10px;
-    text-align: left;
+  .schedule-team-filter {
+    width: 100%;
+    min-width: 0;
+    margin: 16px 0 0;
   }
 }
 
@@ -1688,6 +1707,7 @@ html[data-phase='gameday'] .nav-links a[data-phase='registration'] { display: no
   min-width: 0;
   min-height: 74px;
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   font: 900 clamp(10px, 2.55vw, 13px) var(--ui);
@@ -1698,6 +1718,16 @@ html[data-phase='gameday'] .nav-links a[data-phase='registration'] { display: no
   transition: background .15s ease, color .15s ease;
   white-space: nowrap;
 }
+.day-tab-label,
+.day-tab-date {
+  display: block;
+}
+.day-tab-date {
+  margin-top: 5px;
+  font: 700 10px var(--mono);
+  letter-spacing: 1.1px;
+  color: rgba(255, 255, 255, .58);
+}
 .day-tab:last-child {
   border-right: 0;
 }
@@ -1705,11 +1735,26 @@ html[data-phase='gameday'] .nav-links a[data-phase='registration'] { display: no
   background: linear-gradient(135deg, #75efaa 0%, #20cfca 100%);
   color: var(--navy);
 }
+.day-tab.is-active .day-tab-date {
+  color: rgba(16, 8, 54, .68);
+}
 
 .match-list {
   display: grid;
   gap: 14px;
   padding: 16px;
+}
+.match-empty {
+  margin: 0;
+  border: 1px solid rgba(124, 245, 180, .18);
+  border-radius: var(--control-radius);
+  background: rgba(4, 9, 15, .42);
+  padding: 20px;
+  color: var(--ink-muted);
+  font: 800 12px var(--ui);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-align: center;
 }
 .match-card {
   position: relative;
@@ -4371,7 +4416,6 @@ body.gametime-v3 .rules-preview {
 .videos-page .section-title em,
 .waiver-page .section-title em,
 .raffle-page .section-title em,
-.schedule-page .schedule-video-link,
 .waiver-page .waiver-copy h2,
 .raffle-page .waiver-copy h2 {
   color: var(--poster-mint-main);

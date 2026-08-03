@@ -33,6 +33,12 @@ const formatTime = (iso) => new Intl.DateTimeFormat('en-PH', {
   timeZone: 'Asia/Manila',
 }).format(new Date(iso));
 
+const formatDayDate = (iso) => new Intl.DateTimeFormat('en-PH', {
+  month: 'short',
+  day: 'numeric',
+  timeZone: 'Asia/Manila',
+}).format(new Date(iso));
+
 const setWinsFor = (game, teamId) => game.sets
   .filter((set) => (teamId === game.teamA ? set.a > set.b : set.b > set.a))
   .length;
@@ -155,15 +161,38 @@ standingsBody.innerHTML = buildStandings().map((row, i) => {
 }).join('');
 
 const days = [...new Set(games.map((game) => game.day))].sort((a, b) => a - b);
+const dayDateByDay = Object.fromEntries(days.map((day) => {
+  const firstGame = games
+    .filter((game) => game.day === day)
+    .sort((a, b) => new Date(a.startsAt) - new Date(b.startsAt))[0];
+  return [day, firstGame ? formatDayDate(firstGame.startsAt) : ''];
+}));
+const filterableTeams = teams
+  .filter((team) => games.some((game) =>
+    !game.teamALabel &&
+    !game.teamBLabel &&
+    [game.teamA, game.teamB].includes(team.id)))
+  .sort((a, b) => a.name.localeCompare(b.name));
 let activeDay = days[0];
+let selectedTeamId = '';
 
 const dayTabs = document.getElementById('dayTabs');
 const matchList = document.getElementById('matchList');
+const teamFilter = document.getElementById('teamFilter');
+
+const renderTeamFilter = () => {
+  if (!teamFilter) return;
+  teamFilter.innerHTML = `
+    <option value="">All teams</option>
+    ${filterableTeams.map((team) => `<option value="${escapeHtml(team.id)}">${escapeHtml(team.name)}</option>`).join('')}
+  `;
+};
 
 const renderTabs = () => {
   dayTabs.innerHTML = days.map((day) => `
     <button class="day-tab ${day === activeDay ? 'is-active' : ''}" type="button" data-day="${day}" role="tab" aria-selected="${day === activeDay}">
-      Day ${day}
+      <span class="day-tab-label">Day ${day}</span>
+      <span class="day-tab-date">${escapeHtml(dayDateByDay[day])}</span>
     </button>
   `).join('');
 };
@@ -187,7 +216,22 @@ const gameStatus = (game) => {
 const renderMatches = () => {
   const gamesForDay = games
     .filter((game) => game.day === activeDay)
+    .filter((game) => {
+      if (!selectedTeamId) return true;
+      if (game.teamALabel || game.teamBLabel) return false;
+      return [game.teamA, game.teamB].includes(selectedTeamId);
+    })
     .sort((a, b) => (a.gameOrder || 999) - (b.gameOrder || 999) || new Date(a.startsAt) - new Date(b.startsAt));
+
+  if (!gamesForDay.length) {
+    const team = teamById[selectedTeamId];
+    matchList.innerHTML = `
+      <p class="match-empty">
+        ${team ? `${escapeHtml(team.name)} has no scheduled game on Day ${activeDay}.` : `No games scheduled for Day ${activeDay}.`}
+      </p>
+    `;
+    return;
+  }
 
   matchList.innerHTML = gamesForDay.map((game) => {
     const teamA = gameTeam(game, 'A');
@@ -259,5 +303,11 @@ dayTabs.addEventListener('click', (event) => {
   renderMatches();
 });
 
+teamFilter?.addEventListener('change', () => {
+  selectedTeamId = teamFilter.value;
+  renderMatches();
+});
+
+renderTeamFilter();
 renderTabs();
 renderMatches();
