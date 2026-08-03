@@ -2172,6 +2172,23 @@ html[data-phase='gameday'] .nav-links a[data-phase='registration'] { display: no
 /* ==========================================================================
    Teaser (Phase 1) page — single fold: logo + dates + venue + CTAs
    ========================================================================== */
+/* The teaser is a single fold and the sponsor strip has to be reachable
+   without scrolling, so the fold owns the 100svh and the hero takes whatever
+   the strip leaves — rather than both claiming a full viewport between them. */
+.teaser-fold {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+.teaser-page .teaser-hero {
+  min-height: 0;
+  flex: 1;
+}
+.marquee--teaser {
+  flex: none;
+  border-top: 1px solid rgba(124, 245, 180, .18);
+}
+
 .teaser-hero {
   position: relative;
   min-height: 100svh;

@@ -16,6 +16,10 @@
 <body class="teaser-page" id="top">
 
 <!-- ============ TEASER HERO (full-bleed, single fold: logo + dates + CTAs) ============ -->
+<!-- Hero and sponsor strip share one 100svh fold so the strip needs no
+     scrolling to reach; the hero takes whatever height the strip leaves. -->
+<div class="teaser-fold">
+
 <section class="teaser-hero">
   <video class="teaser-hero-bg" autoplay muted loop playsinline preload="metadata" poster="/mvl/assets/mvl-kv.png" aria-hidden="true">
     <source src="/mvl/assets/mvl-video-1-web-10s.mp4" type="video/mp4">
@@ -49,6 +53,12 @@
     <a class="cta cta--tertiary" href="/mvl/rules.html">2026 Rules</a>
   </div>
 </section>
+
+<div class="marquee marquee--footer marquee--teaser" aria-label="Tournament sponsors">
+  <div class="marquee-track" data-marquee="all"></div>
+</div>
+
+</div><!-- /.teaser-fold -->
 
 <!-- ============ SAVE THE DATES — action sheet ============ -->
 <dialog class="sheet" id="saveDatesSheet" aria-labelledby="sheetTitle">
@@ -106,6 +116,8 @@
   </div>
 </footer>
 
+<script src="/mvl/js/league-data.js"></script>
+<script src="/mvl/js/marquee.js"></script>
 <script src="/mvl/js/teaser.js"></script>
 </body>
 </html>
