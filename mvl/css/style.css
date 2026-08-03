@@ -2112,11 +2112,21 @@ html[data-phase='gameday'] .nav-links a[data-phase='registration'] { display: no
   .match-list {
     gap: 18px;
     padding: 24px 28px 28px;
+    /* The card's four columns have fixed minimums adding up to more than the
+       board is wide between roughly 960px and 1100px. Scroll the whole list so
+       every row moves together, rather than giving each card its own scroller. */
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
   }
   .match-card {
     display: grid;
     grid-template-columns: 190px minmax(360px, 1.3fr) minmax(220px, .7fr) 180px;
     align-items: stretch;
+    /* overflow:hidden below makes this a scroll container, and a scroll
+       container's automatic minimum size is 0 — so the card collapsed under its
+       own columns and clipped them with no way to reach the far side. Pinning it
+       to min-content restores the floor and tracks the columns if they change. */
+    min-width: min-content;
   }
   .match-meta {
     display: grid;
@@ -4287,18 +4297,21 @@ body.gametime-v3 .schedule-preview {
     radial-gradient(circle at 18% 86%, rgba(34, 174, 233, .5) 0%, transparent 36%),
     linear-gradient(138deg, var(--poster-midnight) 0%, var(--poster-court-blue) 42%, var(--poster-teal-main) 100%);
 }
-body.gametime-v3 .games {
+/* Games and Teams share one ramp. Painting a gradient on each section
+   restarted it at their shared edge, and unlike every other section boundary
+   on this page there is no sponsor strip between them to hide the seam. The
+   accents are spread across the combined height rather than per section. */
+body.gametime-v3 .poster-flow {
   background:
-    radial-gradient(circle at 20% 12%, rgba(223, 255, 238, .34) 0%, transparent 28%),
-    radial-gradient(circle at 82% 70%, rgba(84, 240, 187, .54) 0%, transparent 36%),
-    linear-gradient(145deg, var(--poster-deep) 0%, var(--poster-court-blue) 48%, var(--poster-cyan) 100%);
+    radial-gradient(circle at 20% 5%, rgba(223, 255, 238, .3) 0%, transparent 24%),
+    radial-gradient(circle at 86% 20%, rgba(84, 240, 187, .48) 0%, transparent 28%),
+    radial-gradient(circle at 10% 54%, rgba(34, 174, 233, .42) 0%, transparent 30%),
+    radial-gradient(circle at 72% 84%, rgba(223, 255, 238, .36) 0%, transparent 28%),
+    linear-gradient(150deg, var(--poster-deep) 0%, var(--poster-court-blue) 52%, var(--poster-teal-main) 100%);
 }
+body.gametime-v3 .games,
 body.gametime-v3 .teams {
-  background:
-    radial-gradient(circle at 18% 14%, rgba(84, 240, 187, .62) 0%, transparent 32%),
-    radial-gradient(circle at 86% 24%, rgba(34, 174, 233, .5) 0%, transparent 38%),
-    radial-gradient(circle at 64% 88%, rgba(223, 255, 238, .42) 0%, transparent 34%),
-    linear-gradient(136deg, var(--poster-deep) 0%, var(--poster-court-blue) 48%, var(--poster-teal-main) 100%);
+  background: transparent;
 }
 body.gametime-v3 .rules-preview {
   background:
