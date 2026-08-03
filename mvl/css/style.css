@@ -500,10 +500,11 @@ button.cta--secondary { border: 2px solid var(--mint); color: var(--mint); }
   padding: 0 10px;
   border-left: 1px solid rgba(124, 245, 180, .3);
   font-family: var(--mono);
-  font-size: 8px;
-  letter-spacing: 1.4px;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 1.6px;
   text-transform: uppercase;
-  color: rgba(124, 245, 180, .76);
+  color: var(--mint);
   white-space: nowrap;
 }
 .marquee-item--logo {
@@ -540,7 +541,7 @@ button.cta--secondary { border: 2px solid var(--mint); color: var(--mint); }
 }
 .marquee-sep { color: var(--indigo); font-size: 10px; }
 .marquee--footer { border-bottom: 0; }
-.marquee--footer .marquee-tier { color: rgba(255, 255, 255, .48); }
+.marquee--footer .marquee-tier { color: rgba(255, 255, 255, .82); }
 .marquee--footer .marquee-item--logo {
   height: 38px;
   padding: 4px 7px;
@@ -1983,8 +1984,8 @@ html[data-phase='gameday'] .nav-links a[data-phase='registration'] { display: no
   .marquee-item { font-size: 13px; letter-spacing: 3px; }
   .marquee-tier {
     min-height: 46px;
-    padding: 0 12px;
-    font-size: 9px;
+    padding: 0 14px;
+    font-size: 13px;
   }
   .marquee-item--logo {
     height: 54px;

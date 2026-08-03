@@ -9,7 +9,7 @@ const { sponsors: SPONSORS, titlePresenter: TITLE_PRESENTER } = window.MVL_DATA;
 // ---- render: sponsor marquees (unit repeated for the seamless loop) --------
 // Each strip declares which tier it shows via data-marquee. "all" runs the
 // full roster led by the title presenter; a tier name shows just that tier.
-const sponsorTierOrder = ['Official Partner', 'Co-presenter', 'Major Sponsor', 'Minor Sponsor'];
+const sponsorTierOrder = ['Powered by', 'Official Partner', 'Co-presenter', 'Major Sponsor', 'Minor Sponsor'];
 const sortedSponsors = [...SPONSORS].sort((a, b) =>
   sponsorTierOrder.indexOf(a.tier) - sponsorTierOrder.indexOf(b.tier) ||
   a.order - b.order ||
