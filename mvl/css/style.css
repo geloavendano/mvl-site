@@ -3853,7 +3853,7 @@ body:not(.admin-page) .field {
    Falls back to the gradient treatment for any team without a `bg`.
    ========================================================================== */
 .team-card--art {
-  --team-card-rail: 46px;
+  --team-card-rail: 34px;
   min-height: 0;
   aspect-ratio: .82;
   border: 0;
@@ -3891,22 +3891,31 @@ body:not(.admin-page) .field {
   width: var(--team-card-rail);
   min-height: 100%;
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: center;
-  padding: 14px 0 28px;
+  padding: 16px 0 14px;
   background: #f5f7f2;
   border-radius: 0 44px 0 0;
 }
 .team-card--art .team-card-name {
   color: var(--team-a);
-  font-family: var(--ui);
-  font-size: clamp(16px, 4.2vw, 22px);
-  letter-spacing: 1px;
+  /* STRRETCH ships a single 700 face; asking for 900 would only get a
+     synthesised bold */
+  font-family: 'STRRETCH Sans Free', var(--ui);
+  font-weight: 700;
+  font-size: clamp(15px, 3.6vw, 20px);
+  /* em, not px: the shrink-to-fit pass scales font-size, and a fixed px
+     tracking would stay behind as a constant the ratio can never remove —
+     a thirteen-letter name kept overrunning its rail at any size */
+  letter-spacing: .1em;
   line-height: .92;
   text-align: center;
   text-shadow: none;
+  /* vertical-rl on its own reads top-to-bottom with the glyphs turned
+     clockwise; the rotate(180deg) that used to sit here flipped it back to
+     bottom-to-top */
   writing-mode: vertical-rl;
-  transform: rotate(180deg);
+  transform-origin: center;
 }
 
 @media (max-width: 959px) {
@@ -3919,7 +3928,7 @@ body:not(.admin-page) .field {
     padding: 0 30px 0 14px;
   }
   .team-card--art {
-    --team-card-rail: 36px;
+    --team-card-rail: 28px;
     border-radius: 0 36px 0 36px;
   }
   .team-card--art:nth-child(4n + 3),
@@ -3943,7 +3952,7 @@ body:not(.admin-page) .field {
     padding: 0 28px;
   }
   .team-card--art {
-    --team-card-rail: 34px;
+    --team-card-rail: 26px;
     border-radius: 0 34px 0 34px;
   }
   .team-card--art:nth-child(4n + 3),
@@ -3971,7 +3980,7 @@ body:not(.admin-page) .field {
     gap: 32px 28px;
   }
   .team-card--art {
-    --team-card-rail: 50px;
+    --team-card-rail: 38px;
     min-height: 0;
     aspect-ratio: .82;
     border-radius: 0 52px 0 52px;
@@ -4019,7 +4028,7 @@ body:not(.admin-page) .field {
     padding: 0 16px;
   }
   .team-card--art {
-    --team-card-rail: 32px;
+    --team-card-rail: 25px;
     border-radius: 0 30px 0 30px;
     grid-column: span 2;
     grid-row: span 3;
@@ -4048,7 +4057,7 @@ body:not(.admin-page) .field {
     padding: 0 28px;
   }
   .team-card--art {
-    --team-card-rail: 34px;
+    --team-card-rail: 26px;
     border-radius: 0 34px 0 34px;
     grid-column: span 2;
     grid-row: span 4;
@@ -4083,7 +4092,7 @@ body:not(.admin-page) .field {
     padding: 0 48px;
   }
   .team-card--art {
-    --team-card-rail: 42px;
+    --team-card-rail: 32px;
     border-radius: 0 44px 0 44px;
     grid-column: span 3;
     grid-row: span 4;

@@ -59,6 +59,39 @@ if (teamsGrid) {
   `).join('');
 }
 
+// ---- fit: team names to their rail -----------------------------------------
+// The rail length varies per bento slot, so no single font-size fits every
+// card — "Gizmo Spikers" outruns the short slots while "S24" leaves most of a
+// tall one empty. Scale any name that overruns down to its rail, leaving the
+// rest at the size the stylesheet picked.
+const fitTeamNames = () => {
+  document.querySelectorAll('.team-card--art .team-card-name').forEach((name) => {
+    const rail = name.parentElement;
+    if (!rail) return;
+    name.style.fontSize = '';
+    const railStyle = getComputedStyle(rail);
+    const room = rail.clientHeight
+      - parseFloat(railStyle.paddingTop)
+      - parseFloat(railStyle.paddingBottom);
+    const needed = name.getBoundingClientRect().height;
+    if (!room || !needed || needed <= room) return;
+    const base = parseFloat(getComputedStyle(name).fontSize);
+    // a hair under the exact ratio so rounding never leaves a clipped glyph
+    name.style.fontSize = `${Math.max(9, base * (room / needed) * 0.97)}px`;
+  });
+};
+
+// STRRETCH loads async and is far narrower than the fallback, so the first
+// measurement would be against the wrong metrics.
+if (document.fonts?.ready) document.fonts.ready.then(fitTeamNames);
+fitTeamNames();
+
+let fitTimer = 0;
+window.addEventListener('resize', () => {
+  window.clearTimeout(fitTimer);
+  fitTimer = window.setTimeout(fitTeamNames, 120);
+});
+
 // ---- render: livestream ----------------------------------------------------
 document.querySelectorAll('[data-livestream-link]').forEach((link) => {
   if (isLive) {
