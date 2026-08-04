@@ -44,11 +44,16 @@ const luminance = (hex) => {
   return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
 };
 
+const contrast = (a, b) => {
+  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+  return (hi + 0.05) / (lo + 0.05);
+};
+
 const applyTeamAccent = () => {
   const team = teamById[teamSelect.value];
   const root = document.body;
   if (!team) {
-    ['--accent', '--accent-2', '--accent-soft', '--accent-ink', '--waiver-bg-a', '--waiver-bg-b']
+    ['--accent', '--accent-2', '--accent-soft', '--accent-btn', '--accent-ink', '--waiver-bg-a', '--waiver-bg-b']
       .forEach((prop) => root.style.removeProperty(prop));
     teamSwatch?.classList.remove('is-on');
     return;
@@ -59,8 +64,17 @@ const applyTeamAccent = () => {
   root.style.setProperty('--accent-soft', `color-mix(in srgb, ${light} 22%, transparent)`);
   root.style.setProperty('--waiver-bg-a', light);
   root.style.setProperty('--waiver-bg-b', deep);
-  // the button gradient runs light -> deep; judge ink against the darker end
-  root.style.setProperty('--accent-ink', luminance(deep) > 0.42 ? '#0B0730' : '#ffffff');
+  // The submit button takes the team's deep colour flat, the same tone the
+  // swatch reads as. It was the light end mixed 82% into white, which left
+  // white ink on a near-white fill. Running the swatch's own gradient instead
+  // does not work: across light -> deep no single ink clears AA on half the
+  // teams, where the deep alone clears it on all eight.
+  root.style.setProperty('--accent-btn', deep);
+  // Pick the ink that measurably reads better rather than cutting on a fixed
+  // luminance — Thurstrap's teal and Secret's orange land either side of any
+  // single threshold and both came out wrong.
+  root.style.setProperty('--accent-ink',
+    contrast('#ffffff', deep) >= contrast('#0B0730', deep) ? '#ffffff' : '#0B0730');
   if (teamSwatch) {
     teamSwatch.style.setProperty('--team-a', light);
     teamSwatch.style.setProperty('--team-b', deep);

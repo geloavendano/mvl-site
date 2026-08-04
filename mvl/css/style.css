@@ -3771,8 +3771,12 @@ body:not(.admin-page) .video-filter select:focus-visible {
 .waiver-page .form-status.is-success { color: var(--accent); }
 /* must out-specify `body:not(.admin-page) button.cta.cta--primary` */
 body.waiver-page .form-actions button.cta.cta--primary {
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  color: var(--accent-ink);
+  /* Fallbacks matter here: an unset custom property makes the whole
+     declaration invalid at computed-value time, which resolves to the
+     property's initial value — a transparent button — not to the unthemed
+     rule above. Before a team is picked these vars do not exist. */
+  background: var(--accent-btn, linear-gradient(90deg, var(--mint), var(--teal)));
+  color: var(--accent-ink, var(--navy));
   transition: background .25s ease, color .25s ease, filter .15s ease, box-shadow .15s ease, transform .15s ease;
 }
 body.waiver-page .form-actions button.cta.cta--primary:focus-visible {
