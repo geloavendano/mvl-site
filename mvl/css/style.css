@@ -3797,6 +3797,22 @@ body.waiver-page .form-actions button.cta.cta--primary:focus-visible {
   opacity: 0;
 }
 .waiver-page .team-swatch.is-on { opacity: 1; width: 11px; margin-right: 8px; }
+/* Fields in a row are stretched to equal height, and each .field is a grid.
+   TEAM has two rows where PLAYER NAME has three — it carries no helper <small>
+   — so the spare height was being shared out to TEAM's label and select,
+   dropping its select 12px below its neighbour's and making it taller. Packing
+   the rows to the start leaves the slack at the bottom of the field instead. */
+body:not(.admin-page) .field {
+  align-content: start;
+}
+/* With the rows no longer stretched, the swatch's own 11px inline-block box
+   is what would set the label apart — it adds ~1px of line box over a plain
+   text label. Flex sizes the line to the taller of the two rather than
+   stacking half-leading, whether the swatch is collapsed or expanded. */
+.waiver-page .field--team > span {
+  display: flex;
+  align-items: center;
+}
 
 /* ==========================================================================
    Team cards — per-team background artwork
@@ -4125,7 +4141,9 @@ body.waiver-page .form-actions button.cta.cta--primary:focus-visible {
    replaces it with a chevron positioned to match. Scoped away from the admin
    console, which has its own light-theme field styling.
    ========================================================================== */
-body:not(.admin-page) .field select {
+body:not(.admin-page) .field select,
+body:not(.admin-page) .schedule-team-filter select,
+body:not(.admin-page) .video-filter select {
   appearance: none;
   -webkit-appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-opacity='0.6' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
