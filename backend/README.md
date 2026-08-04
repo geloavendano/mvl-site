@@ -58,6 +58,9 @@ public.mvl_submit_player_waiver(...)
 
 The submission RPC verifies that the player belongs to the selected team, then
 writes the player reference and contact details into `mvl.waiver_submissions`.
+It also updates the player's `contact_number`, `email`, and `instagram_handle`
+columns, so a later waiver submission replaces those current profile values
+while preserving every waiver submission as history.
 The older `public.mvl_submit_waiver(...)` helper remains available for
 backward compatibility.
 

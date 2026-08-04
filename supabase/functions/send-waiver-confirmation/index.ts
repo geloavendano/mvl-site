@@ -68,7 +68,7 @@ const teamColors: Record<string, [string, string]> = {
   gremlins: ['#3D9E2A', '#0D4E14'],
   ssvc: ['#FFE44D', '#D6A900'],
   s24: ['#F51642', '#B90025'],
-  'up-leftout': ['#FF9A05', '#FF5A00'],
+  'secret': ['#FF9A05', '#FF5A00'],
 };
 
 const getServiceRoleKey = () => {

@@ -13,7 +13,7 @@ window.MVL_DATA = {
     { id: 'gremlins', name: 'Gremlins', tag: 'Forest Division', grad: ['#3D9E2A', '#0D4E14'], bg: '/mvl/assets/teams/background/forest-green.webp', pos: '20% 72%' },
     { id: 'ssvc', name: 'SSVC', tag: 'Yellow Division', grad: ['#FFE44D', '#D6A900'], bg: '/mvl/assets/teams/background/yellow.webp', pos: '20% 74%' },
     { id: 's24', name: 'S24', tag: 'Red Division', grad: ['#F51642', '#B90025'], bg: '/mvl/assets/teams/background/red.webp', pos: '78% 24%' },
-    { id: 'up-leftout', name: 'Secret', tag: 'Orange Division', grad: ['#FF9A05', '#FF5A00'], bg: '/mvl/assets/teams/background/orange.webp', pos: '22% 72%' },
+    { id: 'secret', name: 'Secret', tag: 'Orange Division', grad: ['#FF9A05', '#FF5A00'], bg: '/mvl/assets/teams/background/orange.webp', pos: '22% 72%' },
   ],
 
   // Title presenter — shown as "Presented by" in the hero and leading the
@@ -53,7 +53,7 @@ window.MVL_DATA = {
     { name: "Mogu Mogu", tier: 'Major Sponsors', order: 9, logo: '/mvl/assets/Sponsor Logos/Major Sponsors/mogu-mogu.png' },
     { name: "Pascual Yogurt", tier: 'Major Sponsors', order: 10, logo: '/mvl/assets/Sponsor Logos/Major Sponsors/Pascual Yogurt Logo.png' },
     { name: "PGA Cars", tier: 'Major Sponsors', order: 11, logo: '/mvl/assets/Sponsor Logos/Major Sponsors/PGA Cars Logo.jpg' },
-    { name: "San Miguel Foods", tier: 'Major Sponsors', order: 12, logo: '/mvl/assets/Sponsor Logos/Major Sponsors/San Miguel Foods Logo.png' },
+    { name: "Purefoods", tier: 'Major Sponsors', order: 12, logo: '/mvl/assets/Sponsor Logos/Major Sponsors/Purefoods Logo.png' },
     { name: "Western Appliances", tier: 'Major Sponsors', order: 13, logo: '/mvl/assets/Sponsor Logos/Major Sponsors/Western Appliances.png' },
 
     { name: "Durex", tier: 'Minor Sponsors', order: 1, logo: '/mvl/assets/Sponsor Logos/Minor Sponsors/Durex.png' },
@@ -148,7 +148,7 @@ window.MVL_DATA = {
       court: 'Gameville Ball Park',
       startsAt: '2026-08-30T21:00:00+08:00',
       teamA: 's24',
-      teamB: 'up-leftout',
+      teamB: 'secret',
       status: 'pending',
       winner: null,
       sets: [],
@@ -204,7 +204,7 @@ window.MVL_DATA = {
       court: 'Gameville Ball Park',
       startsAt: '2026-09-06T21:00:00+08:00',
       teamA: 'ssvc',
-      teamB: 'up-leftout',
+      teamB: 'secret',
       status: 'pending',
       winner: null,
       sets: [],

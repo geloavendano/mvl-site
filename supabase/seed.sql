@@ -28,7 +28,7 @@ values
   ('gremlins', 'Gremlins', 'Forest Division', '#3D9E2A', '#0D4E14', 5),
   ('ssvc', 'SSVC', 'Yellow Division', '#FFE44D', '#D6A900', 6),
   ('s24', 'S24', 'Red Division', '#F51642', '#B90025', 7),
-  ('up-leftout', 'Secret', 'Orange Division', '#FF9A05', '#FF5A00', 8)
+  ('secret', 'Secret', 'Orange Division', '#FF9A05', '#FF5A00', 8)
 on conflict (id) do update set
   name = excluded.name,
   division_label = excluded.division_label,
