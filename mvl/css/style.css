@@ -3759,8 +3759,23 @@ body:not(.admin-page) .video-filter select:focus-visible {
 .waiver-page .field span,
 .waiver-page .waiver-copy h2,
 .waiver-page .release-copy h3 {
-  color: var(--accent-2);
+  /* the fallback matters: an unset custom property makes the declaration
+     invalid at computed-value time, and colour being inherited that would
+     leave these the same tone as body copy rather than the brand mint */
+  color: var(--accent-2, var(--poster-mint-main));
   transition: color .25s ease;
+}
+/* Copy links follow the team as well — they were the last teal left on the
+   page once a team was picked. --accent rather than --accent-2 so they stay a
+   step brighter than the headings they sit under. */
+.waiver-page .waiver-copy a,
+.waiver-page .release-copy a {
+  color: var(--accent, var(--teal));
+  transition: color .25s ease;
+}
+.waiver-page .waiver-copy a:hover,
+.waiver-page .release-copy a:hover {
+  color: var(--accent-2, var(--mint));
 }
 .waiver-page .field input:focus,
 .waiver-page .field select:focus {
@@ -4438,7 +4453,6 @@ body.gametime-v3 .rules-preview {
 .videos-page .section-title em,
 .waiver-page .section-title em,
 .raffle-page .section-title em,
-.waiver-page .waiver-copy h2,
 .raffle-page .waiver-copy h2 {
   color: var(--poster-mint-main);
 }

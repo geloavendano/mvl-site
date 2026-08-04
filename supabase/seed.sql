@@ -24,7 +24,7 @@ values
   ('metarice-x', 'Metarice X', 'Mint Division', '#3FE39A', '#0E7A4C', 1),
   ('metarice-y', 'Metarice Y', 'Violet Division', '#7C3BFF', '#2E00A8', 2),
   ('thurstrap', 'Thurstrap', 'Aqua Division', '#10E0D4', '#078D96', 3),
-  ('gizmo', 'Gizmo', 'Pink Division', '#FF3FB4', '#D50083', 4),
+  ('gizmo', 'Gizmo Spikers', 'Pink Division', '#FF3FB4', '#D50083', 4),
   ('gremlins', 'Gremlins', 'Forest Division', '#3D9E2A', '#0D4E14', 5),
   ('ssvc', 'SSVC', 'Yellow Division', '#FFE44D', '#D6A900', 6),
   ('s24', 'S24', 'Red Division', '#F51642', '#B90025', 7),

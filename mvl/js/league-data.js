@@ -9,7 +9,7 @@ window.MVL_DATA = {
     { id: 'metarice-x', name: 'Metarice X', tag: 'Mint Division', grad: ['#3FE39A', '#0E7A4C'], bg: '/mvl/assets/teams/background/mint-green.webp', pos: '76% 24%' },
     { id: 'metarice-y', name: 'Metarice Y', tag: 'Violet Division', grad: ['#7C3BFF', '#2E00A8'], bg: '/mvl/assets/teams/background/violet.webp', pos: '76% 20%' },
     { id: 'thurstrap', name: 'Thurstrap', tag: 'Aqua Division', grad: ['#10E0D4', '#078D96'], bg: '/mvl/assets/teams/background/blue.webp', pos: '72% 22%' },
-    { id: 'gizmo', name: 'Gizmo', tag: 'Pink Division', grad: ['#FF3FB4', '#D50083'], bg: '/mvl/assets/teams/background/pink.webp', pos: '78% 25%' },
+    { id: 'gizmo', name: 'Gizmo Spikers', tag: 'Pink Division', grad: ['#FF3FB4', '#D50083'], bg: '/mvl/assets/teams/background/pink.webp', pos: '78% 25%' },
     { id: 'gremlins', name: 'Gremlins', tag: 'Forest Division', grad: ['#3D9E2A', '#0D4E14'], bg: '/mvl/assets/teams/background/forest-green.webp', pos: '20% 72%' },
     { id: 'ssvc', name: 'SSVC', tag: 'Yellow Division', grad: ['#FFE44D', '#D6A900'], bg: '/mvl/assets/teams/background/yellow.webp', pos: '20% 74%' },
     { id: 's24', name: 'S24', tag: 'Red Division', grad: ['#F51642', '#B90025'], bg: '/mvl/assets/teams/background/red.webp', pos: '78% 24%' },
