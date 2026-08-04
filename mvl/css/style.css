@@ -3891,13 +3891,19 @@ body:not(.admin-page) .field {
   width: var(--team-card-rail);
   min-height: 100%;
   display: flex;
-  align-items: flex-start;
+  /* the name sits against the bottom of the rail; the rail's rounded corner is
+     at the top, so that is the square end for type to sit on */
+  align-items: flex-end;
   justify-content: center;
-  padding: 16px 0 14px;
+  padding: 14px 0 16px;
   background: #f5f7f2;
   border-radius: 0 44px 0 0;
 }
 .team-card--art .team-card-name {
+  /* h3 keeps its default 1em block margin, which sat under the name as a
+     second gap below the rail padding and, worse, ate room the fit pass had
+     already counted as available */
+  margin: 0;
   color: var(--team-a);
   /* STRRETCH ships a single 700 face; asking for 900 would only get a
      synthesised bold */
@@ -3964,7 +3970,7 @@ body:not(.admin-page) .field {
   }
   .team-card--art .team-card-copy {
     border-radius: 0 34px 0 0;
-    padding-bottom: 24px;
+    padding-bottom: 14px;
   }
   .team-card--art .team-card-name {
     font-size: clamp(11px, 1.7vw, 14px);
@@ -3987,7 +3993,7 @@ body:not(.admin-page) .field {
   }
   .team-card--art .team-card-copy {
     border-radius: 0 52px 0 0;
-    padding-bottom: 32px;
+    padding-bottom: 18px;
   }
   .team-card--art .team-card-name {
     font-size: clamp(16px, 1.35vw, 21px);
@@ -4044,7 +4050,7 @@ body:not(.admin-page) .field {
   }
   .team-card--art .team-card-copy {
     border-radius: 0 30px 0 0;
-    padding-bottom: 20px;
+    padding-bottom: 12px;
   }
 }
 
@@ -4076,7 +4082,7 @@ body:not(.admin-page) .field {
   }
   .team-card--art .team-card-copy {
     border-radius: 0 34px 0 0;
-    padding-bottom: 24px;
+    padding-bottom: 14px;
   }
   .team-card--art .team-card-name {
     font-size: clamp(11px, 1.55vw, 14px);
@@ -4111,7 +4117,7 @@ body:not(.admin-page) .field {
   }
   .team-card--art .team-card-copy {
     border-radius: 0 44px 0 0;
-    padding-bottom: 30px;
+    padding-bottom: 16px;
   }
   .team-card--art .team-card-name {
     font-size: clamp(14px, 1vw, 19px);
