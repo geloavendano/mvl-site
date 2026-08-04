@@ -10,16 +10,30 @@ const readinessTeamSummary = document.getElementById('readinessTeamSummary');
 const readinessSummary = document.getElementById('readinessSummary');
 const readinessTable = document.getElementById('readinessTable');
 const unmatchedCheckins = document.getElementById('unmatchedCheckins');
+const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => ({
+  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
+}[char]));
 const teams = Object.fromEntries(window.MVL_DATA.teams.map((t) => [t.id, t]));
+const adminTeamColor = (teamId) => {
+  const source = teams[teamId]?.grad?.[1];
+  if (!/^#[0-9a-f]{6}$/i.test(source || '')) return '#475467';
+  const base = [29, 36, 51];
+  const rgb = source.slice(1).match(/.{2}/g).map((part) => parseInt(part, 16));
+  return `#${rgb.map((value, index) => Math.round(value * .68 + base[index] * .32).toString(16).padStart(2, '0')).join('')}`;
+};
+const teamNameMarkup = (teamId, name, className = '') => `<span class="admin-team-name ${className}" style="--team-color:${adminTeamColor(teamId)}">${escapeHtml(name)}</span>`;
 const gameTeamName = (game, side) => {
   const id = side === 'A' ? game.teamA : game.teamB;
   const label = side === 'A' ? game.teamALabel : game.teamBLabel;
   return label || teams[id]?.name || 'TBD';
 };
+const gameTeamMarkup = (game, side) => {
+  const id = side === 'A' ? game.teamA : game.teamB;
+  const label = side === 'A' ? game.teamALabel : game.teamBLabel;
+  const name = gameTeamName(game, side);
+  return label ? escapeHtml(name) : teamNameMarkup(id, name);
+};
 const status = (el, text, type = '') => { el.textContent = text; el.className = `form-status ${type ? `is-${type}` : ''}`; };
-const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => ({
-  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
-}[char]));
 const playerPhotoUrl = (value) => {
   if (!value) return '';
   if (/^https?:\/\//i.test(value)) return value;
@@ -29,9 +43,10 @@ const playerPhotoUrl = (value) => {
 const playerPreview = (player) => {
   if (!player) return '<div class="admin-player-preview is-empty" data-player-preview>No player selected</div>';
   const photo = playerPhotoUrl(player.photoPath);
+  const teamName = teams[player.team]?.name || player.team;
   return `<div class="admin-player-preview" data-player-preview>
     ${photo ? `<img src="${escapeHtml(photo)}" alt="">` : '<div class="admin-player-photo-placeholder">No photo</div>'}
-    <div><strong>${escapeHtml(player.name)}</strong><span>#${escapeHtml(player.jerseyNumber || '—')} · ${escapeHtml(teams[player.team]?.name || player.team)}</span></div>
+    <div><strong>${escapeHtml(player.name)}</strong><span>#${escapeHtml(player.jerseyNumber || '—')} · ${teamNameMarkup(player.team, teamName, 'admin-player-team')}</span></div>
   </div>`;
 };
 const call = async (path, body, token = session?.access_token) => {
@@ -99,7 +114,7 @@ const renderReadiness = (readiness) => {
     availableDays.sort((a, b) => a.date.localeCompare(b.date));
   }
   readinessTeamFilter.innerHTML = readiness.teams.map((team) => (
-    `<option value="${escapeHtml(team.id)}" ${team.id === readiness.selectedTeam ? 'selected' : ''}>${escapeHtml(team.name)}</option>`
+    `<option value="${escapeHtml(team.id)}" style="color:${adminTeamColor(team.id)}" ${team.id === readiness.selectedTeam ? 'selected' : ''}>${escapeHtml(team.name)}</option>`
   )).join('');
   readinessDayFilter.innerHTML = availableDays.map((day) => {
     const prefix = day.dayNumber ? `Day ${day.dayNumber} · ` : '';
@@ -114,7 +129,7 @@ const renderReadiness = (readiness) => {
       if (team.outsideRadiusCount) checkinNotes.push(`${team.outsideRadiusCount} outside venue`);
       if (team.unmatchedCheckinCount) checkinNotes.push(`${team.unmatchedCheckinCount} unmatched`);
       return `<tr class="${team.teamId === readiness.selectedTeam ? 'is-selected' : ''}">
-        <td><button class="admin-team-detail-link" type="button" data-readiness-team="${escapeHtml(team.teamId)}">${escapeHtml(team.teamName)}</button></td>
+        <td><button class="admin-team-detail-link" type="button" data-readiness-team="${escapeHtml(team.teamId)}" style="--team-color:${adminTeamColor(team.teamId)}">${escapeHtml(team.teamName)}</button></td>
         <td>${team.rosterCount}</td>
         <td>${readinessCount(team.waiverCount, team.rosterCount)}</td>
         <td>${readinessCount(team.checkinCount, team.rosterCount)}${checkinNotes.length ? `<span class="admin-status-detail">${escapeHtml(checkinNotes.join(' · '))}</span>` : ''}</td>
@@ -215,9 +230,9 @@ const render = () => {
     const setCount = g.id.startsWith('pre-') ? 3 : 5;
     const videos = gameVideos(g);
     return `<form class="admin-panel admin-game admin-form" data-id="${g.id}">
-    <div class="admin-panel-head"><div><p class="games-label">Day ${g.day} · ${g.court} · ${g.status}</p><h3>${gameTeamName(g, 'A')} <em>vs</em> ${gameTeamName(g, 'B')}</h3></div><button type="button" class="admin-link" data-reset>Reset</button></div>
+    <div class="admin-panel-head"><div><p class="games-label">Day ${g.day} · ${g.court} · ${g.status}</p><h3>${gameTeamMarkup(g, 'A')} <em>vs</em> ${gameTeamMarkup(g, 'B')}</h3></div><button type="button" class="admin-link" data-reset>Reset</button></div>
     <div class="admin-result-fields">
-      <label class="field"><span>Winner</span><select name="winner" required ${g.teamALabel || g.teamBLabel ? 'disabled' : ''}><option value="">Choose winner</option><option value="${g.teamA}" ${g.winner === g.teamA ? 'selected' : ''}>${gameTeamName(g, 'A')}</option><option value="${g.teamB}" ${g.winner === g.teamB ? 'selected' : ''}>${gameTeamName(g, 'B')}</option></select></label>
+      <label class="field"><span>Winner</span><select name="winner" required ${g.teamALabel || g.teamBLabel ? 'disabled' : ''}><option value="">Choose winner</option><option value="${g.teamA}" ${g.teamALabel ? '' : `style="color:${adminTeamColor(g.teamA)}"`} ${g.winner === g.teamA ? 'selected' : ''}>${gameTeamName(g, 'A')}</option><option value="${g.teamB}" ${g.teamBLabel ? '' : `style="color:${adminTeamColor(g.teamB)}"`} ${g.winner === g.teamB ? 'selected' : ''}>${gameTeamName(g, 'B')}</option></select></label>
       <label class="field"><span>Player of the Game</span><div class="admin-player-search"><input name="playerLookup" type="text" value="${escapeHtml(g.playerOfGame?.lookupKey || '')}" placeholder="santos-04" autocomplete="off"><button type="button" class="cta cta--secondary" data-find-player>Find</button></div><small>Enter surname and jersey number. Lookup is limited to the selected winner.</small><input name="playerId" type="hidden" value="${escapeHtml(g.playerOfGame?.id || '')}"></label>
     </div>
     ${playerPreview(g.playerOfGame)}
@@ -225,7 +240,7 @@ const render = () => {
       <div class="admin-video-head"><div><strong>Game videos</strong><small>Add a custom label for every recording, such as Full Game, Set 1, or Set 2.</small></div><button type="button" class="admin-link" data-add-video>+ Add video</button></div>
       <div class="admin-video-list" data-video-list>${(videos.length ? videos : [{}]).map(videoRow).join('')}</div>
     </section>
-    <div class="admin-score-heading"><span>Set</span><strong>${gameTeamName(g, 'A')}</strong><strong>${gameTeamName(g, 'B')}</strong></div>
+    <div class="admin-score-heading"><span>Set</span><strong>${gameTeamMarkup(g, 'A')}</strong><strong>${gameTeamMarkup(g, 'B')}</strong></div>
     <div class="admin-sets">${Array.from({ length: setCount }, (_, i) => `<label><span>Set ${i+1}</span><input name="a${i}" aria-label="${gameTeamName(g, 'A')} set ${i+1}" type="number" min="0" value="${g.sets[i]?.a ?? ''}" ${g.teamALabel || g.teamBLabel ? 'disabled' : ''}><input name="b${i}" aria-label="${gameTeamName(g, 'B')} set ${i+1}" type="number" min="0" value="${g.sets[i]?.b ?? ''}" ${g.teamALabel || g.teamBLabel ? 'disabled' : ''}></label>`).join('')}</div>
     <button class="cta cta--primary" ${g.teamALabel || g.teamBLabel ? 'disabled title="The teams will be assigned automatically from tournament results."' : ''}>Save result, player & videos</button><p class="form-status"></p></form>`;
   }).join('');
