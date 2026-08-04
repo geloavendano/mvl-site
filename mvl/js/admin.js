@@ -6,6 +6,7 @@ let activeAdminDay = 1;
 let readinessRequest = 0;
 const readinessTeamFilter = document.getElementById('readinessTeamFilter');
 const readinessDayFilter = document.getElementById('readinessDayFilter');
+const readinessTeamSummary = document.getElementById('readinessTeamSummary');
 const readinessSummary = document.getElementById('readinessSummary');
 const readinessTable = document.getElementById('readinessTable');
 const unmatchedCheckins = document.getElementById('unmatchedCheckins');
@@ -86,6 +87,10 @@ const formatAdminDate = (iso) => new Intl.DateTimeFormat('en-PH', {
 const formatAdminTime = (iso) => iso ? new Intl.DateTimeFormat('en-PH', {
   timeZone: 'Asia/Manila', hour: 'numeric', minute: '2-digit',
 }).format(new Date(iso)) : '';
+const readinessCount = (count, total, completeClass = true) => {
+  const isComplete = total > 0 && count === total;
+  return `<span class="admin-readiness-count ${isComplete && completeClass ? 'is-complete' : ''}"><strong>${count}</strong> / ${total}</span>`;
+};
 const renderReadiness = (readiness) => {
   const selectedDay = readiness.selectedDay;
   const availableDays = [...readiness.days];
@@ -100,6 +105,22 @@ const renderReadiness = (readiness) => {
     const prefix = day.dayNumber ? `Day ${day.dayNumber} · ` : '';
     return `<option value="${escapeHtml(day.date)}" ${day.date === selectedDay ? 'selected' : ''}>${prefix}${escapeHtml(formatReadinessDay(day.date))}</option>`;
   }).join('');
+
+  const teamSummary = readiness.teamSummary || [];
+  readinessTeamSummary.innerHTML = teamSummary.length ? `<table class="admin-readiness-table admin-readiness-team-table">
+    <thead><tr><th>Team</th><th>Roster</th><th>Waivers</th><th>Checked in</th></tr></thead>
+    <tbody>${teamSummary.map((team) => {
+      const checkinNotes = [];
+      if (team.outsideRadiusCount) checkinNotes.push(`${team.outsideRadiusCount} outside venue`);
+      if (team.unmatchedCheckinCount) checkinNotes.push(`${team.unmatchedCheckinCount} unmatched`);
+      return `<tr class="${team.teamId === readiness.selectedTeam ? 'is-selected' : ''}">
+        <td><button class="admin-team-detail-link" type="button" data-readiness-team="${escapeHtml(team.teamId)}">${escapeHtml(team.teamName)}</button></td>
+        <td>${team.rosterCount}</td>
+        <td>${readinessCount(team.waiverCount, team.rosterCount)}</td>
+        <td>${readinessCount(team.checkinCount, team.rosterCount)}${checkinNotes.length ? `<span class="admin-status-detail">${escapeHtml(checkinNotes.join(' · '))}</span>` : ''}</td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>` : '<p class="admin-readiness-empty">No tournament teams found.</p>';
 
   const players = readiness.players || [];
   const waiverCount = players.filter((player) => player.waiverCompleted).length;
@@ -140,17 +161,23 @@ const renderReadiness = (readiness) => {
 const loadReadiness = async (teamId = null, day = null) => {
   const request = ++readinessRequest;
   readinessSummary.textContent = 'Loading player status…';
+  readinessTeamSummary.innerHTML = '<p class="admin-readiness-empty">Loading team summary…</p>';
   readinessTable.innerHTML = '';
   try {
-    const readiness = await rpc('mvl_admin_get_player_readiness', {
-      p_team_id: teamId || null,
-      p_day: day || null,
-    });
+    const [readiness, summary] = await Promise.all([
+      rpc('mvl_admin_get_player_readiness', {
+        p_team_id: teamId || null,
+        p_day: day || null,
+      }),
+      rpc('mvl_admin_get_readiness_summary', { p_day: day || null }),
+    ]);
     if (request !== readinessRequest) return;
+    readiness.teamSummary = summary.teams;
     renderReadiness(readiness);
   } catch (error) {
     if (request !== readinessRequest) return;
     readinessSummary.textContent = 'Player readiness could not be loaded.';
+    readinessTeamSummary.innerHTML = '';
     readinessTable.innerHTML = `<p class="form-status is-error">${escapeHtml(error.message)}</p>`;
     unmatchedCheckins.classList.add('is-hidden');
   }
@@ -233,6 +260,11 @@ readinessTeamFilter.addEventListener('change', () => {
 });
 readinessDayFilter.addEventListener('change', () => {
   loadReadiness(readinessTeamFilter.value, readinessDayFilter.value);
+});
+readinessTeamSummary.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-readiness-team]');
+  if (!button) return;
+  loadReadiness(button.dataset.readinessTeam, readinessDayFilter.value);
 });
 adminGameList.addEventListener('change', (e) => {
   if (!e.target.matches('[name="winner"]')) return;

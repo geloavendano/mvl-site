@@ -18,9 +18,12 @@
     <section class="admin-panel admin-readiness" aria-labelledby="readinessTitle">
       <div class="admin-panel-head"><div><h2 id="readinessTitle">Player readiness</h2><p>Waiver completion and venue check-ins for every rostered player.</p></div></div>
       <div class="admin-readiness-filters">
-        <label class="field"><span>Team</span><select id="readinessTeamFilter"></select></label>
         <label class="field"><span>Game day</span><select id="readinessDayFilter"></select></label>
+        <label class="field"><span>Player detail team</span><select id="readinessTeamFilter"></select></label>
       </div>
+      <h3 class="admin-readiness-subtitle">Team summary</h3>
+      <div id="readinessTeamSummary" class="admin-readiness-table-wrap" aria-live="polite"></div>
+      <h3 class="admin-readiness-subtitle">Player status</h3>
       <p id="readinessSummary" class="admin-readiness-summary" aria-live="polite">Loading player status…</p>
       <div id="readinessTable" class="admin-readiness-table-wrap"></div>
       <div id="unmatchedCheckins" class="admin-unmatched is-hidden"></div>
