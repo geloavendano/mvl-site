@@ -26,9 +26,17 @@ const sponsorChip = (sponsor) => `
     <span class="marquee-sep">&#9670;</span>
   `;
 
+// A strip can carry more than one tier. Converge sits in its own "Powered by"
+// tier so it can be labelled separately, but it belongs on the partners strip
+// rather than getting a band of its own.
+const marqueeTierGroups = {
+  'Official Partners': ['Powered by', 'Official Partners'],
+};
+
 const buildMarquee = (filter) => {
   const showAll = !filter || filter === 'all';
-  const list = showAll ? sortedSponsors : sortedSponsors.filter((s) => s.tier === filter);
+  const tiers = showAll ? sponsorTierOrder : (marqueeTierGroups[filter] || [filter]);
+  const list = sortedSponsors.filter((s) => tiers.includes(s.tier));
   if (!list.length) return '';
 
   // the full strip opens with the title presenter
@@ -38,11 +46,10 @@ const buildMarquee = (filter) => {
       <span class="marquee-tier">Presented by</span>
       ${sponsorChip(TITLE_PRESENTER)}`;
   }
-  // a single-tier strip is labelled once at the head of each loop; the full
-  // strip labels every tier as it changes
-  if (!showAll) markup += `<span class="marquee-tier">${filter}</span>`;
+  // every tier is labelled at the head of its own run, so a strip carrying one
+  // tier gets a single label per loop and a strip carrying several gets each
   markup += list.map((sponsor, index, arr) => {
-    const tierChanged = showAll && (index === 0 || sponsor.tier !== arr[index - 1].tier);
+    const tierChanged = index === 0 || sponsor.tier !== arr[index - 1].tier;
     return `${tierChanged ? `<span class="marquee-tier">${sponsor.tier}</span>` : ''}${sponsorChip(sponsor)}`;
   }).join('');
   return markup;
@@ -149,11 +156,29 @@ const setupMarquee = (marquee) => {
   marquee.addEventListener('pointerup', endDrag);
   marquee.addEventListener('pointercancel', endDrag);
 
+  // A trackpad two-finger swipe never becomes a pointer drag — it arrives as a
+  // wheel event with deltaX. Claim it only when the gesture is mostly
+  // horizontal, so a vertical scroll that happens to pass over the strip still
+  // scrolls the page. preventDefault also stops the horizontal overscroll that
+  // browsers turn into a back-navigation.
+  let wheeling = false;
+  let wheelTimer = 0;
+  marquee.addEventListener('wheel', (e) => {
+    if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+    e.preventDefault();
+    wheeling = true;
+    pos += e.deltaX;
+    render();
+    window.clearTimeout(wheelTimer);
+    // wheel has no gesture-end event, so resume once the deltas stop arriving
+    wheelTimer = window.setTimeout(() => { wheeling = false; }, 160);
+  }, { passive: false });
+
   let lastTime = 0;
   const tick = (now) => {
     const dt = lastTime ? Math.min((now - lastTime) / 1000, .1) : 0;
     lastTime = now;
-    if (!hovering && !dragging && !marqueeReduceMotion) {
+    if (!hovering && !dragging && !wheeling && !marqueeReduceMotion) {
       pos += MARQUEE_SPEED * dt;
       render();
     }
