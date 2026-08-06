@@ -25,6 +25,16 @@
     page_path: location.pathname + location.search,
   });
 
+  // Which calendar a link actually adds the dates to. The Google links carry
+  // the weekend in their `dates` range, so the two weekends stay separable
+  // without anyone having to read a URL in the reports.
+  const calendarTarget = (url) => {
+    if (url.pathname.endsWith('.ics')) return 'device';
+    if (url.search.includes('20260829')) return 'google_weekend_1';
+    if (url.search.includes('20260905')) return 'google_weekend_2';
+    return 'google';
+  };
+
   document.addEventListener('click', (event) => {
     const link = event.target.closest('a[href]');
     if (!link || typeof window.gtag !== 'function') return;
@@ -40,10 +50,31 @@
 
     if (!isOutbound && !isCalendar && !isCta) return;
 
-    window.gtag('event', isCalendar ? 'calendar_click' : (isCta ? 'cta_click' : 'outbound_click'), {
+    const common = {
       link_url: link.href,
       link_text: link.textContent.trim().replace(/\s+/g, ' ').slice(0, 120),
       page_path: location.pathname + location.search,
-    });
+    };
+
+    if (isCalendar) {
+      // The Save the Dates trigger points at the .ics so it still works without
+      // JS, but where <dialog> is supported the script swallows the click and
+      // opens the picker instead. That prevented click saved nothing, so
+      // counting it as a save both double-counted anyone who went on to pick a
+      // calendar and counted everyone who opened the sheet and cancelled.
+      // defaultPrevented is exactly the "the href never ran" signal, and it is
+      // already set by the time this document-level listener sees the event.
+      if (event.defaultPrevented) {
+        window.gtag('event', 'calendar_picker_open', common);
+        return;
+      }
+      window.gtag('event', 'calendar_save', {
+        ...common,
+        calendar_target: calendarTarget(url),
+      });
+      return;
+    }
+
+    window.gtag('event', isCta ? 'cta_click' : 'outbound_click', common);
   });
 })();
