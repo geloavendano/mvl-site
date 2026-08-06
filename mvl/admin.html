@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex,nofollow"><title>MVL Admin</title>
+<meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><title>MVL Admin</title>
 <link rel="icon" type="image/svg+xml" href="/mvl/assets/metarice-icon.svg">
 <link rel="stylesheet" href="/mvl/css/style.css">
 </head>
@@ -15,15 +15,12 @@
   <section id="dashboard" class="is-hidden">
     <div class="admin-heading"><div><h1>MVL Admin</h1><p>Manage the livestream, player readiness, and game results.</p></div><p id="adminIdentity"></p></div>
     <form id="livestreamForm" class="admin-panel admin-form"><div class="admin-panel-head"><div><h2>Livestream</h2><p>Controls the livestream state on the homepage.</p></div><label class="admin-switch"><input name="isLive" type="checkbox"> Live now</label></div><label class="field"><span>YouTube livestream link</span><input name="youtubeUrl" type="url" placeholder="https://youtube.com/watch?v=..."></label><div class="admin-form-actions"><button class="cta cta--primary" type="submit">Save livestream</button><p class="form-status"></p></div></form>
-    <section class="admin-panel admin-readiness" aria-labelledby="readinessTitle">
-      <div class="admin-panel-head"><div><h2 id="readinessTitle">Player readiness</h2><p>Waiver completion and venue check-ins for every rostered player.</p></div></div>
-      <div class="admin-readiness-filters">
-        <label class="field"><span>Game day</span><select id="readinessDayFilter"></select></label>
-        <label class="field"><span>Player detail team</span><select id="readinessTeamFilter"></select></label>
-      </div>
-      <h3 class="admin-readiness-subtitle">Team summary</h3>
+    <section class="admin-panel admin-readiness admin-team-readiness" aria-labelledby="teamReadinessTitle">
+      <div class="admin-panel-head admin-readiness-card-head"><div><h2 id="teamReadinessTitle">Team summary</h2><p>Waiver and daily check-in completion across all tournament teams.</p></div><label class="field admin-readiness-day"><span>Game day</span><select id="readinessDayFilter"></select></label></div>
       <div id="readinessTeamSummary" class="admin-readiness-table-wrap" aria-live="polite"></div>
-      <h3 class="admin-readiness-subtitle">Player status</h3>
+    </section>
+    <section id="playerStatusCard" class="admin-panel admin-readiness admin-player-status" aria-labelledby="playerStatusTitle">
+      <div class="admin-panel-head admin-readiness-card-head"><div><h2 id="playerStatusTitle">Player status</h2><p>Individual waiver, contact, and selected-day check-in status.</p></div><label class="field admin-readiness-team-control"><span>Team</span><select id="readinessTeamFilter"></select></label></div>
       <p id="readinessSummary" class="admin-readiness-summary" aria-live="polite">Loading player status…</p>
       <div id="readinessTable" class="admin-readiness-table-wrap"></div>
       <div id="unmatchedCheckins" class="admin-unmatched is-hidden"></div>
@@ -32,5 +29,19 @@
     <div id="adminGameList"></div>
   </section>
 </main>
+<dialog id="emergencyContactDialog" class="admin-contact-dialog" aria-labelledby="emergencyDialogTitle" aria-describedby="emergencyDialogNote">
+  <div class="admin-contact-dialog-card">
+    <div class="admin-contact-dialog-head"><div><p>Emergency contact</p><h2 id="emergencyDialogTitle">Player</h2></div><form method="dialog"><button class="admin-contact-close" type="submit" aria-label="Close emergency contact">×</button></form></div>
+    <p id="emergencyDialogNote" class="admin-contact-note">Visible only to signed-in MVL administrators.</p>
+    <p id="emergencyContactLoading" class="admin-contact-loading">Loading contact…</p>
+    <dl id="emergencyContactDetails" class="admin-contact-details is-hidden">
+      <div><dt>Contact</dt><dd id="emergencyContactName"></dd></div>
+      <div><dt>Relationship</dt><dd id="emergencyContactRelationship"></dd></div>
+      <div><dt>Mobile number</dt><dd id="emergencyContactNumber"></dd></div>
+    </dl>
+    <p id="emergencyContactError" class="form-status is-error is-hidden"></p>
+    <a id="emergencyCallLink" class="cta cta--primary admin-contact-call is-hidden" href="#"><span aria-hidden="true">☎</span> Call mobile number</a>
+  </div>
+</dialog>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/mvl/js/supabase-config.js"></script><script src="/mvl/js/league-data.js"></script><script src="/mvl/js/admin.js"></script>
 </body></html>

@@ -4,12 +4,23 @@ let session = null;
 let data;
 let activeAdminDay = 1;
 let readinessRequest = 0;
+let emergencyRequest = 0;
+let readinessPlayers = new Map();
 const readinessTeamFilter = document.getElementById('readinessTeamFilter');
 const readinessDayFilter = document.getElementById('readinessDayFilter');
 const readinessTeamSummary = document.getElementById('readinessTeamSummary');
 const readinessSummary = document.getElementById('readinessSummary');
 const readinessTable = document.getElementById('readinessTable');
 const unmatchedCheckins = document.getElementById('unmatchedCheckins');
+const emergencyContactDialog = document.getElementById('emergencyContactDialog');
+const emergencyDialogTitle = document.getElementById('emergencyDialogTitle');
+const emergencyContactLoading = document.getElementById('emergencyContactLoading');
+const emergencyContactDetails = document.getElementById('emergencyContactDetails');
+const emergencyContactName = document.getElementById('emergencyContactName');
+const emergencyContactRelationship = document.getElementById('emergencyContactRelationship');
+const emergencyContactNumber = document.getElementById('emergencyContactNumber');
+const emergencyContactError = document.getElementById('emergencyContactError');
+const emergencyCallLink = document.getElementById('emergencyCallLink');
 const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
 }[char]));
@@ -50,12 +61,63 @@ const playerPreview = (player) => {
   </div>`;
 };
 const call = async (path, body, token = session?.access_token) => {
-  const res = await fetch(`${cfg.url}${path}`, { method: 'POST', headers: { apikey: cfg.anonKey, Authorization: `Bearer ${token || cfg.anonKey}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) });
+  const res = await fetch(`${cfg.url}${path}`, { method: 'POST', cache: 'no-store', headers: { apikey: cfg.anonKey, Authorization: `Bearer ${token || cfg.anonKey}`, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }, body: JSON.stringify(body || {}) });
   const json = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(json.message || json.error_description || 'Request failed');
   return json;
 };
 const rpc = (name, body) => call(`/rest/v1/rpc/${name}`, body);
+const instagramDisplay = (value) => {
+  const handle = String(value || '').trim().replace(/^@/, '');
+  return handle ? `@${handle}` : '';
+};
+const telephoneHref = (value) => {
+  const compact = String(value || '').replace(/[^+\d]/g, '');
+  const normalized = compact.startsWith('+')
+    ? `+${compact.slice(1).replace(/\+/g, '')}`
+    : compact.replace(/\+/g, '');
+  return /\d/.test(normalized) ? `tel:${normalized}` : '';
+};
+const clearEmergencyContact = () => {
+  emergencyRequest += 1;
+  emergencyDialogTitle.textContent = 'Player';
+  emergencyContactName.textContent = '';
+  emergencyContactRelationship.textContent = '';
+  emergencyContactNumber.textContent = '';
+  emergencyContactError.textContent = '';
+  emergencyCallLink.removeAttribute('href');
+  emergencyContactLoading.classList.remove('is-hidden');
+  emergencyContactDetails.classList.add('is-hidden');
+  emergencyContactError.classList.add('is-hidden');
+  emergencyCallLink.classList.add('is-hidden');
+};
+const openEmergencyContact = async (player) => {
+  clearEmergencyContact();
+  const request = emergencyRequest;
+  emergencyDialogTitle.textContent = player.name;
+  emergencyContactDialog.showModal();
+  try {
+    const contact = await rpc('mvl_admin_get_player_emergency_contact', {
+      p_player_id: player.id,
+    });
+    if (request !== emergencyRequest || !emergencyContactDialog.open) return;
+    const callHref = telephoneHref(contact.phoneNumber);
+    emergencyContactName.textContent = contact.contactName || 'Not provided';
+    emergencyContactRelationship.textContent = contact.relationship || 'Not provided';
+    emergencyContactNumber.textContent = contact.phoneNumber || 'Not provided';
+    emergencyContactLoading.classList.add('is-hidden');
+    emergencyContactDetails.classList.remove('is-hidden');
+    if (callHref) {
+      emergencyCallLink.href = callHref;
+      emergencyCallLink.classList.remove('is-hidden');
+    }
+  } catch (error) {
+    if (request !== emergencyRequest || !emergencyContactDialog.open) return;
+    emergencyContactLoading.classList.add('is-hidden');
+    emergencyContactError.textContent = error.message;
+    emergencyContactError.classList.remove('is-hidden');
+  }
+};
 const youtubeId = (value) => {
   const clean = value.trim();
   if (!clean) return null;
@@ -138,6 +200,7 @@ const renderReadiness = (readiness) => {
   </table>` : '<p class="admin-readiness-empty">No tournament teams found.</p>';
 
   const players = readiness.players || [];
+  readinessPlayers = new Map(players.map((player) => [player.id, player]));
   const waiverCount = players.filter((player) => player.waiverCompleted).length;
   const checkinCount = players.filter((player) => player.checkinStatus === 'checked_in').length;
   readinessSummary.textContent = `${waiverCount} of ${players.length} waivers complete · ${checkinCount} of ${players.length} players checked in`;
@@ -155,8 +218,13 @@ const renderReadiness = (readiness) => {
           ? 'is-complete'
           : player.checkinStatus === 'outside_radius' ? 'is-warning' : '';
         const checkinTime = player.checkedInAt || player.checkinAttemptedAt;
+        const instagram = instagramDisplay(player.instagramHandle);
+        const playerIdentifiers = `${player.jerseyNumber ? `#${escapeHtml(player.jerseyNumber)}` : 'No jersey number'}${instagram ? ` · <b class="admin-player-instagram">${escapeHtml(instagram)}</b>` : ''}`;
+        const emergencyButton = player.hasEmergencyContact
+          ? `<button class="admin-emergency-button" type="button" data-emergency-player="${escapeHtml(player.id)}" aria-label="View emergency contact for ${escapeHtml(player.name)}" title="View emergency contact"><span aria-hidden="true">✚</span></button>`
+          : '';
         return `<tr>
-          <td class="admin-player-name"><strong>${escapeHtml(player.name)}</strong><span>${player.jerseyNumber ? `#${escapeHtml(player.jerseyNumber)}` : 'No jersey number'}</span></td>
+          <td class="admin-player-name"><strong>${escapeHtml(player.name)}</strong><div class="admin-player-meta"><span class="admin-player-identifiers">${playerIdentifiers}</span>${emergencyButton}</div></td>
           <td><span class="admin-status-badge ${player.waiverCompleted ? 'is-complete' : ''}">${player.waiverCompleted ? 'Complete' : 'Pending'}</span>${player.waiverSubmittedAt ? `<span class="admin-status-detail">${escapeHtml(formatAdminDate(player.waiverSubmittedAt))}</span>` : ''}</td>
           <td><span class="admin-status-badge ${checkinClass}">${checkinLabel}</span>${checkinTime ? `<span class="admin-status-detail">${escapeHtml(formatAdminTime(checkinTime))}</span>` : ''}</td>
         </tr>`;
@@ -175,6 +243,8 @@ const renderReadiness = (readiness) => {
 };
 const loadReadiness = async (teamId = null, day = null) => {
   const request = ++readinessRequest;
+  readinessPlayers = new Map();
+  if (emergencyContactDialog.open) emergencyContactDialog.close();
   readinessSummary.textContent = 'Loading player status…';
   readinessTeamSummary.innerHTML = '<p class="admin-readiness-empty">Loading team summary…</p>';
   readinessTable.innerHTML = '';
@@ -187,6 +257,16 @@ const loadReadiness = async (teamId = null, day = null) => {
       rpc('mvl_admin_get_readiness_summary', { p_day: day || null }),
     ]);
     if (request !== readinessRequest) return;
+    const contactIndex = await rpc('mvl_admin_get_player_contact_index', {
+      p_team_id: readiness.selectedTeam,
+    });
+    if (request !== readinessRequest) return;
+    const contactsByPlayer = new Map(contactIndex.map((contact) => [contact.playerId, contact]));
+    readiness.players = (readiness.players || []).map((player) => ({
+      ...player,
+      instagramHandle: contactsByPlayer.get(player.id)?.instagramHandle || '',
+      hasEmergencyContact: contactsByPlayer.get(player.id)?.hasEmergencyContact === true,
+    }));
     readiness.teamSummary = summary.teams;
     renderReadiness(readiness);
   } catch (error) {
@@ -280,6 +360,16 @@ readinessTeamSummary.addEventListener('click', (event) => {
   const button = event.target.closest('[data-readiness-team]');
   if (!button) return;
   loadReadiness(button.dataset.readinessTeam, readinessDayFilter.value);
+});
+readinessTable.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-emergency-player]');
+  if (!button) return;
+  const player = readinessPlayers.get(button.dataset.emergencyPlayer);
+  if (player) openEmergencyContact(player);
+});
+emergencyContactDialog.addEventListener('close', clearEmergencyContact);
+emergencyContactDialog.addEventListener('click', (event) => {
+  if (event.target === emergencyContactDialog) emergencyContactDialog.close();
 });
 adminGameList.addEventListener('change', (e) => {
   if (!e.target.matches('[name="winner"]')) return;
