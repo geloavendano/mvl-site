@@ -14,6 +14,17 @@
   </section>
   <section id="dashboard" class="is-hidden">
     <div class="admin-heading"><div><h1>MVL Admin</h1><p>Manage the livestream, player readiness, and game results.</p></div><p id="adminIdentity"></p></div>
+    <section class="admin-panel admin-scoreboards" aria-labelledby="scoreboardsTitle">
+      <div class="admin-panel-head"><div><h2 id="scoreboardsTitle">Live scoreboards</h2><p>Run multiple OBS overlays and share phone-friendly controls.</p></div><button id="newScoreboardBtn" class="cta cta--primary" type="button">New scoreboard</button></div>
+      <form id="scoreboardCreateForm" class="admin-scoreboard-create is-hidden">
+        <label class="field"><span>Scoreboard name</span><input name="name" type="text" maxlength="80" placeholder="Court 1 · Match 3" required></label>
+        <label class="field"><span>Left team</span><select name="leftTeam" required></select></label>
+        <label class="field"><span>Right team</span><select name="rightTeam" required></select></label>
+        <div class="admin-scoreboard-create-actions"><button class="cta cta--primary" type="submit">Create scoreboard</button><button class="admin-link" type="button" data-cancel-scoreboard>Cancel</button></div>
+        <p class="form-status"></p>
+      </form>
+      <div id="scoreboardList" class="admin-scoreboard-list" aria-live="polite"><p class="admin-scoreboard-empty">Loading scoreboards…</p></div>
+    </section>
     <form id="livestreamForm" class="admin-panel admin-form"><div class="admin-panel-head"><div><h2>Livestream</h2><p>Controls the livestream state on the homepage.</p></div><label class="admin-switch"><input name="isLive" type="checkbox"> Live now</label></div><label class="field"><span>YouTube livestream link</span><input name="youtubeUrl" type="url" placeholder="https://youtube.com/watch?v=..."></label><div class="admin-form-actions"><button class="cta cta--primary" type="submit">Save livestream</button><p class="form-status"></p></div></form>
     <section class="admin-panel admin-readiness admin-team-readiness" aria-labelledby="teamReadinessTitle">
       <div class="admin-panel-head admin-readiness-card-head"><div><h2 id="teamReadinessTitle">Team summary</h2><p>Waiver and daily check-in completion across all tournament teams.</p></div><label class="field admin-readiness-day"><span>Game day</span><select id="readinessDayFilter"></select></label></div>

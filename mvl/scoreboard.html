@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>MVL Live Scoreboard</title>
+  <link rel="stylesheet" href="/mvl/css/scoreboard.css">
+</head>
+<body class="scoreboard-overlay-page">
+  <main class="scoreboard-stage" aria-live="polite">
+    <section id="scoreboard" class="scoreboard is-loading" aria-label="Live match scoreboard">
+      <div class="scoreboard-bar">
+        <div class="score-box score-box--left"><strong id="leftScore">0</strong><span>Sets <b id="leftSets">0</b></span></div>
+        <div class="team-box team-box--left"><span id="leftService" class="service-dot" aria-label="Serving"></span><strong id="leftName">Team A</strong></div>
+        <div class="team-box team-box--right"><strong id="rightName">Team B</strong><span id="rightService" class="service-dot" aria-label="Serving"></span></div>
+        <div class="score-box score-box--right"><strong id="rightScore">0</strong><span>Sets <b id="rightSets">0</b></span></div>
+      </div>
+      <img class="scoreboard-logo" src="/mvl/assets/hero-mvl-2026-logo.png" alt="Metarice Volleyball League 2026">
+    </section>
+    <p id="overlayStatus" class="overlay-status">Connecting to scoreboard…</p>
+  </main>
+  <script src="/mvl/js/supabase-config.js"></script>
+  <script src="/mvl/js/scoreboard.js"></script>
+</body>
+</html>

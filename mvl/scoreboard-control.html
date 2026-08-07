@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+  <title>MVL Scoreboard Control</title>
+  <link rel="icon" type="image/svg+xml" href="/mvl/assets/metarice-icon.svg">
+  <link rel="stylesheet" href="/mvl/css/scoreboard-control.css">
+</head>
+<body>
+  <header class="control-header"><img src="/mvl/assets/hero-mvl-2026-logo.png" alt="MVL 2026"><div><p>Live scoreboard</p><h1 id="boardName">Connecting…</h1></div><span id="connectionState" class="connection-state">Connecting</span></header>
+  <main id="controlApp" class="control-main is-loading">
+    <section class="team-selectors" aria-label="Participating teams">
+      <label><span>Left team</span><select id="leftTeamSelect"></select></label>
+      <button id="switchSidesBtn" class="switch-button" type="button"><span aria-hidden="true">⇄</span> Switch sides</button>
+      <label><span>Right team</span><select id="rightTeamSelect"></select></label>
+    </section>
+    <section class="control-scoreboard" aria-label="Score controls">
+      <article id="leftTeamPanel" class="team-control team-control--left">
+        <div class="team-control-head"><span id="leftService" class="control-service">Serving</span><h2 id="leftTeamName">Left team</h2></div>
+        <strong id="leftScore" class="control-score">0</strong>
+        <div class="score-actions"><button type="button" data-action="left-score-subtract" aria-label="Subtract one point from left team">−1</button><button class="is-primary" type="button" data-action="left-score-add" aria-label="Add one point to left team">+1</button></div>
+        <div class="sets-control"><span>Set wins</span><div><button type="button" data-action="left-set-subtract" aria-label="Subtract one set from left team">−</button><b id="leftSets">0</b><button type="button" data-action="left-set-add" aria-label="Add one set to left team">+</button></div></div>
+      </article>
+      <article id="rightTeamPanel" class="team-control team-control--right">
+        <div class="team-control-head"><span id="rightService" class="control-service">Serving</span><h2 id="rightTeamName">Right team</h2></div>
+        <strong id="rightScore" class="control-score">0</strong>
+        <div class="score-actions"><button type="button" data-action="right-score-subtract" aria-label="Subtract one point from right team">−1</button><button class="is-primary" type="button" data-action="right-score-add" aria-label="Add one point to right team">+1</button></div>
+        <div class="sets-control"><span>Set wins</span><div><button type="button" data-action="right-set-subtract" aria-label="Subtract one set from right team">−</button><b id="rightSets">0</b><button type="button" data-action="right-set-add" aria-label="Add one set to right team">+</button></div></div>
+      </article>
+    </section>
+    <section class="control-footer">
+      <button id="resetScoresBtn" class="danger-button" type="button">Reset scores to zero</button>
+      <button id="copyObsBtn" class="share-button" type="button">Copy OBS link</button>
+    </section>
+    <p id="controlStatus" class="control-status" aria-live="polite"></p>
+  </main>
+  <section id="controlError" class="control-error is-hidden"><h2>Control link unavailable</h2><p id="controlErrorMessage">Ask an MVL admin for a new scoreboard control link.</p></section>
+  <script src="/mvl/js/supabase-config.js"></script>
+  <script src="/mvl/js/league-data.js"></script>
+  <script src="/mvl/js/scoreboard-control.js"></script>
+</body>
+</html>

@@ -165,6 +165,25 @@ video item contains a custom label and parsed YouTube ID:
 The older `public.mvl_record_game_result(...)` helper remains available for
 backward compatibility with single-video scripts.
 
+## Live Scoreboards
+
+Apply the live scoreboard migration with:
+
+```bash
+supabase db query --linked --file supabase/migrations/20260807000100_live_scoreboards.sql
+```
+
+Admins create any number of live boards from `/mvl/admin`. Each board provides:
+
+- a public, read-only `/mvl/scoreboard` URL for an OBS browser source;
+- a secret bearer-link `/mvl/scoreboard-control` URL for remote scorekeeping;
+- atomic point, set, reset, service, team-selection, and side-switch updates.
+
+The control URL grants write access to that scoreboard without sign-in. Treat
+it like a password and share it only with the scorekeeper. Direct table access
+remains blocked by row-level security; public reads and bearer-token writes go
+through narrowly scoped RPC functions.
+
 ## Admin Access
 
 Admin access uses a normalized email allowlist and Google SSO. An administrator

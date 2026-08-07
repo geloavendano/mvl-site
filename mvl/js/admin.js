@@ -21,6 +21,9 @@ const emergencyContactRelationship = document.getElementById('emergencyContactRe
 const emergencyContactNumber = document.getElementById('emergencyContactNumber');
 const emergencyContactError = document.getElementById('emergencyContactError');
 const emergencyCallLink = document.getElementById('emergencyCallLink');
+const scoreboardCreateForm = document.getElementById('scoreboardCreateForm');
+const scoreboardList = document.getElementById('scoreboardList');
+const newScoreboardBtn = document.getElementById('newScoreboardBtn');
 const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
 }[char]));
@@ -67,6 +70,56 @@ const call = async (path, body, token = session?.access_token) => {
   return json;
 };
 const rpc = (name, body) => call(`/rest/v1/rpc/${name}`, body);
+const scoreboardUrls = (board) => ({
+  obs: `${window.location.origin}/mvl/scoreboard?board=${encodeURIComponent(board.id)}`,
+  control: `${window.location.origin}/mvl/scoreboard-control?board=${encodeURIComponent(board.id)}&key=${encodeURIComponent(board.controlToken)}`,
+});
+const copyText = async (value) => {
+  if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(value);
+  const input = document.createElement('textarea');
+  input.value = value;
+  input.style.position = 'fixed';
+  input.style.opacity = '0';
+  document.body.append(input);
+  input.select();
+  document.execCommand('copy');
+  input.remove();
+};
+const renderScoreboards = (boards) => {
+  if (!boards.length) {
+    scoreboardList.innerHTML = '<p class="admin-scoreboard-empty">No live scoreboards yet. Create one for each court or match you need to run.</p>';
+    return;
+  }
+  scoreboardList.innerHTML = boards.map((board) => {
+    const urls = scoreboardUrls(board);
+    return `<article class="admin-scoreboard-card" data-scoreboard-id="${escapeHtml(board.id)}">
+      <div class="admin-scoreboard-matchup">
+        <div><strong>${escapeHtml(board.name)}</strong><span>Updated ${escapeHtml(new Date(board.updatedAt).toLocaleString('en-PH'))}</span></div>
+        <div class="admin-scoreboard-score"><span style="--team-color:${escapeHtml(board.leftTeam.colorB)}">${escapeHtml(board.leftTeam.name)} <b>${board.leftScore}</b></span><i>–</i><span style="--team-color:${escapeHtml(board.rightTeam.colorB)}"><b>${board.rightScore}</b> ${escapeHtml(board.rightTeam.name)}</span></div>
+      </div>
+      <div class="admin-scoreboard-actions">
+        <a class="cta cta--primary" href="${escapeHtml(urls.control)}" target="_blank" rel="noopener">Manage</a>
+        <button class="cta cta--secondary" type="button" data-copy-url="${escapeHtml(urls.obs)}">Copy OBS link</button>
+        <button class="cta cta--secondary" type="button" data-copy-url="${escapeHtml(urls.control)}">Copy control link</button>
+      </div>
+      <p class="form-status"></p>
+    </article>`;
+  }).join('');
+};
+const loadScoreboards = async () => {
+  try {
+    const boards = await rpc('mvl_admin_get_scoreboards');
+    renderScoreboards(boards || []);
+  } catch (error) {
+    scoreboardList.innerHTML = `<p class="form-status is-error">${escapeHtml(error.message)}</p>`;
+  }
+};
+const populateScoreboardTeams = () => {
+  const options = window.MVL_DATA.teams.map((team) => `<option value="${escapeHtml(team.id)}">${escapeHtml(team.name)}</option>`).join('');
+  scoreboardCreateForm.elements.leftTeam.innerHTML = options;
+  scoreboardCreateForm.elements.rightTeam.innerHTML = options;
+  scoreboardCreateForm.elements.rightTeam.selectedIndex = Math.min(1, window.MVL_DATA.teams.length - 1);
+};
 const instagramDisplay = (value) => {
   const handle = String(value || '').trim().replace(/^@/, '');
   return handle ? `@${handle}` : '';
@@ -333,7 +386,7 @@ const show = async () => {
     const live = data.publicData.livestream, form = livestreamForm.elements;
     form.isLive.checked = live.is_live; form.youtubeUrl.value = live.youtube_url || '';
     render();
-    await loadReadiness();
+    await Promise.all([loadReadiness(), loadScoreboards()]);
   } catch (e) {
     session = null;
     authClient.auth.signOut();
@@ -347,6 +400,50 @@ googleSignInBtn.addEventListener('click', async () => {
     options: { redirectTo: `${window.location.origin}/mvl/admin` },
   });
   if (error) status(loginStatus, error.message, 'error');
+});
+newScoreboardBtn.addEventListener('click', () => {
+  scoreboardCreateForm.classList.remove('is-hidden');
+  newScoreboardBtn.classList.add('is-hidden');
+  scoreboardCreateForm.elements.name.focus();
+});
+scoreboardCreateForm.addEventListener('click', (event) => {
+  if (!event.target.closest('[data-cancel-scoreboard]')) return;
+  scoreboardCreateForm.reset();
+  populateScoreboardTeams();
+  scoreboardCreateForm.classList.add('is-hidden');
+  newScoreboardBtn.classList.remove('is-hidden');
+});
+scoreboardCreateForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const formStatus = form.querySelector('.form-status');
+  status(formStatus, 'Creating…');
+  try {
+    if (form.elements.leftTeam.value === form.elements.rightTeam.value) throw new Error('Choose two different teams.');
+    await rpc('mvl_admin_create_scoreboard', {
+      p_name: form.elements.name.value,
+      p_team_left_id: form.elements.leftTeam.value,
+      p_team_right_id: form.elements.rightTeam.value,
+    });
+    form.reset();
+    populateScoreboardTeams();
+    form.classList.add('is-hidden');
+    newScoreboardBtn.classList.remove('is-hidden');
+    await loadScoreboards();
+  } catch (error) {
+    status(formStatus, error.message, 'error');
+  }
+});
+scoreboardList.addEventListener('click', async (event) => {
+  const button = event.target.closest('[data-copy-url]');
+  if (!button) return;
+  const cardStatus = button.closest('.admin-scoreboard-card').querySelector('.form-status');
+  try {
+    await copyText(button.dataset.copyUrl);
+    status(cardStatus, button.textContent.includes('OBS') ? 'OBS link copied.' : 'Control link copied.', 'success');
+  } catch {
+    status(cardStatus, 'Could not copy the link. Open Manage and copy it there.', 'error');
+  }
 });
 livestreamForm.addEventListener('submit', async (e) => { e.preventDefault(); const s = e.target.querySelector('.form-status'), f = e.target.elements; status(s, 'Saving…'); try { const id = youtubeId(f.youtubeUrl.value) || ''; await rpc('mvl_admin_update_livestream', { p_is_live: f.isLive.checked, p_youtube_url: f.youtubeUrl.value, p_youtube_id: id }); status(s, 'Livestream updated.', 'success'); } catch (err) { status(s, err.message, 'error'); } });
 adminDayFilter.addEventListener('change', () => { activeAdminDay = Number(adminDayFilter.value); render(); });
@@ -484,3 +581,4 @@ authClient.auth.getSession().then(({ data: authData }) => {
   session = authData.session;
   if (session?.access_token) show();
 });
+populateScoreboardTeams();
