@@ -30,8 +30,7 @@ const rpc = async (name, body) => {
 const applyTeam = (side, team) => {
   const box = document.querySelector(`.team-box--${side}`);
   const score = document.querySelector(`.score-box--${side}`);
-  const center = document.querySelector(`.center-fill--${side}`);
-  [box, score, center].forEach((element) => {
+  [box, score].forEach((element) => {
     element.style.setProperty('--team-a', team.colorA);
     element.style.setProperty('--team-b', team.colorB);
   });
