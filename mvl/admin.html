@@ -13,31 +13,45 @@
     <div class="admin-form"><p class="admin-login-copy">Continue with an allowlisted Google account.</p><button id="googleSignInBtn" class="cta cta--primary" type="button">Continue with Google</button><p id="loginStatus" class="form-status"></p></div>
   </section>
   <section id="dashboard" class="is-hidden">
-    <div class="admin-heading"><div><h1>MVL Admin</h1><p>Manage the livestream, player readiness, and game results.</p></div><p id="adminIdentity"></p></div>
-    <section class="admin-panel admin-scoreboards" aria-labelledby="scoreboardsTitle">
-      <div class="admin-panel-head"><div><h2 id="scoreboardsTitle">Live scoreboards</h2><p>Run multiple OBS overlays and share phone-friendly controls.</p></div><button id="newScoreboardBtn" class="cta cta--primary" type="button">New scoreboard</button></div>
-      <form id="scoreboardCreateForm" class="admin-scoreboard-create is-hidden">
-        <label class="field"><span>Scoreboard name</span><input name="name" type="text" maxlength="80" placeholder="Court 1 · Match 3" required></label>
-        <label class="field"><span>Left team</span><select name="leftTeam" required></select></label>
-        <label class="field"><span>Right team</span><select name="rightTeam" required></select></label>
-        <div class="admin-scoreboard-create-actions"><button class="cta cta--primary" type="submit">Create scoreboard</button><button class="admin-link" type="button" data-cancel-scoreboard>Cancel</button></div>
-        <p class="form-status"></p>
-      </form>
-      <div id="scoreboardList" class="admin-scoreboard-list" aria-live="polite"><p class="admin-scoreboard-empty">Loading scoreboards…</p></div>
+    <div class="admin-heading"><div><h1>MVL Admin</h1><p>Manage tournament operations from one place.</p></div><p id="adminIdentity"></p></div>
+    <nav class="admin-tabs" role="tablist" aria-label="Admin sections">
+      <button id="registrationsTab" class="admin-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="registrationsPanel" data-admin-tab="registrations">Registrations</button>
+      <button id="livestreamTab" class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="livestreamPanel" tabindex="-1" data-admin-tab="livestream">Livestream</button>
+      <button id="scoreboardTab" class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="scoreboardPanel" tabindex="-1" data-admin-tab="scoreboard">Scoreboard</button>
+      <button id="gameResultsTab" class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="gameResultsPanel" tabindex="-1" data-admin-tab="game-results">Game results</button>
+    </nav>
+    <section id="registrationsPanel" class="admin-tab-panel is-active" role="tabpanel" aria-labelledby="registrationsTab" data-admin-panel="registrations">
+      <section class="admin-panel admin-readiness admin-team-readiness" aria-labelledby="teamReadinessTitle">
+        <div class="admin-panel-head admin-readiness-card-head"><div><h2 id="teamReadinessTitle">Team summary</h2><p>Waiver and daily check-in completion across all tournament teams.</p></div><label class="field admin-readiness-day"><span>Game day</span><select id="readinessDayFilter"></select></label></div>
+        <div id="readinessTeamSummary" class="admin-readiness-table-wrap" aria-live="polite"></div>
+      </section>
+      <section id="playerStatusCard" class="admin-panel admin-readiness admin-player-status" aria-labelledby="playerStatusTitle">
+        <div class="admin-panel-head admin-readiness-card-head"><div><h2 id="playerStatusTitle">Player status</h2><p>Individual waiver, contact, and selected-day check-in status.</p></div><label class="field admin-readiness-team-control"><span>Team</span><select id="readinessTeamFilter"></select></label></div>
+        <p id="readinessSummary" class="admin-readiness-summary" aria-live="polite">Loading player status…</p>
+        <div id="readinessTable" class="admin-readiness-table-wrap"></div>
+        <div id="unmatchedCheckins" class="admin-unmatched is-hidden"></div>
+      </section>
     </section>
-    <form id="livestreamForm" class="admin-panel admin-form"><div class="admin-panel-head"><div><h2>Livestream</h2><p>Controls the livestream state on the homepage.</p></div><label class="admin-switch"><input name="isLive" type="checkbox"> Live now</label></div><label class="field"><span>YouTube livestream link</span><input name="youtubeUrl" type="url" placeholder="https://youtube.com/watch?v=..."></label><div class="admin-form-actions"><button class="cta cta--primary" type="submit">Save livestream</button><p class="form-status"></p></div></form>
-    <section class="admin-panel admin-readiness admin-team-readiness" aria-labelledby="teamReadinessTitle">
-      <div class="admin-panel-head admin-readiness-card-head"><div><h2 id="teamReadinessTitle">Team summary</h2><p>Waiver and daily check-in completion across all tournament teams.</p></div><label class="field admin-readiness-day"><span>Game day</span><select id="readinessDayFilter"></select></label></div>
-      <div id="readinessTeamSummary" class="admin-readiness-table-wrap" aria-live="polite"></div>
+    <section id="livestreamPanel" class="admin-tab-panel" role="tabpanel" aria-labelledby="livestreamTab" data-admin-panel="livestream" hidden>
+      <form id="livestreamForm" class="admin-panel admin-form"><div class="admin-panel-head"><div><h2>Livestream</h2><p>Controls the livestream state on the homepage.</p></div><label class="admin-switch"><input name="isLive" type="checkbox"> Live now</label></div><label class="field"><span>YouTube livestream link</span><input name="youtubeUrl" type="url" placeholder="https://youtube.com/watch?v=..."></label><div class="admin-form-actions"><button class="cta cta--primary" type="submit">Save livestream</button><p class="form-status"></p></div></form>
     </section>
-    <section id="playerStatusCard" class="admin-panel admin-readiness admin-player-status" aria-labelledby="playerStatusTitle">
-      <div class="admin-panel-head admin-readiness-card-head"><div><h2 id="playerStatusTitle">Player status</h2><p>Individual waiver, contact, and selected-day check-in status.</p></div><label class="field admin-readiness-team-control"><span>Team</span><select id="readinessTeamFilter"></select></label></div>
-      <p id="readinessSummary" class="admin-readiness-summary" aria-live="polite">Loading player status…</p>
-      <div id="readinessTable" class="admin-readiness-table-wrap"></div>
-      <div id="unmatchedCheckins" class="admin-unmatched is-hidden"></div>
+    <section id="scoreboardPanel" class="admin-tab-panel" role="tabpanel" aria-labelledby="scoreboardTab" data-admin-panel="scoreboard" hidden>
+      <section class="admin-panel admin-scoreboards" aria-labelledby="scoreboardsTitle">
+        <div class="admin-panel-head"><div><h2 id="scoreboardsTitle">Live scoreboards</h2><p>Run multiple OBS overlays and share phone-friendly controls.</p></div><button id="newScoreboardBtn" class="cta cta--primary" type="button">New scoreboard</button></div>
+        <form id="scoreboardCreateForm" class="admin-scoreboard-create is-hidden">
+          <label class="field"><span>Scoreboard name</span><input name="name" type="text" maxlength="80" placeholder="Court 1 · Match 3" required></label>
+          <label class="field"><span>Left team</span><select name="leftTeam" required></select></label>
+          <label class="field"><span>Right team</span><select name="rightTeam" required></select></label>
+          <div class="admin-scoreboard-create-actions"><button class="cta cta--primary" type="submit">Create scoreboard</button><button class="admin-link" type="button" data-cancel-scoreboard>Cancel</button></div>
+          <p class="form-status"></p>
+        </form>
+        <div id="scoreboardList" class="admin-scoreboard-list" aria-live="polite"><p class="admin-scoreboard-empty">Loading scoreboards…</p></div>
+      </section>
     </section>
-    <div class="admin-games-toolbar"><div><h2>Games</h2><p id="adminDaySummary"></p></div><label class="admin-day-filter"><span>Match day</span><select id="adminDayFilter"></select></label></div>
-    <div id="adminGameList"></div>
+    <section id="gameResultsPanel" class="admin-tab-panel" role="tabpanel" aria-labelledby="gameResultsTab" data-admin-panel="game-results" hidden>
+      <div class="admin-games-toolbar"><div><h2>Games</h2><p id="adminDaySummary"></p></div><label class="admin-day-filter"><span>Match day</span><select id="adminDayFilter"></select></label></div>
+      <div id="adminGameList"></div>
+    </section>
   </section>
 </main>
 <dialog id="emergencyContactDialog" class="admin-contact-dialog" aria-labelledby="emergencyDialogTitle" aria-describedby="emergencyDialogNote">

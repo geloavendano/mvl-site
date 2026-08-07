@@ -24,6 +24,9 @@ const emergencyCallLink = document.getElementById('emergencyCallLink');
 const scoreboardCreateForm = document.getElementById('scoreboardCreateForm');
 const scoreboardList = document.getElementById('scoreboardList');
 const newScoreboardBtn = document.getElementById('newScoreboardBtn');
+const adminTabs = [...document.querySelectorAll('[data-admin-tab]')];
+const adminTabPanels = [...document.querySelectorAll('[data-admin-panel]')];
+const adminTabNames = new Set(adminTabs.map((tab) => tab.dataset.adminTab));
 const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
 }[char]));
@@ -48,6 +51,28 @@ const gameTeamMarkup = (game, side) => {
   return label ? escapeHtml(name) : teamNameMarkup(id, name);
 };
 const status = (el, text, type = '') => { el.textContent = text; el.className = `form-status ${type ? `is-${type}` : ''}`; };
+const adminTabFromHash = () => {
+  const requested = window.location.hash.slice(1);
+  return adminTabNames.has(requested) ? requested : 'registrations';
+};
+const activateAdminTab = (name, { updateUrl = false, focus = false } = {}) => {
+  const activeName = adminTabNames.has(name) ? name : 'registrations';
+  adminTabs.forEach((tab) => {
+    const isActive = tab.dataset.adminTab === activeName;
+    tab.classList.toggle('is-active', isActive);
+    tab.setAttribute('aria-selected', String(isActive));
+    tab.tabIndex = isActive ? 0 : -1;
+    if (isActive && focus) tab.focus();
+  });
+  adminTabPanels.forEach((panel) => {
+    const isActive = panel.dataset.adminPanel === activeName;
+    panel.classList.toggle('is-active', isActive);
+    panel.hidden = !isActive;
+  });
+  if (updateUrl && window.location.hash !== `#${activeName}`) {
+    window.history.pushState(null, '', `#${activeName}`);
+  }
+};
 const playerPhotoUrl = (value) => {
   if (!value) return '';
   if (/^https?:\/\//i.test(value)) return value;
@@ -386,6 +411,7 @@ const show = async () => {
     const live = data.publicData.livestream, form = livestreamForm.elements;
     form.isLive.checked = live.is_live; form.youtubeUrl.value = live.youtube_url || '';
     render();
+    activateAdminTab(adminTabFromHash());
     await Promise.all([loadReadiness(), loadScoreboards()]);
   } catch (e) {
     session = null;
@@ -401,6 +427,22 @@ googleSignInBtn.addEventListener('click', async () => {
   });
   if (error) status(loginStatus, error.message, 'error');
 });
+document.querySelector('.admin-tabs').addEventListener('click', (event) => {
+  const tab = event.target.closest('[data-admin-tab]');
+  if (tab) activateAdminTab(tab.dataset.adminTab, { updateUrl: true });
+});
+document.querySelector('.admin-tabs').addEventListener('keydown', (event) => {
+  if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+  event.preventDefault();
+  const currentIndex = adminTabs.findIndex((tab) => tab.classList.contains('is-active'));
+  const nextIndex = event.key === 'Home' ? 0
+    : event.key === 'End' ? adminTabs.length - 1
+      : event.key === 'ArrowRight' ? (currentIndex + 1) % adminTabs.length
+        : (currentIndex - 1 + adminTabs.length) % adminTabs.length;
+  activateAdminTab(adminTabs[nextIndex].dataset.adminTab, { updateUrl: true, focus: true });
+});
+window.addEventListener('popstate', () => activateAdminTab(adminTabFromHash()));
+window.addEventListener('hashchange', () => activateAdminTab(adminTabFromHash()));
 newScoreboardBtn.addEventListener('click', () => {
   scoreboardCreateForm.classList.remove('is-hidden');
   newScoreboardBtn.classList.add('is-hidden');
@@ -581,4 +623,5 @@ authClient.auth.getSession().then(({ data: authData }) => {
   session = authData.session;
   if (session?.access_token) show();
 });
+activateAdminTab(adminTabFromHash());
 populateScoreboardTeams();
