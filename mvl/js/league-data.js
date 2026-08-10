@@ -75,8 +75,10 @@ window.MVL_DATA = {
     // Dates (Asia/Manila, YYYY-MM-DD) when check-in is open even though no game
     // is scheduled. Mirrors mvl.raffle_open_dates in Supabase, which is the
     // authority — this list only decides whether the form is shown.
-    // TEMP: client testing window, remove after 2026-08-02.
-    openDates: ['2026-07-31', '2026-08-01', '2026-08-02'],
+    // TEMP: client testing window. Mirrors mvl.raffle_open_dates, and the
+    // venue radius on Court 1 is temporarily widened to 2km to match.
+    // Remove these dates and reset the radius to 500m when testing is done.
+    openDates: ['2026-07-31', '2026-08-01', '2026-08-02', '2026-08-11'],
     headline: 'Win big just for showing up',
     blurb: 'Check in at the venue on any game day and you are in the draw. Winners are announced and claimed on-site.',
     prizes: [
