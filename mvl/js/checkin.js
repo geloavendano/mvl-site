@@ -1,0 +1,353 @@
+/* ==========================================================================
+   Game-day check-in — two paths to the same confirmation.
+     self : the player's own phone. Server checks the day, the venue radius,
+            and the email on file for that team+jersey.
+     qr   : the booth laptop. Staff sign in with Google; the server requires
+            mvl.is_admin() because the QR payload carries no secret itself.
+   Both call an RPC that resolves a real roster row, so a check-in is tied to a
+   player and deduped on (player_id, day) rather than on a typed name.
+   ========================================================================== */
+const { teams, games, raffle } = window.MVL_DATA;
+const supabase = window.MVL_SUPABASE;
+
+// Gameville Ball Park · Court 1 (seeded UUID) — the row that carries a location
+const VENUE_ID = '11111111-1111-4111-8111-111111111111';
+
+const el = (id) => document.getElementById(id);
+const teamById = Object.fromEntries(teams.map((t) => [t.id, t]));
+
+// ---- prize showcase ----------------------------------------------------------
+const prizeShowcase = el('prizeShowcase');
+if (prizeShowcase && raffle?.prizes?.length) {
+  el('prizeHeadline').textContent = raffle.headline || 'Win big just for showing up';
+  prizeShowcase.querySelector('.prize-blurb').textContent = raffle.blurb || '';
+  el('prizeGrid').innerHTML = raffle.prizes.map((prize, i) => `
+    <article class="prize-card${i === 0 ? ' prize-card--feature' : ''}">
+      ${prize.tag ? `<span class="prize-tag">${prize.tag}</span>` : ''}
+      <div class="prize-media${prize.image ? '' : ' is-empty'}">
+        ${prize.image ? `<img src="${prize.image}" alt="${prize.name}" loading="lazy">` : '<span>Prize photo</span>'}
+      </div>
+      <div class="prize-copy">
+        ${prize.sponsor ? `<p class="prize-sponsor">${prize.sponsor}</p>` : ''}
+        <h3>${prize.name}</h3>
+      </div>
+    </article>
+  `).join('');
+  prizeShowcase.classList.remove('is-hidden');
+}
+
+// ---- game-day gate (Manila) --------------------------------------------------
+// The client gate only decides what to show. The server re-checks the day on
+// every call, so this can never let a real check-in through on a closed day.
+const manilaDate = (value) => new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit',
+}).format(value ? new Date(value) : new Date());
+
+const openDays = new Set([
+  ...games.map((game) => manilaDate(game.startsAt)),
+  ...(raffle?.openDates || []),
+]);
+const previewMode = new URLSearchParams(location.search).has('preview');
+const isOpen = previewMode || openDays.has(manilaDate());
+
+const modes = el('checkinModes');
+const selfForm = el('selfForm');
+const qrPanel = el('qrPanel');
+const done = el('checkinDone');
+
+if (isOpen) {
+  modes.classList.remove('is-hidden');
+} else {
+  el('raffleClosed').classList.remove('is-hidden');
+}
+
+// ---- shared helpers ------------------------------------------------------------
+const setStatus = (node, message, kind) => {
+  node.textContent = message || '';
+  node.classList.toggle('is-error', kind === 'error');
+  node.classList.toggle('is-success', kind === 'success');
+};
+
+const show = (node) => node.classList.remove('is-hidden');
+const hide = (node) => node.classList.add('is-hidden');
+
+const playerPhotoUrl = (payload) => {
+  const { photo_url: url, photo_path: path } = payload.player;
+  if (url) return url;
+  if (!path) return '';
+  const clean = path.split('/').filter(Boolean).map(encodeURIComponent).join('/');
+  return `${supabase.url}/storage/v1/object/public/mvl-player-photos/${clean}`;
+};
+
+const rpc = async (fn, body, token) => {
+  const res = await fetch(`${supabase.url}/rest/v1/rpc/${fn}`, {
+    method: 'POST',
+    headers: {
+      apikey: supabase.anonKey,
+      Authorization: `Bearer ${token || supabase.anonKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.message || `Request failed (${res.status})`);
+  return data;
+};
+
+// The server raises these; turn them into something a person can act on.
+const friendlyError = (message) => {
+  if (message.startsWith('OUTSIDE_VENUE')) {
+    const metres = Number(message.split(':')[1] || 0);
+    const away = metres >= 1000 ? `${(metres / 1000).toFixed(1)}km` : `${Math.round(metres)}m`;
+    return `You look about ${away} from Gameville Ball Park. Check in once you're at the venue.`;
+  }
+  return {
+    CHECKIN_CLOSED: "Check-in isn't open today. It runs on game days only.",
+    PLAYER_NOT_FOUND: "We couldn't find that jersey number on that team. Double-check both, or visit the registration booth.",
+    EMAIL_MISMATCH: "That email doesn't match the one on your registration. Use the address you registered with, or visit the booth.",
+    NO_EMAIL_ON_FILE: 'There is no email on your registration, so self check-in is unavailable. Please check in at the registration booth.',
+    NOT_AUTHORISED: 'This Google account is not an MVL administrator.',
+    BAD_CODE: "That code isn't in the expected format.",
+    VENUE_NOT_FOUND: 'Venue is not configured. Please check in at the booth.',
+    VENUE_LOCATION_MISSING: 'Venue location is not configured. Please check in at the booth.',
+  }[message] || message;
+};
+
+// ---- confirmation --------------------------------------------------------------
+const CHEERS = [
+  'Go get it out there.',
+  'Leave it all on the court.',
+  'Play loose, play loud.',
+  'Make it count today.',
+];
+
+const showConfirmation = (payload) => {
+  const team = teamById[payload.team.id];
+  const card = el('checkinCard');
+  // Colours come from league-data.js, not the row: the client is the source of
+  // truth for the 2026 palette.
+  if (team) {
+    card.style.setProperty('--team-a', team.grad[0]);
+    card.style.setProperty('--team-b', team.grad[1]);
+  }
+
+  const img = el('checkinPhotoImg');
+  const src = playerPhotoUrl(payload);
+  const photo = el('checkinPhoto');
+  photo.classList.toggle('has-photo', Boolean(src));
+  if (src) {
+    img.src = src;
+    img.hidden = false;
+    // a broken or missing file falls back to the silhouette rather than an icon
+    img.onerror = () => { img.hidden = true; photo.classList.remove('has-photo'); };
+  } else {
+    img.hidden = true;
+    img.removeAttribute('src');
+  }
+
+  const player = payload.player;
+  const full = [player.display_name, player.surname].filter(Boolean).join(' ');
+  el('checkinTeam').textContent = payload.team.name || '';
+  el('checkinName').textContent = full;
+  el('checkinJersey').textContent = player.jersey_number ? `Jersey ${player.jersey_number}` : '';
+
+  if (payload.already_checked_in) {
+    const at = new Intl.DateTimeFormat('en-PH', {
+      timeZone: 'Asia/Manila', hour: 'numeric', minute: '2-digit',
+    }).format(new Date(payload.checked_in_at));
+    el('checkinKicker').textContent = 'Already checked in';
+    el('checkinMessage').textContent = `You're in the draw for today — checked in at ${at}. No need to do it again.`;
+  } else {
+    el('checkinKicker').textContent = "You're checked in!";
+    el('checkinMessage').textContent =
+      `You're in today's raffle draw. ${CHEERS[Math.floor(Math.random() * CHEERS.length)]} Best of luck!`;
+  }
+
+  hide(modes); hide(selfForm); hide(qrPanel);
+  show(done);
+  done.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  // TODO: trigger the check-in confirmation email once its template exists.
+};
+
+el('checkinAgainBtn').addEventListener('click', () => {
+  hide(done);
+  if (qrSignedIn) { show(qrPanel); focusScanner(); } else { show(modes); }
+});
+
+// ---- mode chooser ---------------------------------------------------------------
+modes.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-mode]');
+  if (!button) return;
+  hide(modes);
+  if (button.dataset.mode === 'self') {
+    show(selfForm);
+    el('teamSelect').focus();
+  } else {
+    show(qrPanel);
+  }
+});
+
+// ---- self check-in ---------------------------------------------------------------
+const teamSelect = el('teamSelect');
+const teamSwatch = el('teamSwatch');
+teamSelect.innerHTML = '<option value="">Select your team</option>' +
+  teams.map((team) => `<option value="${team.id}">${team.name}</option>`).join('');
+
+teamSelect.addEventListener('change', () => {
+  const team = teamById[teamSelect.value];
+  if (!team) { teamSwatch.classList.remove('is-on'); return; }
+  teamSwatch.style.setProperty('--team-a', team.grad[0]);
+  teamSwatch.style.setProperty('--team-b', team.grad[1]);
+  teamSwatch.classList.add('is-on');
+});
+
+const getPosition = () => new Promise((resolve, reject) => {
+  if (!navigator.geolocation) {
+    reject(new Error('This device cannot share its location. Please check in at the booth.'));
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(resolve, (error) => {
+    reject(new Error(error.code === error.PERMISSION_DENIED
+      ? 'Location permission is off, so we cannot confirm you are at the venue. Turn it on, or check in at the booth.'
+      : 'We could not read your location. Move somewhere with a clearer signal and try again.'));
+  }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+});
+
+const formStatus = el('formStatus');
+const submitBtn = el('submitBtn');
+
+selfForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const teamId = teamSelect.value;
+  const jersey = el('jerseyNumber').value.trim();
+  const email = el('checkinEmail').value.trim();
+
+  if (!teamId || !jersey || !email) {
+    setStatus(formStatus, 'Fill in your team, jersey number and email.', 'error');
+    return;
+  }
+
+  submitBtn.disabled = true;
+  setStatus(formStatus, 'Checking your location…');
+  try {
+    const position = await getPosition();
+    setStatus(formStatus, 'Checking you in…');
+    const payload = await rpc('mvl_self_checkin', {
+      p_team_id: teamId,
+      p_jersey_number: jersey,
+      p_email: email,
+      p_venue_id: VENUE_ID,
+      p_lat: position.coords.latitude,
+      p_lng: position.coords.longitude,
+      p_accuracy_m: position.coords.accuracy ?? null,
+      p_user_agent: navigator.userAgent,
+    });
+    setStatus(formStatus, '');
+    showConfirmation(payload);
+  } catch (error) {
+    setStatus(formStatus, friendlyError(error.message), 'error');
+  } finally {
+    submitBtn.disabled = false;
+  }
+});
+
+// ---- QR booth -------------------------------------------------------------------
+// supabase-js is only needed to sign a staff member in, so it is fetched on
+// demand rather than shipped to every visitor who opens this page.
+let authClient = null;
+let qrSignedIn = false;
+const qrAuthStatus = el('qrAuthStatus');
+const qrStatus = el('qrStatus');
+const qrInput = el('qrInput');
+
+const focusScanner = () => setTimeout(() => qrInput.focus(), 50);
+
+const loadAuthClient = () => new Promise((resolve, reject) => {
+  if (authClient) { resolve(authClient); return; }
+  const script = document.createElement('script');
+  script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+  script.onload = () => {
+    authClient = window.supabase.createClient(supabase.url, supabase.anonKey);
+    resolve(authClient);
+  };
+  script.onerror = () => reject(new Error('Could not load sign-in. Check the connection and try again.'));
+  document.head.appendChild(script);
+});
+
+const enterScanner = (session) => {
+  qrSignedIn = true;
+  hide(el('qrSignIn'));
+  show(el('qrScanner'));
+  el('qrWho').textContent = `Signed in as ${session.user?.email || 'staff'}. Scan a player's QR code to check them in.`;
+  focusScanner();
+};
+
+el('qrSignInBtn').addEventListener('click', async () => {
+  setStatus(qrAuthStatus, 'Loading sign-in…');
+  try {
+    const client = await loadAuthClient();
+    setStatus(qrAuthStatus, 'Redirecting to Google…');
+    const { error } = await client.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${location.origin}/mvl/checkin` },
+    });
+    if (error) throw error;
+  } catch (error) {
+    setStatus(qrAuthStatus, error.message, 'error');
+  }
+});
+
+el('qrSignOutBtn').addEventListener('click', async () => {
+  if (authClient) await authClient.auth.signOut();
+  qrSignedIn = false;
+  hide(el('qrScanner'));
+  show(el('qrSignIn'));
+  setStatus(qrAuthStatus, '');
+});
+
+const submitCode = async (code) => {
+  if (!code) return;
+  setStatus(qrStatus, 'Checking in…');
+  try {
+    const { data } = await authClient.auth.getSession();
+    const payload = await rpc('mvl_qr_checkin',
+      { p_code: code, p_user_agent: navigator.userAgent },
+      data?.session?.access_token);
+    setStatus(qrStatus, '');
+    showConfirmation(payload);
+  } catch (error) {
+    setStatus(qrStatus, friendlyError(error.message), 'error');
+    focusScanner();
+  }
+};
+
+// A booth scanner behaves as a keyboard: it types the payload then presses
+// Enter. That covers any USB or Bluetooth reader with no camera permission and
+// no decoding library, and typing a code by hand works the same way.
+qrInput.addEventListener('keydown', (event) => {
+  if (event.key !== 'Enter') return;
+  event.preventDefault();
+  const code = qrInput.value.trim();
+  qrInput.value = '';
+  submitCode(code);
+});
+
+// returning from the Google redirect lands here with a session already set
+if (location.hash.includes('access_token') || location.search.includes('code=')) {
+  show(qrPanel);
+  hide(modes);
+  setStatus(qrAuthStatus, 'Signing in…');
+  loadAuthClient()
+    .then((client) => client.auth.getSession())
+    .then(({ data }) => {
+      if (data?.session) {
+        setStatus(qrAuthStatus, '');
+        enterScanner(data.session);
+        history.replaceState(null, '', location.pathname);
+      } else {
+        setStatus(qrAuthStatus, 'Sign-in did not complete. Try again.', 'error');
+      }
+    })
+    .catch((error) => setStatus(qrAuthStatus, error.message, 'error'));
+}

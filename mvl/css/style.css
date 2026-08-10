@@ -4573,3 +4573,130 @@ body.gametime-v3 .rules-preview {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
+
+/* ==========================================================================
+   Game-day check-in — mode chooser and confirmation card
+   ========================================================================== */
+.checkin-modes {
+  display: grid;
+  gap: 14px;
+  margin: 24px 0 8px;
+}
+.checkin-mode {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  width: 100%;
+  padding: 18px;
+  text-align: left;
+  border: 1px solid rgba(124, 245, 180, .28);
+  border-radius: var(--surface-radius);
+  background: var(--surface-deep);
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: border-color .15s ease, transform .15s ease;
+}
+.checkin-mode:hover { border-color: var(--mint); transform: translateY(-1px); }
+.checkin-mode:focus-visible { outline: 2px solid var(--mint); outline-offset: 3px; }
+.checkin-mode-icon {
+  flex: 0 0 34px;
+  color: var(--mint);
+}
+.checkin-mode-icon svg { width: 34px; height: 34px; display: block; }
+.checkin-mode-copy strong {
+  display: block;
+  font: 800 15px var(--ui);
+  letter-spacing: .4px;
+  text-transform: uppercase;
+}
+.checkin-mode-copy small {
+  display: block;
+  margin-top: 5px;
+  color: var(--ink-muted);
+  font: 400 12.5px/1.5 var(--ui);
+}
+
+.checkin-done { margin: 24px 0 8px; }
+.checkin-card {
+  padding: 30px 24px 26px;
+  text-align: center;
+  border-radius: var(--surface-radius);
+  /* the player's own team colours frame the card */
+  border: 2px solid var(--team-a, var(--mint));
+  background:
+    radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--team-a, var(--mint)) 26%, transparent), transparent 62%),
+    var(--surface-deep);
+}
+.checkin-photo {
+  width: 132px;
+  height: 132px;
+  margin: 0 auto 18px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 50%;
+  /* the frame is the team gradient; the well behind it stays dark so the
+     silhouette fallback reads as deliberate rather than as a broken image */
+  padding: 4px;
+  background: linear-gradient(135deg, var(--team-a, var(--mint)), var(--team-b, var(--teal)));
+  color: color-mix(in srgb, var(--team-a, var(--mint)) 55%, #ffffff);
+}
+.checkin-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+.checkin-silhouette {
+  width: 74px;
+  height: 86px;
+  display: block;
+}
+.checkin-photo.has-photo .checkin-silhouette { display: none; }
+.checkin-photo:not(.has-photo) {
+  /* no photo: sink the middle so the gradient reads as a ring */
+  background:
+    radial-gradient(circle at 50% 50%, var(--navy-deep) 0 62%, transparent 62%),
+    linear-gradient(135deg, var(--team-a, var(--mint)), var(--team-b, var(--teal)));
+}
+.checkin-team {
+  margin: 0;
+  color: var(--team-a, var(--mint));
+  font: 800 11px var(--mono);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.checkin-name {
+  margin: 6px 0 2px;
+  font-family: var(--stretch);
+  font-style: italic;
+  font-size: clamp(30px, 8vw, 44px);
+  line-height: 1;
+  text-transform: uppercase;
+  color: #fff;
+}
+.checkin-jersey {
+  margin: 0;
+  color: var(--ink-muted);
+  font: 700 12px var(--mono);
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+}
+.checkin-kicker {
+  margin: 18px 0 4px;
+  color: var(--mint);
+  font: 800 15px var(--ui);
+  letter-spacing: .6px;
+  text-transform: uppercase;
+}
+.checkin-message {
+  margin: 0 auto;
+  max-width: 42ch;
+  color: var(--ink-soft);
+  font: 400 14.5px/1.6 var(--ui);
+}
+@media (min-width: 760px) {
+  .checkin-modes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .checkin-card { padding: 36px 30px 30px; }
+}
