@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/mvl/css/style.css?v=checkin-flows">
+<link rel="stylesheet" href="/mvl/css/style.css?v=checkin-modal">
 <script src="/mvl/js/site-config.js"></script>
 <script src="/mvl/js/analytics.js"></script>
 <script src="/mvl/js/nav.js"></script>
@@ -41,7 +41,7 @@
       <p class="section-kicker section-kicker--teal">Game-Day Raffle</p>
       <h2 id="prizeHeadline"></h2>
       <p class="prize-blurb"></p>
-      <a class="cta cta--primary prize-cta" href="#enterRaffle">Check In to Enter</a>
+      <button class="cta cta--primary prize-cta" type="button" id="openModes">Check In to Enter</button>
     </div>
     <div class="prize-grid" id="prizeGrid"></div>
   </section>
@@ -62,28 +62,31 @@
     </div>
   </section>
 
-  <!-- how do you want to check in -->
-  <section class="checkin-modes is-hidden" id="checkinModes" aria-label="Choose how to check in">
-    <button class="checkin-mode" type="button" data-mode="self">
-      <span class="checkin-mode-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>
-      </span>
-      <span class="checkin-mode-copy">
+  <!-- how do you want to check in — opened from the Check In to Enter button -->
+  <dialog class="sheet checkin-sheet" id="modeSheet" aria-labelledby="modeSheetTitle">
+    <div class="sheet-head">
+      <h2 class="sheet-title" id="modeSheetTitle">Check In</h2>
+      <p class="sheet-sub">Two ways to join today's draw.</p>
+    </div>
+
+    <button class="sheet-option" type="button" data-mode="self">
+      <svg class="sheet-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>
+      <span>
         <strong>Self Check-In</strong>
-        <small>On your own phone, at the venue. Needs your jersey number and the email on your registration.</small>
+        <small>On your own phone, at the venue &middot; needs your jersey number and registered email</small>
       </span>
     </button>
 
-    <button class="checkin-mode" type="button" data-mode="qr">
-      <span class="checkin-mode-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 3h8v8H3V3Zm2 2v4h4V5H5Zm8-2h8v8h-8V3Zm2 2v4h4V5h-4ZM3 13h8v8H3v-8Zm2 2v4h4v-4H5Zm8-2h3v3h-3v-3Zm5 0h3v3h-3v-3Zm-5 5h3v3h-3v-3Zm5 0h3v3h-3v-3Z"/></svg>
-      </span>
-      <span class="checkin-mode-copy">
+    <button class="sheet-option" type="button" data-mode="qr">
+      <svg class="sheet-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 3h8v8H3V3Zm2 2v4h4V5H5Zm8-2h8v8h-8V3Zm2 2v4h4V5h-4ZM3 13h8v8H3v-8Zm2 2v4h4v-4H5Zm8-2h3v3h-3v-3Zm5 0h3v3h-3v-3Zm-5 5h3v3h-3v-3Zm5 0h3v3h-3v-3Z"/></svg>
+      <span>
         <strong>Check In by QR</strong>
-        <small>Staff only, at the registration booth. Bring your QR code and we'll scan it for you.</small>
+        <small>Staff only &middot; bring your QR code to the registration booth and we'll scan it</small>
       </span>
     </button>
-  </section>
+
+    <button class="sheet-cancel" type="button" data-sheet-close>Cancel</button>
+  </dialog>
 
   <!-- self check-in -->
   <form class="waiver-form is-hidden" id="selfForm" novalidate>
@@ -151,28 +154,32 @@
     </div>
   </section>
 
-  <!-- confirmation -->
-  <section class="checkin-done is-hidden" id="checkinDone" role="status" aria-live="polite">
-    <div class="checkin-card" id="checkinCard">
-      <div class="checkin-photo" id="checkinPhoto">
-        <img id="checkinPhotoImg" alt="" hidden>
-        <svg class="checkin-silhouette" viewBox="0 0 120 140" aria-hidden="true">
-          <path fill="currentColor" d="M60 18a24 24 0 1 1 0 48 24 24 0 0 1 0-48Zm0 58c26 0 47 17 47 38v6H13v-6c0-21 21-38 47-38Z"/>
-        </svg>
-      </div>
-      <p class="checkin-team" id="checkinTeam"></p>
-      <h2 class="checkin-name" id="checkinName"></h2>
-      <p class="checkin-jersey" id="checkinJersey"></p>
-      <p class="checkin-kicker" id="checkinKicker"></p>
-      <p class="checkin-message" id="checkinMessage"></p>
+</main>
+
+<!-- Confirmation takes the whole page: it is the end of the flow, and at the
+     booth it is read across a table rather than held at arm's length. Sits
+     outside <main> so the takeover has nothing behind it to scroll. -->
+<section class="checkin-done is-hidden" id="checkinDone" role="status" aria-live="polite">
+  <div class="checkin-card" id="checkinCard">
+    <div class="checkin-photo" id="checkinPhoto">
+      <img id="checkinPhotoImg" alt="" hidden>
+      <svg class="checkin-silhouette" viewBox="0 0 120 140" aria-hidden="true">
+        <path fill="currentColor" d="M60 18a24 24 0 1 1 0 48 24 24 0 0 1 0-48Zm0 58c26 0 47 17 47 38v6H13v-6c0-21 21-38 47-38Z"/>
+      </svg>
     </div>
-    <div class="raffle-closed-actions">
-      <button class="cta cta--secondary" type="button" id="checkinAgainBtn">Check in someone else</button>
+    <p class="checkin-team" id="checkinTeam"></p>
+    <h2 class="checkin-name" id="checkinName"></h2>
+    <p class="checkin-jersey" id="checkinJersey"></p>
+    <p class="checkin-kicker" id="checkinKicker"></p>
+    <p class="checkin-message" id="checkinMessage"></p>
+    <div class="checkin-actions">
+      <button class="cta cta--primary" type="button" id="checkinAgainBtn">Check in someone else</button>
       <a class="cta cta--secondary" href="/mvl/schedule.html">View the Schedule</a>
     </div>
-  </section>
+  </div>
+</section>
 
-</main>
+
 
 <div class="marquee marquee--footer" aria-label="Tournament sponsors">
   <div class="marquee-track" data-marquee="all"></div>

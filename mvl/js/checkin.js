@@ -8,7 +8,10 @@
    player and deduped on (player_id, day) rather than on a typed name.
    ========================================================================== */
 const { teams, games, raffle } = window.MVL_DATA;
-const supabase = window.MVL_SUPABASE;
+// NOT named `supabase`: supabase-js publishes a global by that name, and a
+// top-level const here would claim the binding first — the library's own
+// declaration then throws and window.supabase never exists.
+const cfg = window.MVL_SUPABASE;
 
 // Gameville Ball Park · Court 1 (seeded UUID) — the row that carries a location
 const VENUE_ID = '11111111-1111-4111-8111-111111111111';
@@ -50,15 +53,15 @@ const openDays = new Set([
 const previewMode = new URLSearchParams(location.search).has('preview');
 const isOpen = previewMode || openDays.has(manilaDate());
 
-const modes = el('checkinModes');
+const modeSheet = el('modeSheet');
+const openModes = el('openModes');
 const selfForm = el('selfForm');
 const qrPanel = el('qrPanel');
 const done = el('checkinDone');
 
-if (isOpen) {
-  modes.classList.remove('is-hidden');
-} else {
+if (!isOpen) {
   el('raffleClosed').classList.remove('is-hidden');
+  openModes?.remove();
 }
 
 // ---- shared helpers ------------------------------------------------------------
@@ -76,15 +79,15 @@ const playerPhotoUrl = (payload) => {
   if (url) return url;
   if (!path) return '';
   const clean = path.split('/').filter(Boolean).map(encodeURIComponent).join('/');
-  return `${supabase.url}/storage/v1/object/public/mvl-player-photos/${clean}`;
+  return `${cfg.url}/storage/v1/object/public/mvl-player-photos/${clean}`;
 };
 
 const rpc = async (fn, body, token) => {
-  const res = await fetch(`${supabase.url}/rest/v1/rpc/${fn}`, {
+  const res = await fetch(`${cfg.url}/rest/v1/rpc/${fn}`, {
     method: 'POST',
     headers: {
-      apikey: supabase.anonKey,
-      Authorization: `Bearer ${token || supabase.anonKey}`,
+      apikey: cfg.anonKey,
+      Authorization: `Bearer ${token || cfg.anonKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(body),
@@ -163,28 +166,45 @@ const showConfirmation = (payload) => {
       `You're in today's raffle draw. ${CHEERS[Math.floor(Math.random() * CHEERS.length)]} Best of luck!`;
   }
 
-  hide(modes); hide(selfForm); hide(qrPanel);
+  hide(selfForm); hide(qrPanel);
+  if (modeSheet.open) modeSheet.close();
+  // the takeover hides everything else, so lock the page behind it
+  document.body.classList.add('checkin-complete');
   show(done);
-  done.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  window.scrollTo(0, 0);
 
   // TODO: trigger the check-in confirmation email once its template exists.
 };
 
 el('checkinAgainBtn').addEventListener('click', () => {
   hide(done);
-  if (qrSignedIn) { show(qrPanel); focusScanner(); } else { show(modes); }
+  document.body.classList.remove('checkin-complete');
+  if (qrSignedIn) { show(qrPanel); focusScanner(); } else { openSheet(); }
 });
 
-// ---- mode chooser ---------------------------------------------------------------
-modes.addEventListener('click', (event) => {
+// ---- mode chooser (modal) ---------------------------------------------------
+const openSheet = () => {
+  if (typeof modeSheet.showModal === 'function') modeSheet.showModal();
+  else modeSheet.setAttribute('open', '');
+};
+
+openModes?.addEventListener('click', openSheet);
+
+modeSheet.addEventListener('click', (event) => {
+  if (event.target.closest('[data-sheet-close]')) { modeSheet.close(); return; }
+  // a click on the ::backdrop registers on the dialog itself
+  if (event.target === modeSheet) { modeSheet.close(); return; }
+
   const button = event.target.closest('[data-mode]');
   if (!button) return;
-  hide(modes);
+  modeSheet.close();
   if (button.dataset.mode === 'self') {
     show(selfForm);
     el('teamSelect').focus();
+    selfForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } else {
     show(qrPanel);
+    qrPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 });
 
@@ -194,13 +214,46 @@ const teamSwatch = el('teamSwatch');
 teamSelect.innerHTML = '<option value="">Select your team</option>' +
   teams.map((team) => `<option value="${team.id}">${team.name}</option>`).join('');
 
-teamSelect.addEventListener('change', () => {
+// Same treatment as the waiver: picking a team recolours the page's accents,
+// so the form already looks like the team before the confirmation appears.
+const luminance = (hex) => {
+  const m = /^#?([\da-f]{6})$/i.exec(hex.trim());
+  if (!m) return 0;
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(m[1].slice(i, i + 2), 16) / 255);
+  const lin = (c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+};
+const contrast = (a, b) => {
+  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+  return (hi + 0.05) / (lo + 0.05);
+};
+
+const applyTeamAccent = () => {
   const team = teamById[teamSelect.value];
-  if (!team) { teamSwatch.classList.remove('is-on'); return; }
-  teamSwatch.style.setProperty('--team-a', team.grad[0]);
-  teamSwatch.style.setProperty('--team-b', team.grad[1]);
-  teamSwatch.classList.add('is-on');
-});
+  const root = document.body;
+  if (!team) {
+    ['--accent', '--accent-2', '--accent-soft', '--accent-btn', '--accent-ink']
+      .forEach((prop) => root.style.removeProperty(prop));
+    teamSwatch?.classList.remove('is-on');
+    return;
+  }
+  const [light, deep] = team.grad;
+  root.style.setProperty('--accent', `color-mix(in srgb, ${light} 82%, #ffffff)`);
+  root.style.setProperty('--accent-2', `color-mix(in srgb, ${light} 62%, #ffffff)`);
+  root.style.setProperty('--accent-soft', `color-mix(in srgb, ${light} 22%, transparent)`);
+  // flat deep tone on the button, and whichever ink measurably reads better on
+  // it — the same reasoning as the waiver's submit button
+  root.style.setProperty('--accent-btn', deep);
+  root.style.setProperty('--accent-ink',
+    contrast('#ffffff', deep) >= contrast('#0B0730', deep) ? '#ffffff' : '#0B0730');
+  if (teamSwatch) {
+    teamSwatch.style.setProperty('--team-a', light);
+    teamSwatch.style.setProperty('--team-b', deep);
+    teamSwatch.classList.add('is-on');
+  }
+};
+
+teamSelect.addEventListener('change', applyTeamAccent);
 
 const getPosition = () => new Promise((resolve, reject) => {
   if (!navigator.geolocation) {
@@ -268,7 +321,7 @@ const loadAuthClient = () => new Promise((resolve, reject) => {
   const script = document.createElement('script');
   script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
   script.onload = () => {
-    authClient = window.supabase.createClient(supabase.url, supabase.anonKey);
+    authClient = window.supabase.createClient(cfg.url, cfg.anonKey);
     resolve(authClient);
   };
   script.onerror = () => reject(new Error('Could not load sign-in. Check the connection and try again.'));

@@ -2814,7 +2814,9 @@ html[data-phase='gameday'] .nav-links a[data-phase='registration'] { display: no
   transition: box-shadow .15s ease, background .15s ease;
 }
 .waiver-page .field input:focus,
-.waiver-page .field select:focus {
+.waiver-page .field select:focus,
+.raffle-page .field input:focus,
+.raffle-page .field select:focus {
   box-shadow:
     0 0 0 2px var(--mint),
     0 0 0 6px rgba(124, 245, 180, .12),
@@ -3774,6 +3776,9 @@ body:not(.admin-page) .video-filter select:focus-visible {
 .waiver-page .section-kicker,
 .waiver-page .section-kicker--teal,
 .waiver-page .field span,
+.raffle-page .section-kicker,
+.raffle-page .section-kicker--teal,
+.raffle-page .field span,
 .waiver-page .waiver-copy h2,
 .waiver-page .release-copy h3 {
   /* the fallback matters: an unset custom property makes the declaration
@@ -3800,9 +3805,12 @@ body:not(.admin-page) .video-filter select:focus-visible {
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 .waiver-page .waiver-check input { accent-color: var(--accent); }
-.waiver-page .form-status.is-success { color: var(--accent); }
+.waiver-page .form-status.is-success,
+.raffle-page .form-status.is-success { color: var(--accent); }
 /* must out-specify `body:not(.admin-page) button.cta.cta--primary` */
-body.waiver-page .form-actions button.cta.cta--primary {
+body.waiver-page .form-actions button.cta.cta--primary,
+body.raffle-page .form-actions button.cta.cta--primary,
+body.raffle-page .prize-cta {
   /* Fallbacks matter here: an unset custom property makes the whole
      declaration invalid at computed-value time, which resolves to the
      property's initial value — a transparent button — not to the unthemed
@@ -3811,15 +3819,18 @@ body.waiver-page .form-actions button.cta.cta--primary {
   color: var(--accent-ink, var(--navy));
   transition: background .25s ease, color .25s ease, filter .15s ease, box-shadow .15s ease, transform .15s ease;
 }
-body.waiver-page .form-actions button.cta.cta--primary:focus-visible {
+body.waiver-page .form-actions button.cta.cta--primary:focus-visible,
+body.raffle-page .form-actions button.cta.cta--primary:focus-visible {
   box-shadow:
     0 0 0 2px var(--accent),
     0 0 0 6px var(--accent-soft),
     0 0 22px var(--accent-soft);
 }
 /* the team select itself carries a dot of its own colour */
-.waiver-page .field--team { position: relative; }
-.waiver-page .team-swatch {
+.waiver-page .field--team,
+.raffle-page .field--team { position: relative; }
+.waiver-page .team-swatch,
+.raffle-page .team-swatch {
   display: inline-block;
   /* collapsed until a team is picked, otherwise it indents the TEAM label
      out of line with its sibling field labels */
@@ -3832,7 +3843,8 @@ body.waiver-page .form-actions button.cta.cta--primary:focus-visible {
   background: linear-gradient(135deg, var(--team-a, var(--mint)), var(--team-b, var(--teal)));
   opacity: 0;
 }
-.waiver-page .team-swatch.is-on { opacity: 1; width: 11px; margin-right: 8px; }
+.waiver-page .team-swatch.is-on,
+.raffle-page .team-swatch.is-on { opacity: 1; width: 11px; margin-right: 8px; }
 /* Fields in a row are stretched to equal height, and each .field is a grid.
    TEAM has two rows where PLAYER NAME has three — it carries no helper <small>
    — so the spare height was being shared out to TEAM's label and select,
@@ -3845,7 +3857,8 @@ body:not(.admin-page) .field {
    is what would set the label apart — it adds ~1px of line box over a plain
    text label. Flex sizes the line to the taller of the two rather than
    stacking half-leading, whether the swatch is collapsed or expanded. */
-.waiver-page .field--team > span {
+.waiver-page .field--team > span,
+.raffle-page .field--team > span {
   display: flex;
   align-items: center;
 }
@@ -4575,69 +4588,54 @@ body.gametime-v3 .rules-preview {
 }
 
 /* ==========================================================================
-   Game-day check-in — mode chooser and confirmation card
+   Game-day check-in — mode modal and full-page confirmation
    ========================================================================== */
-.checkin-modes {
-  display: grid;
-  gap: 14px;
-  margin: 24px 0 8px;
-}
-.checkin-mode {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
+.checkin-sheet .sheet-option {
   width: 100%;
-  padding: 18px;
   text-align: left;
-  border: 1px solid rgba(124, 245, 180, .28);
-  border-radius: var(--surface-radius);
-  background: var(--surface-deep);
-  color: var(--ink-soft);
   cursor: pointer;
-  transition: border-color .15s ease, transform .15s ease;
-}
-.checkin-mode:hover { border-color: var(--mint); transform: translateY(-1px); }
-.checkin-mode:focus-visible { outline: 2px solid var(--mint); outline-offset: 3px; }
-.checkin-mode-icon {
-  flex: 0 0 34px;
-  color: var(--mint);
-}
-.checkin-mode-icon svg { width: 34px; height: 34px; display: block; }
-.checkin-mode-copy strong {
-  display: block;
-  font: 800 15px var(--ui);
-  letter-spacing: .4px;
-  text-transform: uppercase;
-}
-.checkin-mode-copy small {
-  display: block;
-  margin-top: 5px;
-  color: var(--ink-muted);
-  font: 400 12.5px/1.5 var(--ui);
+  font: inherit;
 }
 
-.checkin-done { margin: 24px 0 8px; }
+/* The confirmation is the end of the flow, and at the booth it is read across
+   a table rather than held at arm's length — so it takes the whole viewport
+   and everything behind it is hidden rather than merely scrolled past. */
+body.checkin-complete > *:not(.checkin-done) { display: none; }
+body.checkin-complete { overflow: hidden; }
+
+.checkin-done {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  overflow-y: auto;
+  background:
+    radial-gradient(circle at 50% 12%, color-mix(in srgb, var(--team-a, var(--mint)) 22%, transparent), transparent 58%),
+    var(--navy-deep);
+}
+.checkin-done.is-hidden { display: none; }
+
 .checkin-card {
-  padding: 30px 24px 26px;
+  width: min(560px, 100%);
+  padding: 40px 28px 32px;
   text-align: center;
   border-radius: var(--surface-radius);
-  /* the player's own team colours frame the card */
   border: 2px solid var(--team-a, var(--mint));
   background:
     radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--team-a, var(--mint)) 26%, transparent), transparent 62%),
     var(--surface-deep);
 }
 .checkin-photo {
-  width: 132px;
-  height: 132px;
-  margin: 0 auto 18px;
+  width: clamp(140px, 34vw, 190px);
+  aspect-ratio: 1;
+  margin: 0 auto 22px;
   display: grid;
   place-items: center;
   overflow: hidden;
   border-radius: 50%;
-  /* the frame is the team gradient; the well behind it stays dark so the
-     silhouette fallback reads as deliberate rather than as a broken image */
-  padding: 4px;
+  padding: 5px;
   background: linear-gradient(135deg, var(--team-a, var(--mint)), var(--team-b, var(--teal)));
   color: color-mix(in srgb, var(--team-a, var(--mint)) 55%, #ffffff);
 }
@@ -4648,14 +4646,11 @@ body.gametime-v3 .rules-preview {
   border-radius: 50%;
   display: block;
 }
-.checkin-silhouette {
-  width: 74px;
-  height: 86px;
-  display: block;
-}
+.checkin-silhouette { width: 46%; height: auto; display: block; }
 .checkin-photo.has-photo .checkin-silhouette { display: none; }
 .checkin-photo:not(.has-photo) {
-  /* no photo: sink the middle so the gradient reads as a ring */
+  /* no photo on file: sink the middle so the gradient reads as a ring and the
+     silhouette looks deliberate rather than like a failed image */
   background:
     radial-gradient(circle at 50% 50%, var(--navy-deep) 0 62%, transparent 62%),
     linear-gradient(135deg, var(--team-a, var(--mint)), var(--team-b, var(--teal)));
@@ -4663,40 +4658,45 @@ body.gametime-v3 .rules-preview {
 .checkin-team {
   margin: 0;
   color: var(--team-a, var(--mint));
-  font: 800 11px var(--mono);
-  letter-spacing: 2px;
+  font: 800 12px var(--mono);
+  letter-spacing: 2.2px;
   text-transform: uppercase;
 }
 .checkin-name {
-  margin: 6px 0 2px;
+  margin: 8px 0 4px;
   font-family: var(--stretch);
   font-style: italic;
-  font-size: clamp(30px, 8vw, 44px);
-  line-height: 1;
+  font-size: clamp(38px, 11vw, 62px);
+  line-height: .96;
   text-transform: uppercase;
   color: #fff;
 }
 .checkin-jersey {
   margin: 0;
   color: var(--ink-muted);
-  font: 700 12px var(--mono);
-  letter-spacing: 1.6px;
+  font: 700 13px var(--mono);
+  letter-spacing: 1.8px;
   text-transform: uppercase;
 }
 .checkin-kicker {
-  margin: 18px 0 4px;
-  color: var(--mint);
-  font: 800 15px var(--ui);
+  margin: 24px 0 6px;
+  color: var(--team-a, var(--mint));
+  font: 800 18px var(--ui);
   letter-spacing: .6px;
   text-transform: uppercase;
 }
 .checkin-message {
   margin: 0 auto;
-  max-width: 42ch;
+  max-width: 40ch;
   color: var(--ink-soft);
-  font: 400 14.5px/1.6 var(--ui);
+  font: 400 15px/1.65 var(--ui);
 }
-@media (min-width: 760px) {
-  .checkin-modes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .checkin-card { padding: 36px 30px 30px; }
+.checkin-actions {
+  margin-top: 28px;
+  display: grid;
+  gap: 10px;
+}
+@media (min-width: 560px) {
+  .checkin-actions { grid-auto-flow: column; justify-content: center; }
+  .checkin-card { padding: 48px 40px 38px; }
 }
