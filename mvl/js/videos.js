@@ -16,7 +16,6 @@ const featureClose = document.getElementById('latestVideoClose');
 const liveSection = document.getElementById('videoLiveStreams');
 const liveGrid = document.getElementById('videoLiveGrid');
 const liveTitle = document.getElementById('videoLiveTitle');
-const liveDescription = document.getElementById('videoLiveDescription');
 
 const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
@@ -29,9 +28,6 @@ const activeLivestreams = (livestream.streams || [])
 if (activeLivestreams.length) {
   liveSection.classList.remove('is-hidden');
   liveTitle.textContent = activeLivestreams.length > 1 ? 'Watch Both Courts' : `Watch ${activeLivestreams[0].court}`;
-  liveDescription.textContent = activeLivestreams.length > 1
-    ? 'Court 1 is the primary stream. Both courts remain available below.'
-    : `${activeLivestreams[0].court} is live now.`;
   liveGrid.classList.toggle('has-two-streams', activeLivestreams.length > 1);
   liveGrid.innerHTML = activeLivestreams.map((stream, index) => `
     <article class="videos-live-card${index === 0 ? ' is-primary' : ''}">
