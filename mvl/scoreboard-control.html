@@ -6,11 +6,15 @@
   <meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
   <title>MVL Scoreboard Control</title>
   <link rel="icon" type="image/svg+xml" href="/mvl/assets/metarice-icon.svg">
-  <link rel="stylesheet" href="/mvl/css/scoreboard-control.css">
+  <link rel="stylesheet" href="/mvl/css/scoreboard-control.css?v=game-scores">
 </head>
 <body>
   <header class="control-header"><img src="/mvl/assets/hero-mvl-2026-logo.png" alt="MVL 2026"><div><p>Live scoreboard</p><h1 id="boardName">Connecting…</h1></div><span id="connectionState" class="connection-state">Connecting</span></header>
   <main id="controlApp" class="control-main is-loading">
+    <section class="game-linker" aria-label="Game score destination">
+      <label><span>Scheduled game</span><select id="gameSelect"><option value="">No game attached</option></select></label>
+      <p>Choose a game so saved set scores update its schedule and standings record.</p>
+    </section>
     <section class="team-selectors" aria-label="Participating teams">
       <label><span>Left team</span><select id="leftTeamSelect"></select></label>
       <button id="switchSidesBtn" class="switch-button" type="button"><span aria-hidden="true">⇄</span> Switch sides</button>
@@ -30,6 +34,12 @@
         <div class="sets-control"><span>Set wins</span><div><button type="button" data-action="right-set-subtract" aria-label="Subtract one set from right team">−</button><b id="rightSets">0</b><button type="button" data-action="right-set-add" aria-label="Add one set to right team">+</button></div></div>
       </article>
     </section>
+    <section class="set-recorder" aria-labelledby="setRecorderTitle">
+      <div><p>Game record</p><h2 id="setRecorderTitle">Save set score</h2></div>
+      <label><span>Current set</span><select id="currentSetSelect"><option value="1">Set 1</option><option value="2">Set 2</option><option value="3">Set 3</option><option value="4">Set 4</option><option value="5">Set 5</option></select></label>
+      <button id="saveSetBtn" class="save-set-button" type="button" disabled>Save set score</button>
+      <div id="savedSets" class="saved-sets"><span>No set scores saved yet.</span></div>
+    </section>
     <section class="control-footer">
       <button id="resetScoresBtn" class="danger-button" type="button">Reset scores to zero</button>
       <button id="copyObsBtn" class="share-button" type="button">Copy OBS link</button>
@@ -38,7 +48,7 @@
   </main>
   <section id="controlError" class="control-error is-hidden"><h2>Control link unavailable</h2><p id="controlErrorMessage">Ask an MVL admin for a new scoreboard control link.</p></section>
   <script src="/mvl/js/supabase-config.js"></script>
-  <script src="/mvl/js/league-data.js"></script>
-  <script src="/mvl/js/scoreboard-control.js"></script>
+  <script src="/mvl/js/league-data.js?v=two-courts"></script>
+  <script src="/mvl/js/scoreboard-control.js?v=game-scores"></script>
 </body>
 </html>

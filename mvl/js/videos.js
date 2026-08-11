@@ -1,4 +1,4 @@
-const { teams, games } = window.MVL_DATA;
+const { teams, games, livestream } = window.MVL_DATA;
 const teamById = Object.fromEntries(teams.map((team) => [team.id, team]));
 const teamFilter = document.getElementById('videoTeamFilter');
 const dayFilter = document.getElementById('videoDayFilter');
@@ -13,12 +13,34 @@ const featureMeta = document.getElementById('latestGameMeta');
 const featureResult = document.getElementById('latestGameResult');
 const featurePlay = document.getElementById('latestVideoPlay');
 const featureClose = document.getElementById('latestVideoClose');
+const liveSection = document.getElementById('videoLiveStreams');
+const liveGrid = document.getElementById('videoLiveGrid');
+const liveTitle = document.getElementById('videoLiveTitle');
+const liveDescription = document.getElementById('videoLiveDescription');
 
 const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
 }[char]));
 
 const validYouTubeId = (value) => /^[A-Za-z0-9_-]{11}$/.test(value || '');
+const activeLivestreams = (livestream.streams || [])
+  .filter((stream) => stream.isLive && validYouTubeId(stream.youtubeId))
+  .sort((a, b) => a.court.localeCompare(b.court));
+if (activeLivestreams.length) {
+  liveSection.classList.remove('is-hidden');
+  liveTitle.textContent = activeLivestreams.length > 1 ? 'Watch Both Courts' : `Watch ${activeLivestreams[0].court}`;
+  liveDescription.textContent = activeLivestreams.length > 1
+    ? 'Court 1 is the primary stream. Both courts remain available below.'
+    : `${activeLivestreams[0].court} is live now.`;
+  liveGrid.classList.toggle('has-two-streams', activeLivestreams.length > 1);
+  liveGrid.innerHTML = activeLivestreams.map((stream, index) => `
+    <article class="videos-live-card${index === 0 ? ' is-primary' : ''}">
+      <div class="videos-live-card-head"><p><span class="live-dot" aria-hidden="true"></span>${escapeHtml(stream.court)}</p>${index === 0 ? '<strong>Primary stream</strong>' : ''}</div>
+      <div class="videos-live-player"><iframe src="https://www.youtube-nocookie.com/embed/${stream.youtubeId}?autoplay=1&mute=1" title="MVL livestream · ${escapeHtml(stream.court)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+      <a href="https://www.youtube.com/watch?v=${stream.youtubeId}" target="_blank" rel="noopener">Open ${escapeHtml(stream.court)} on YouTube</a>
+    </article>
+  `).join('');
+}
 const gameVideos = (game) => {
   if (Array.isArray(game.videos)) {
     return game.videos.filter((video) => validYouTubeId(video.youtubeId));

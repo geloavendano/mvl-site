@@ -7,7 +7,10 @@
 // ---- state ---------------------------------------------------------------
 // ---- data ----------------------------------------------------------------
 const { teams: TEAMS, games: GAMES, livestream } = window.MVL_DATA;
-const isLive = Boolean(livestream.isLive);
+const validLivestreamId = (value) => /^[A-Za-z0-9_-]{11}$/.test(value || '');
+const activeLivestreams = (livestream.streams || [])
+  .filter((stream) => stream.isLive && validLivestreamId(stream.youtubeId))
+  .sort((a, b) => a.court.localeCompare(b.court));
 const teamById = Object.fromEntries(TEAMS.map((team) => [team.id, team]));
 const playoffGameIds = new Set(['qf1', 'qf2', 'qf3', 'qf4', 'sf1', 'sf2', 'bronze', 'final']);
 const gameTeam = (game, side) => {
@@ -94,11 +97,20 @@ window.addEventListener('resize', () => {
 
 // ---- render: livestream ----------------------------------------------------
 document.querySelectorAll('[data-livestream-link]').forEach((link) => {
-  if (isLive) {
-    link.href = livestream.youtubeUrl;
-    link.target = '_blank';
-    link.rel = 'noopener';
+  if (activeLivestreams.length) {
+    link.href = `https://www.youtube.com/watch?v=${activeLivestreams[0].youtubeId}`;
     link.innerHTML = '<span class="live-dot" aria-hidden="true"></span> Watch the Livestream';
+    if (activeLivestreams.length === 1) {
+      link.target = '_blank';
+      link.rel = 'noopener';
+    } else {
+      link.removeAttribute('target');
+      link.removeAttribute('rel');
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        document.getElementById('livestreamPicker')?.showModal();
+      });
+    }
   } else {
     link.href = '/mvl/schedule.html';
     link.removeAttribute('target');
@@ -107,21 +119,36 @@ document.querySelectorAll('[data-livestream-link]').forEach((link) => {
   }
 });
 
-const liveEmbed = document.getElementById('liveEmbed');
+const liveStreams = document.getElementById('liveStreams');
 const gamesLive = document.querySelector('.games-live');
 const gamesGrid = document.querySelector('.games-grid');
-if (!isLive) {
+const livestreamPickerOptions = document.getElementById('livestreamPickerOptions');
+if (!activeLivestreams.length) {
   gamesLive?.classList.add('is-hidden');
   gamesGrid?.classList.add('is-offline');
-} else if (liveEmbed && livestream.youtubeId) {
-  liveEmbed.classList.remove('placeholder');
-  liveEmbed.innerHTML = `
-    <iframe
-      src="https://www.youtube-nocookie.com/embed/${livestream.youtubeId}"
-      title="MVL livestream"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      allowfullscreen></iframe>
-  `;
+} else if (liveStreams) {
+  liveStreams.classList.toggle('has-two-streams', activeLivestreams.length > 1);
+  liveStreams.innerHTML = activeLivestreams.map((stream) => `
+    <article class="live-court">
+      <p>${stream.court}</p>
+      <div class="live-frame">
+        <iframe
+          src="https://www.youtube-nocookie.com/embed/${stream.youtubeId}?autoplay=1&mute=1"
+          title="MVL livestream · ${stream.court}"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen></iframe>
+      </div>
+    </article>
+  `).join('');
+}
+if (livestreamPickerOptions) {
+  livestreamPickerOptions.innerHTML = activeLivestreams.map((stream) => `
+    <a href="https://www.youtube.com/watch?v=${stream.youtubeId}" target="_blank" rel="noopener">
+      <span><i class="live-dot" aria-hidden="true"></i>${stream.court}</span>
+      <strong>Watch livestream <b aria-hidden="true">→</b></strong>
+    </a>
+  `).join('');
 }
 
 // ---- render: schedule & standings preview ----------------------------------
@@ -318,7 +345,7 @@ if (recentVideosEl) {
 
 
 // ---- live state -------------------------------------------------------------
-if (!isLive) {
+if (!activeLivestreams.length) {
   document.querySelectorAll('.live-dot').forEach((d) => { d.style.animation = 'none'; d.style.opacity = '.35'; });
 }
 

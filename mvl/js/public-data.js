@@ -4,6 +4,27 @@
   const loaderScript = document.currentScript;
   const entry = loaderScript.dataset.entry;
   const version = loaderScript.dataset.version || '';
+  const normalizeLivestream = (managed = {}, fallbackLivestream = {}) => {
+    const fallbackStreams = Array.isArray(fallbackLivestream.streams) ? fallbackLivestream.streams : [];
+    const managedStreams = Array.isArray(managed.streams) ? managed.streams : [];
+    const streams = ['Court 1', 'Court 2'].map((court, index) => {
+      const stream = managedStreams[index] || (index === 0 ? managed : {}) || {};
+      const fallbackStream = fallbackStreams[index] || {};
+      return {
+        court,
+        youtubeUrl: stream.youtube_url || stream.youtubeUrl || fallbackStream.youtubeUrl || fallbackLivestream.youtubeUrl || 'https://www.youtube.com/@metaricevolley',
+        youtubeId: stream.youtube_id || stream.youtubeId || fallbackStream.youtubeId || '',
+        isLive: Boolean(stream.is_live ?? stream.isLive ?? fallbackStream.isLive),
+      };
+    });
+    const primary = streams.find((stream) => stream.isLive) || streams[0];
+    return {
+      streams,
+      youtubeUrl: primary.youtubeUrl,
+      youtubeId: primary.youtubeId,
+      isLive: streams.some((stream) => stream.isLive),
+    };
+  };
   const normalizeGames = (games = []) => games.map((game) => {
     const videos = Array.isArray(game.videos) && game.videos.length
       ? game.videos
@@ -30,17 +51,14 @@
     const managed = await response.json();
     window.MVL_DATA = {
       ...fallback,
-      livestream: {
-        youtubeUrl: managed.livestream?.youtube_url || fallback.livestream.youtubeUrl,
-        youtubeId: managed.livestream?.youtube_id || '',
-        isLive: Boolean(managed.livestream?.is_live),
-      },
+      livestream: normalizeLivestream(managed.livestream, fallback.livestream),
       games: normalizeGames(managed.games?.length ? managed.games : fallback.games),
     };
   } catch (error) {
     console.warn('Using bundled MVL data:', error);
     window.MVL_DATA = {
       ...fallback,
+      livestream: normalizeLivestream({}, fallback.livestream),
       games: normalizeGames(fallback.games),
     };
   }

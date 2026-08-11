@@ -4,7 +4,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><title>MVL Admin</title>
 <link rel="icon" type="image/svg+xml" href="/mvl/assets/metarice-icon.svg">
-<link rel="stylesheet" href="/mvl/css/style.css">
+<link rel="stylesheet" href="/mvl/css/style.css?v=two-courts">
 </head>
 <body class="admin-page">
 <header class="admin-topbar"><a href="/mvl/index.html"><img src="/mvl/assets/hero-mvl-2026-logo.png" alt="MVL 2026"></a><button id="signOutBtn" class="admin-link is-hidden" type="button">Sign out</button></header>
@@ -33,7 +33,7 @@
       </section>
     </section>
     <section id="livestreamPanel" class="admin-tab-panel" role="tabpanel" aria-labelledby="livestreamTab" data-admin-panel="livestream" hidden>
-      <form id="livestreamForm" class="admin-panel admin-form"><div class="admin-panel-head"><div><h2>Livestream</h2><p>Controls the livestream state on the homepage.</p></div><label class="admin-switch"><input name="isLive" type="checkbox"> Live now</label></div><label class="field"><span>YouTube livestream link</span><input name="youtubeUrl" type="url" placeholder="https://youtube.com/watch?v=..."></label><div class="admin-form-actions"><button class="cta cta--primary" type="submit">Save livestream</button><p class="form-status"></p></div></form>
+      <form id="livestreamForm" class="admin-panel admin-form"><div class="admin-panel-head"><div><h2>Livestreams</h2><p>Manage the two courts independently. Court 1 is shown first on the public site.</p></div></div><div class="admin-livestream-grid"><section class="admin-livestream-court"><div class="admin-livestream-court-head"><h3>Court 1</h3><label class="admin-switch"><input name="court1Live" type="checkbox"> Live now</label></div><label class="field"><span>YouTube livestream link</span><input name="court1Url" type="url" placeholder="https://youtube.com/watch?v=..."></label></section><section class="admin-livestream-court"><div class="admin-livestream-court-head"><h3>Court 2</h3><label class="admin-switch"><input name="court2Live" type="checkbox"> Live now</label></div><label class="field"><span>YouTube livestream link</span><input name="court2Url" type="url" placeholder="https://youtube.com/watch?v=..."></label></section></div><div class="admin-form-actions"><button class="cta cta--primary" type="submit">Save livestreams</button><p class="form-status"></p></div></form>
     </section>
     <section id="scoreboardPanel" class="admin-tab-panel" role="tabpanel" aria-labelledby="scoreboardTab" data-admin-panel="scoreboard" hidden>
       <section class="admin-panel admin-scoreboards" aria-labelledby="scoreboardsTitle">
@@ -68,5 +68,5 @@
     <a id="emergencyCallLink" class="cta cta--primary admin-contact-call is-hidden" href="#"><span aria-hidden="true">☎</span> Call mobile number</a>
   </div>
 </dialog>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/mvl/js/supabase-config.js"></script><script src="/mvl/js/league-data.js"></script><script src="/mvl/js/admin.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/mvl/js/supabase-config.js"></script><script src="/mvl/js/league-data.js?v=two-courts"></script><script src="/mvl/js/admin.js?v=two-courts"></script>
 </body></html>

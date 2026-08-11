@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/mvl/css/style.css?v=checkin-email">
+<link rel="stylesheet" href="/mvl/css/style.css?v=two-courts">
 <script src="/mvl/js/site-config.js"></script>
 <script src="/mvl/js/analytics.js"></script>
 <script src="/mvl/js/nav.js"></script>
@@ -31,6 +31,10 @@
 </header>
 
 <main class="videos-main">
+  <section class="videos-live is-hidden" id="videoLiveStreams" aria-labelledby="videoLiveTitle">
+    <div class="videos-live-head"><p class="games-label"><span class="live-dot" aria-hidden="true"></span>Live now</p><h1 id="videoLiveTitle">Watch Both Courts</h1><p id="videoLiveDescription">Court 1 is the primary stream. Both courts remain available below.</p></div>
+    <div class="videos-live-grid" id="videoLiveGrid"></div>
+  </section>
   <section class="videos-feature" id="latestGame" aria-labelledby="latestGameTitle">
     <div class="videos-feature-media" id="latestVideoMedia">
       <img id="latestVideoPoster" src="/mvl/assets/mvl-hero-still.jpg" alt="">
@@ -108,9 +112,9 @@
   </div>
 </footer>
 
-<script src="/mvl/js/league-data.js"></script>
+<script src="/mvl/js/league-data.js?v=two-courts"></script>
 <script src="/mvl/js/marquee.js"></script>
 <script src="/mvl/js/supabase-config.js"></script>
-<script src="/mvl/js/public-data.js" data-entry="videos"></script>
+<script src="/mvl/js/public-data.js?v=two-courts" data-entry="videos" data-version="two-courts"></script>
 </body>
 </html>

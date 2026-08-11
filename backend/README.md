@@ -171,13 +171,17 @@ Apply the live scoreboard migration with:
 
 ```bash
 supabase db query --linked --file supabase/migrations/20260807000100_live_scoreboards.sql
+supabase db query --linked --file supabase/migrations/20260812000100_two_court_livestreams_and_game_scoreboards.sql
 ```
 
 Admins create any number of live boards from `/mvl/admin`. Each board provides:
 
 - a public, read-only `/mvl/scoreboard` URL for an OBS browser source;
 - a secret bearer-link `/mvl/scoreboard-control` URL for remote scorekeeping;
-- atomic point, set, reset, service, team-selection, and side-switch updates.
+- atomic point, set, reset, service, team-selection, and side-switch updates;
+- an optional scheduled-game link, current-set selector, and saved set-score
+  history. Saving a linked set writes its points to `mvl.game_sets`, so the
+  public schedule and standings use the same record immediately.
 
 The control URL grants write access to that scoreboard without sign-in. Treat
 it like a password and share it only with the scorekeeper. Direct table access

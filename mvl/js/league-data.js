@@ -3,6 +3,11 @@ window.MVL_DATA = {
     // Replace these when the official stream is ready.
     youtubeUrl: 'https://www.youtube.com/',
     youtubeId: '',
+    isLive: false,
+    streams: [
+      { court: 'Court 1', youtubeUrl: 'https://www.youtube.com/', youtubeId: '', isLive: false },
+      { court: 'Court 2', youtubeUrl: 'https://www.youtube.com/', youtubeId: '', isLive: false },
+    ],
   },
 
   teams: [

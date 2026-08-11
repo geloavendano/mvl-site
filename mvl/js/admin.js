@@ -119,7 +119,7 @@ const renderScoreboards = (boards) => {
     const urls = scoreboardUrls(board);
     return `<article class="admin-scoreboard-card" data-scoreboard-id="${escapeHtml(board.id)}">
       <div class="admin-scoreboard-matchup">
-        <div><strong>${escapeHtml(board.name)}</strong><span>Updated ${escapeHtml(new Date(board.updatedAt).toLocaleString('en-PH'))}</span></div>
+        <div><strong>${escapeHtml(board.name)}</strong><span>${board.game ? `Game: ${escapeHtml(board.game.id)} · Set ${board.currentSet} · ` : ''}Updated ${escapeHtml(new Date(board.updatedAt).toLocaleString('en-PH'))}</span></div>
         <div class="admin-scoreboard-score"><span style="--team-color:${escapeHtml(board.leftTeam.colorB)}">${escapeHtml(board.leftTeam.name)} <b>${board.leftScore}</b></span><i>–</i><span style="--team-color:${escapeHtml(board.rightTeam.colorB)}"><b>${board.rightScore}</b> ${escapeHtml(board.rightTeam.name)}</span></div>
       </div>
       <div class="admin-scoreboard-actions">
@@ -409,7 +409,11 @@ const show = async () => {
     loginPanel.classList.add('is-hidden'); dashboard.classList.remove('is-hidden'); signOutBtn.classList.remove('is-hidden');
     adminIdentity.textContent = data.email;
     const live = data.publicData.livestream, form = livestreamForm.elements;
-    form.isLive.checked = live.is_live; form.youtubeUrl.value = live.youtube_url || '';
+    const streams = Array.isArray(live.streams) ? live.streams : [live, {}];
+    form.court1Live.checked = Boolean(streams[0]?.is_live);
+    form.court1Url.value = streams[0]?.youtube_url || live.youtube_url || '';
+    form.court2Live.checked = Boolean(streams[1]?.is_live);
+    form.court2Url.value = streams[1]?.youtube_url || '';
     render();
     activateAdminTab(adminTabFromHash());
     await Promise.all([loadReadiness(), loadScoreboards()]);
@@ -487,7 +491,23 @@ scoreboardList.addEventListener('click', async (event) => {
     status(cardStatus, 'Could not copy the link. Open Manage and copy it there.', 'error');
   }
 });
-livestreamForm.addEventListener('submit', async (e) => { e.preventDefault(); const s = e.target.querySelector('.form-status'), f = e.target.elements; status(s, 'Saving…'); try { const id = youtubeId(f.youtubeUrl.value) || ''; await rpc('mvl_admin_update_livestream', { p_is_live: f.isLive.checked, p_youtube_url: f.youtubeUrl.value, p_youtube_id: id }); status(s, 'Livestream updated.', 'success'); } catch (err) { status(s, err.message, 'error'); } });
+livestreamForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const s = e.target.querySelector('.form-status');
+  const f = e.target.elements;
+  status(s, 'Saving…');
+  try {
+    const streams = [
+      { court: 'Court 1', is_live: f.court1Live.checked, youtube_url: f.court1Url.value.trim(), youtube_id: youtubeId(f.court1Url.value) || '' },
+      { court: 'Court 2', is_live: f.court2Live.checked, youtube_url: f.court2Url.value.trim(), youtube_id: youtubeId(f.court2Url.value) || '' },
+    ];
+    await rpc('mvl_admin_update_livestreams', { p_streams: streams });
+    data = await rpc('mvl_admin_get_dashboard');
+    status(s, 'Court livestreams updated.', 'success');
+  } catch (err) {
+    status(s, err.message, 'error');
+  }
+});
 adminDayFilter.addEventListener('change', () => { activeAdminDay = Number(adminDayFilter.value); render(); });
 readinessTeamFilter.addEventListener('change', () => {
   loadReadiness(readinessTeamFilter.value, readinessDayFilter.value);

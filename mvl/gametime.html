@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/mvl/css/style.css?v=checkin-email">
+<link rel="stylesheet" href="/mvl/css/style.css?v=two-courts">
 <script src="/mvl/js/site-config.js"></script>
 <script src="/mvl/js/analytics.js"></script>
 <script src="/mvl/js/nav.js"></script>
@@ -163,9 +163,11 @@
         <p class="games-label"><span class="live-dot" aria-hidden="true"></span> Livestream</p>
         <!-- PLACEHOLDER: swap for YouTube iframe embed
              <iframe src="https://www.youtube.com/embed/VIDEO_ID" ...></iframe> -->
-        <div class="live-frame placeholder" id="liveEmbed">
+        <div class="games-live-grid" id="liveStreams">
+        <div class="live-frame placeholder">
           <span class="play-btn" aria-hidden="true"></span>
           <span class="ph-note">livestream embed</span>
+        </div>
         </div>
       </div>
 
@@ -178,6 +180,13 @@
     <a class="section-link reveal" href="/mvl/videos.html">All Game Videos</a>
   </div>
 </section>
+
+<dialog class="livestream-picker" id="livestreamPicker" aria-labelledby="livestreamPickerTitle">
+  <div class="livestream-picker-card">
+    <div class="livestream-picker-head"><div><p>Live now</p><h2 id="livestreamPickerTitle">Choose a court</h2></div><form method="dialog"><button type="submit" aria-label="Close livestream choices">×</button></form></div>
+    <div id="livestreamPickerOptions" class="livestream-picker-options"></div>
+  </div>
+</dialog>
 
 <!-- Inside the wrapper on purpose: the strip separates the two folds without
      restarting the ramp, which keeps running behind it. -->
@@ -268,7 +277,7 @@
   </div>
 </footer>
 
-<script src="/mvl/js/league-data.js"></script>
+<script src="/mvl/js/league-data.js?v=two-courts"></script>
 <script src="/mvl/js/marquee.js"></script>
 <script src="/mvl/js/supabase-config.js"></script>
 <!-- data-version is the cache key for the entry script public-data.js
@@ -276,7 +285,7 @@
      this has to change: a returning visitor holding the old main.js under
      the previous key would load it alongside marquee.js and hit duplicate
      top-level declarations, killing the whole entry script. -->
-<script src="/mvl/js/public-data.js?v=checkin-email" data-entry="main" data-version="checkin-email"></script>
+<script src="/mvl/js/public-data.js?v=two-courts" data-entry="main" data-version="two-courts"></script>
 <script src="/mvl/js/faq.js"></script>
 </body>
 </html>
