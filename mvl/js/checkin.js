@@ -124,6 +124,25 @@ const CHEERS = [
   'Make it count today.',
 ];
 
+// The screen is the real receipt; the email is a bonus. So this never blocks
+// the confirmation and never surfaces an error — at the booth there is a queue
+// behind the player, and a Resend hiccup is not their problem.
+const sendConfirmationEmail = (checkinId) => {
+  fetch(`${cfg.url}/functions/v1/send-checkin-confirmation`, {
+    method: 'POST',
+    headers: {
+      apikey: cfg.anonKey,
+      Authorization: `Bearer ${cfg.anonKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ checkinId }),
+  })
+    .then((response) => {
+      if (!response.ok) console.warn('Check-in confirmation email failed:', response.status);
+    })
+    .catch((error) => console.warn('Check-in confirmation email failed:', error));
+};
+
 const showConfirmation = (payload) => {
   const team = teamById[payload.team.id];
   const card = el('checkinCard');
@@ -173,7 +192,11 @@ const showConfirmation = (payload) => {
   show(done);
   window.scrollTo(0, 0);
 
-  // TODO: trigger the check-in confirmation email once its template exists.
+  // Only on a fresh entry: a repeat check-in already got its email today, and
+  // the RPC hands back the original row either way.
+  if (!payload.already_checked_in && payload.checkin_id) {
+    sendConfirmationEmail(payload.checkin_id);
+  }
 };
 
 el('checkinAgainBtn').addEventListener('click', () => {
