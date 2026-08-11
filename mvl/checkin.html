@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/mvl/css/style.css?v=checkin-modal">
+<link rel="stylesheet" href="/mvl/css/style.css?v=checkin-views">
 <script src="/mvl/js/site-config.js"></script>
 <script src="/mvl/js/analytics.js"></script>
 <script src="/mvl/js/nav.js"></script>
@@ -92,6 +92,7 @@
   <form class="waiver-form is-hidden" id="selfForm" novalidate>
     <section class="form-panel" id="enterRaffle">
       <div class="form-panel-head">
+        <button class="panel-back" type="button" data-back>Change method</button>
         <p class="section-kicker section-kicker--teal">Join Today's Draw</p>
         <h2>Self Check-In</h2>
       </div>
@@ -128,6 +129,7 @@
   <!-- QR booth: staff sign in, then scan -->
   <section class="form-panel is-hidden" id="qrPanel">
     <div class="form-panel-head">
+      <button class="panel-back" type="button" data-back>Change method</button>
       <p class="section-kicker section-kicker--teal">Registration Booth</p>
       <h2>Check In by QR</h2>
     </div>

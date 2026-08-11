@@ -179,7 +179,8 @@ const showConfirmation = (payload) => {
 el('checkinAgainBtn').addEventListener('click', () => {
   hide(done);
   document.body.classList.remove('checkin-complete');
-  if (qrSignedIn) { show(qrPanel); focusScanner(); } else { openSheet(); }
+  // staff stay on the scanner; a player is offered the choice again
+  if (qrSignedIn) { showView('qr'); focusScanner(); } else { showView(null); openSheet(); }
 });
 
 // ---- mode chooser (modal) ---------------------------------------------------
@@ -190,6 +191,37 @@ const openSheet = () => {
 
 openModes?.addEventListener('click', openSheet);
 
+// ---- view routing -----------------------------------------------------------
+// Exactly one flow is on screen at a time, and each is a real URL. That gives
+// the browser Back button something to return to, lets staff bookmark
+// ?mode=qr, and gives the Google redirect a view to land on.
+const views = { self: selfForm, qr: qrPanel };
+
+const showView = (name, push = true) => {
+  hide(selfForm);
+  hide(qrPanel);
+  if (modeSheet.open) modeSheet.close();
+
+  const view = views[name];
+  if (view) {
+    show(view);
+    // the scanner input lives behind sign-in, so only the form takes focus here
+    if (name === 'self') el('teamSelect').focus();
+    view.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  if (!push) return;
+  history.pushState({ view: name || '' }, '', view ? `${location.pathname}?mode=${name}` : location.pathname);
+};
+
+const urlMode = () => new URLSearchParams(location.search).get('mode');
+
+window.addEventListener('popstate', () => showView(urlMode(), false));
+
+document.querySelectorAll('[data-back]').forEach((button) => {
+  button.addEventListener('click', () => { showView(null); openSheet(); });
+});
+
 modeSheet.addEventListener('click', (event) => {
   if (event.target.closest('[data-sheet-close]')) { modeSheet.close(); return; }
   // a click on the ::backdrop registers on the dialog itself
@@ -197,15 +229,7 @@ modeSheet.addEventListener('click', (event) => {
 
   const button = event.target.closest('[data-mode]');
   if (!button) return;
-  modeSheet.close();
-  if (button.dataset.mode === 'self') {
-    show(selfForm);
-    el('teamSelect').focus();
-    selfForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  } else {
-    show(qrPanel);
-    qrPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
+  showView(button.dataset.mode);
 });
 
 // ---- self check-in ---------------------------------------------------------------
@@ -386,10 +410,11 @@ qrInput.addEventListener('keydown', (event) => {
   submitCode(code);
 });
 
-// returning from the Google redirect lands here with a session already set
+// ---- first paint --------------------------------------------------------------
+// Returning from the Google redirect lands here carrying the grant, so go
+// straight to the scanner rather than making staff pick a mode again.
 if (location.hash.includes('access_token') || location.search.includes('code=')) {
-  show(qrPanel);
-  hide(modes);
+  showView('qr', false);
   setStatus(qrAuthStatus, 'Signing in…');
   loadAuthClient()
     .then((client) => client.auth.getSession())
@@ -397,10 +422,20 @@ if (location.hash.includes('access_token') || location.search.includes('code='))
       if (data?.session) {
         setStatus(qrAuthStatus, '');
         enterScanner(data.session);
-        history.replaceState(null, '', location.pathname);
       } else {
         setStatus(qrAuthStatus, 'Sign-in did not complete. Try again.', 'error');
       }
+      // drop the grant from the URL either way, but keep the view
+      history.replaceState(null, '', `${location.pathname}?mode=qr`);
     })
     .catch((error) => setStatus(qrAuthStatus, error.message, 'error'));
+} else if (isOpen) {
+  // an already-signed-in staff member reloading ?mode=qr goes back to the scanner
+  showView(urlMode(), false);
+  if (urlMode() === 'qr') {
+    loadAuthClient()
+      .then((client) => client.auth.getSession())
+      .then(({ data }) => { if (data?.session) enterScanner(data.session); })
+      .catch(() => { /* not signed in: the sign-in button is already showing */ });
+  }
 }
