@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/mvl/css/style.css?v=checkin-views">
+<link rel="stylesheet" href="/mvl/css/style.css?v=checkin-polish">
 <script src="/mvl/js/site-config.js"></script>
 <script src="/mvl/js/analytics.js"></script>
 <script src="/mvl/js/nav.js"></script>
@@ -35,6 +35,11 @@
     <h1 class="section-title">Raffle <em>Check-In</em></h1>
   </section>
 
+  <div class="waiver-copy">
+    <p>Every player who checks in at Gameville Ball Park joins that day's raffle. Prizes are drawn and claimed on-site, so you have to be at the venue — and each player gets one entry per game day.</p>
+    <p>You can check in yourself from your phone, or show your QR code at the registration booth and we'll scan it for you.</p>
+  </div>
+
   <!-- prize showcase — rendered from MVL_DATA.raffle in js/league-data.js -->
   <section class="prize-showcase is-hidden" id="prizeShowcase" aria-labelledby="prizeHeadline">
     <div class="prize-banner">
@@ -45,10 +50,6 @@
     </div>
     <div class="prize-grid" id="prizeGrid"></div>
   </section>
-
-  <div class="waiver-copy">
-    <p>Watching the games at Gameville Ball Park? Check in to join the game-day raffle — prizes are drawn and claimed at the venue. One entry per player per game day.</p>
-  </div>
 
   <!-- closed outside game days -->
   <section class="form-panel raffle-closed is-hidden" id="raffleClosed">
@@ -61,32 +62,6 @@
       <a class="cta cta--secondary" href="/mvl/schedule.html">View the Schedule</a>
     </div>
   </section>
-
-  <!-- how do you want to check in — opened from the Check In to Enter button -->
-  <dialog class="sheet checkin-sheet" id="modeSheet" aria-labelledby="modeSheetTitle">
-    <div class="sheet-head">
-      <h2 class="sheet-title" id="modeSheetTitle">Check In</h2>
-      <p class="sheet-sub">Two ways to join today's draw.</p>
-    </div>
-
-    <button class="sheet-option" type="button" data-mode="self">
-      <svg class="sheet-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>
-      <span>
-        <strong>Self Check-In</strong>
-        <small>On your own phone, at the venue &middot; needs your jersey number and registered email</small>
-      </span>
-    </button>
-
-    <button class="sheet-option" type="button" data-mode="qr">
-      <svg class="sheet-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 3h8v8H3V3Zm2 2v4h4V5H5Zm8-2h8v8h-8V3Zm2 2v4h4V5h-4ZM3 13h8v8H3v-8Zm2 2v4h4v-4H5Zm8-2h3v3h-3v-3Zm5 0h3v3h-3v-3Zm-5 5h3v3h-3v-3Zm5 0h3v3h-3v-3Z"/></svg>
-      <span>
-        <strong>Check In by QR</strong>
-        <small>Staff only &middot; bring your QR code to the registration booth and we'll scan it</small>
-      </span>
-    </button>
-
-    <button class="sheet-cancel" type="button" data-sheet-close>Cancel</button>
-  </dialog>
 
   <!-- self check-in -->
   <form class="waiver-form is-hidden" id="selfForm" novalidate>
@@ -110,7 +85,7 @@
           <input name="jersey_number" id="jerseyNumber" type="text" inputmode="numeric" autocomplete="off" placeholder="00" required>
         </label>
 
-        <label class="field">
+        <label class="field field--wide">
           <span>Email Address</span>
           <input name="email" id="checkinEmail" type="email" autocomplete="email" placeholder="you@example.com" required>
           <small>Use the same address you registered with — it's how we confirm it's you.</small>
@@ -135,7 +110,7 @@
     </div>
 
     <div id="qrSignIn">
-      <p class="raffle-closed-copy">Scanning is for MVL staff. If you're a player, head to the registration booth and show your QR code — we'll scan it for you.</p>
+      <p class="panel-copy">Scanning is for MVL staff. If you're a player, head to the registration booth and show your QR code — we'll scan it for you.</p>
       <div class="form-actions">
         <p class="form-status" id="qrAuthStatus" role="status" aria-live="polite"></p>
         <button class="cta cta--secondary" type="button" id="qrSignInBtn">Staff sign in with Google</button>
@@ -143,20 +118,51 @@
     </div>
 
     <div id="qrScanner" class="is-hidden">
-      <p class="raffle-closed-copy" id="qrWho"></p>
-      <label class="field">
-        <span>Scan or type a code</span>
-        <input id="qrInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="team_00">
-        <small>A booth scanner types the code and submits it automatically.</small>
-      </label>
-      <div class="form-actions">
-        <p class="form-status" id="qrStatus" role="status" aria-live="polite"></p>
-        <button class="cta cta--secondary" type="button" id="qrSignOutBtn">Sign out</button>
+      <div class="panel-note">
+        <p class="panel-copy" id="qrWho"></p>
+        <button class="panel-link" type="button" id="qrSignOutBtn">Sign out</button>
       </div>
+      <div class="form-grid">
+        <label class="field field--code">
+          <span>Scan or type a code</span>
+          <!-- no placeholder: the payload format is not something the page
+               should spell out to anyone who opens it -->
+          <input id="qrInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false">
+          <small>A booth scanner types the code and submits it automatically.</small>
+        </label>
+      </div>
+      <p class="form-status" id="qrStatus" role="status" aria-live="polite"></p>
     </div>
   </section>
 
 </main>
+
+<!-- Mode chooser. Outside <main> with the confirmation: both are overlays, so
+     neither belongs in the page's reading order. -->
+<dialog class="sheet checkin-sheet" id="modeSheet" aria-labelledby="modeSheetTitle">
+  <div class="sheet-head">
+    <h2 class="sheet-title" id="modeSheetTitle">Check In</h2>
+    <p class="sheet-sub">Two ways to join today's draw.</p>
+  </div>
+
+  <button class="sheet-option" type="button" data-mode="self">
+    <svg class="sheet-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>
+    <span>
+      <strong>Self Check-In</strong>
+      <small>On your own phone, at the venue &middot; needs your jersey number and registered email</small>
+    </span>
+  </button>
+
+  <button class="sheet-option" type="button" data-mode="qr">
+    <svg class="sheet-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 3h8v8H3V3Zm2 2v4h4V5H5Zm8-2h8v8h-8V3Zm2 2v4h4V5h-4ZM3 13h8v8H3v-8Zm2 2v4h4v-4H5Zm8-2h3v3h-3v-3Zm5 0h3v3h-3v-3Zm-5 5h3v3h-3v-3Zm5 0h3v3h-3v-3Z"/></svg>
+    <span>
+      <strong>Check In by QR</strong>
+      <small>Staff only &middot; bring your QR code to the registration booth and we'll scan it</small>
+    </span>
+  </button>
+
+  <button class="sheet-cancel" type="button" data-sheet-close>Cancel</button>
+</dialog>
 
 <!-- Confirmation takes the whole page: it is the end of the flow, and at the
      booth it is read across a table rather than held at arm's length. Sits

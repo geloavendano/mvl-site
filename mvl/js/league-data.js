@@ -80,7 +80,8 @@ window.MVL_DATA = {
     // Remove these dates and reset the radius to 500m when testing is done.
     openDates: ['2026-07-31', '2026-08-01', '2026-08-02', '2026-08-11'],
     headline: 'Win big just for showing up',
-    blurb: 'Check in at the venue on any game day and you are in the draw. Winners are announced and claimed on-site.',
+    // Sells the prizes; the mechanics are covered by the page intro above it.
+    blurb: 'A fresh draw every game day, with prizes from the partners and sponsors behind the league.',
     prizes: [
       { name: 'Grand Prize', sponsor: 'TBA', image: '', tag: 'Grand Prize' },
       { name: 'Prize TBA', sponsor: 'TBA', image: '' },

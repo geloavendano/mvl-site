@@ -2851,6 +2851,10 @@ html[data-phase='gameday'] .nav-links a[data-phase='registration'] { display: no
   font-size: 11px;
   line-height: 1.5;
 }
+/* the two lines stack directly, so they need the same measure as well as the
+   same type or the ragged edges give away that they are different elements */
+.raffle-page .field--wide small,
+.raffle-page .raffle-privacy { max-width: 62ch; }
 .waiver-page .field small.is-error,
 .raffle-page .field small.is-error { color: #FF9BAE; }
 .waiver-page .waiver-check {
@@ -2969,11 +2973,45 @@ html[data-phase='gameday'] .nav-links a[data-phase='registration'] { display: no
   padding: 10px 14px;
 }
 .raffle-closed-copy,
-.raffle-result-copy {
+.raffle-result-copy,
+.panel-copy {
   color: var(--ink-soft);
   font-size: 14px;
   line-height: 1.7;
 }
+/* Standing state plus the control that leaves it — the sign-out is a utility,
+   not a form action, so it reads as a link beside the status rather than as a
+   button competing with the scanner. */
+.panel-note {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-top: 18px;
+}
+.panel-note .panel-copy { flex: 1 1 22ch; margin: 0; }
+.panel-link {
+  flex: 0 0 auto;
+  padding: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--ink-muted);
+  font: 700 11px var(--ui);
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: color .15s ease;
+}
+.panel-link:hover { color: var(--accent, var(--mint)); }
+.panel-link:focus-visible { outline: 2px solid var(--accent, var(--mint)); outline-offset: 3px; }
+/* a scan code is short; a full-width input reads as a comment box */
+.field--code { max-width: 420px; }
+#qrStatus { margin-top: 14px; }
 .raffle-closed-actions {
   display: flex;
   gap: 10px;
@@ -3275,7 +3313,8 @@ body:not(.admin-page) .video-filter select:focus-visible {
 }
 
 /* Registration and raffle */
-.raffle-page .waiver-main { max-width: 1120px; }
+/* same measure as /waiver and /rules — the forms here are the same forms, and
+   a wider column made the page read as if it belonged to another site */
 .raffle-page .waiver-copy {
   padding: 0;
   border: 0;
@@ -3638,7 +3677,8 @@ body:not(.admin-page) .video-filter select:focus-visible {
 /* ==========================================================================
    Raffle prize showcase (/checkin)
    ========================================================================== */
-.prize-showcase { margin-top: 22px; }
+/* 24px is the page's panel rhythm (.waiver-copy, .form-panel) */
+.prize-showcase { margin-top: 24px; }
 .prize-banner {
   position: relative;
   overflow: hidden;
@@ -4563,7 +4603,6 @@ body.gametime-v3 .rules-preview {
   background: transparent;
   padding: 0;
   margin-top: 4px;
-  max-width: 62ch;
 }
 .day-tabs button[aria-selected='true'],
 .cta.cta--primary.prize-cta {
