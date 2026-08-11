@@ -36,6 +36,20 @@ const applyTeam = (side, team) => {
   });
 };
 
+const fitTeamName = (element) => {
+  element.style.fontSize = '';
+  const available = element.clientWidth;
+  const required = element.scrollWidth;
+  if (!available || !required || required <= available) return;
+  const baseSize = Number.parseFloat(getComputedStyle(element).fontSize);
+  const fittedSize = Math.max(20, Math.floor(baseSize * (available / required) * 0.96));
+  element.style.fontSize = `${fittedSize}px`;
+};
+const fitTeamNames = () => {
+  fitTeamName(elements.leftName);
+  fitTeamName(elements.rightName);
+};
+
 const render = (board) => {
   if (lastUpdate === board.updatedAt) return;
   lastUpdate = board.updatedAt;
@@ -49,6 +63,7 @@ const render = (board) => {
   elements.rightService.classList.toggle('is-serving', board.servingSide === 'right');
   applyTeam('left', board.leftTeam);
   applyTeam('right', board.rightTeam);
+  window.requestAnimationFrame(fitTeamNames);
   document.title = `${board.name} · MVL Scoreboard`;
   boardElement.classList.remove('is-loading');
   overlayStatus.className = 'overlay-status is-hidden';
@@ -70,3 +85,9 @@ const refresh = async () => {
 
 refresh();
 window.setInterval(refresh, 500);
+document.fonts?.ready.then(fitTeamNames);
+let resizeTimer = 0;
+window.addEventListener('resize', () => {
+  window.clearTimeout(resizeTimer);
+  resizeTimer = window.setTimeout(fitTeamNames, 80);
+});
