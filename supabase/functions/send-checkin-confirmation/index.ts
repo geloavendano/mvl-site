@@ -5,9 +5,10 @@
 // arrive weeks apart from the same sender and should read as one voice.
 //
 // What differs is the job. The waiver mail is a receipt you keep; this one is
-// read at the venue, on a phone, minutes after checking in — so it leads with
-// the entry being confirmed, then gets out of the way with the day's fixtures
-// and nothing else.
+// read at the venue, on a phone, minutes before a player takes the court — so
+// it is a game-day hype note first. The day's fixtures are the hero, the
+// check-in is a line inside that panel, and the raffle rides along in a single
+// chip. Checking in is about playing in the league; the draw is the bonus.
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -169,6 +170,23 @@ const drawDays = [
 const playerFullName = (player: Player) =>
   [player.display_name, player.surname].filter(Boolean).join(' ').trim();
 
+const countWord = (n: number) =>
+  ['no', 'one', 'two', 'three', 'four', 'five', 'six'][n] ?? String(n);
+
+// The reason they are here. Named after the first fixture rather than the
+// check-in, because that is what the player is actually turning up for.
+const leadLine = (teamName: string, games: Game[]) => {
+  if (!games.length) {
+    return `${teamName} isn't on today's card, so grab a seat and enjoy the games.`;
+  }
+  const first = games[0];
+  const plural = games.length === 1 ? 'one game' : `${countWord(games.length)} games`;
+  return `${teamName} has ${plural} today &mdash; ` +
+    `first serve ${manilaTime(first.starts_at)} against ${first.opponent ?? 'TBA'}` +
+    // "Gameville Ball Park · Court 1" -> "Court 1"; the venue is already stated
+    `${first.venue ? `, ${first.venue.replace(`${venue} · `, '')}` : ''}. Go get it.`;
+};
+
 // "Juan" out of "Juan Santos" — the headline is a greeting, not a record.
 const firstName = (player: Player) =>
   (player.display_name ?? '').trim().split(/\s+/)[0] || 'Metarice friend';
@@ -185,45 +203,35 @@ const createEmailHtml = (payload: ConfirmationPayload) => {
   const { checkin, player, team, games, day_number } = payload;
   const safeFirst = escapeHtml(firstName(player));
   const safeTeam = escapeHtml(team.name ?? team.id);
-  const jersey = (player.jersey_number ?? '').trim();
   const [teamA] = teamColors[team.id] ?? [c.mint];
 
   const dayLabel = day_number ? `Game Day ${day_number}` : manilaLongDate(dayToDate(checkin.checkin_day));
   const checkedInAt = manilaTime(checkin.created_at);
 
-  // One chip per fixture, same shape as the waiver mail's calendar chips.
-  const gameRows = games.map((game) => `
-              <tr>
-                <td class="x-chip" bgcolor="${g.chipSolid}" style="background-color:${g.chipFill};border:1px solid ${g.chipEdge};">
-                  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-                    <tr>
-                      <td style="padding:13px 16px;">
-                        <span class="x-ink" style="display:block;color:${g.ink};font:800 13px/1.3 ${uiFont};letter-spacing:.4px;">${manilaTime(game.starts_at)} &middot; vs ${escapeHtml(game.opponent ?? 'TBA')}</span>
-                        <span class="x-ink" style="display:block;margin-top:3px;color:${g.ink};font:400 11px/1.4 ${uiFont};">${escapeHtml(game.venue ?? venue)}</span>
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-              <tr><td height="8" style="height:8px;line-height:8px;font-size:0;">&nbsp;</td></tr>`).join('');
+  // The day's fixtures are the hero panel: kick-off big enough to read across a
+  // gym, opponent and court under it, one hairline between entries.
+  const gameRows = games.map((game, i) => `
+                        <tr>
+                          <td style="padding:${i ? '14px' : '0'} 0 0;${i ? `border-top:1px solid ${g.edge};` : ''}">
+                            ${i ? '' : ''}<p class="x-ink" style="margin:${i ? '14px' : '0'} 0 2px;color:${g.ink};font:800 26px/1.1 ${uiFont};letter-spacing:-.3px;text-transform:uppercase;">${manilaTime(game.starts_at)}</p>
+                            <p class="x-ink" style="margin:0;color:${g.ink};font:800 15px/1.35 ${uiFont};">vs ${escapeHtml(game.opponent ?? 'TBA')}</p>
+                            <p class="x-ink" style="margin:2px 0 0;color:${g.ink};font:400 12px/1.4 ${uiFont};">${escapeHtml(game.venue ?? venue)}</p>
+                          </td>
+                        </tr>`).join('');
 
   // A player can check in on a day their own team is not playing — they are at
   // the venue either way, and the entry counts either way.
-  const gamesBlock = games.length
+  const heroPanel = games.length
     ? `
-                <tr>
-                  <td style="padding:0 28px 12px;">
-                    <p class="x-ink" style="margin:0 0 12px;color:${g.ink};font:700 10px/1 ${monoFont};letter-spacing:2px;text-transform:uppercase;">${safeTeam} today</p>
-                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">${gameRows}
-                    </table>
-                  </td>
-                </tr>`
+                          <p class="x-ink" style="margin:0 0 14px;color:${g.ink};font:700 10px/1 ${monoFont};letter-spacing:2px;text-transform:uppercase;">${safeTeam} today</p>
+                          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">${gameRows}
+                          </table>
+                          <p class="x-ink" style="margin:16px 0 0;padding-top:14px;border-top:1px solid ${g.edge};color:${g.ink};font:400 12px/1.5 ${uiFont};">Checked in ${escapeHtml(checkedInAt)} at ${venue}.</p>`
     : `
-                <tr>
-                  <td style="padding:0 28px 20px;">
-                    <p class="x-ink" style="margin:0;color:${g.ink};font:400 13px/1.6 ${uiFont};">${safeTeam} has no fixtures today &mdash; your entry is in all the same.</p>
-                  </td>
-                </tr>`;
+                          <p class="x-ink" style="margin:0 0 10px;color:${g.ink};font:700 10px/1 ${monoFont};letter-spacing:2px;text-transform:uppercase;">You're checked in</p>
+                          <p class="x-ink" style="margin:0 0 4px;color:${g.ink};font:800 22px/1.22 ${uiFont};letter-spacing:-.2px;text-transform:uppercase;">${escapeHtml(manilaLongDate(dayToDate(checkin.checkin_day)))}</p>
+                          <p class="x-ink" style="margin:0;color:${g.ink};font:800 22px/1.22 ${uiFont};letter-spacing:-.2px;text-transform:uppercase;">Checked in ${escapeHtml(checkedInAt)}</p>
+                          <p class="x-ink" style="margin:14px 0 0;padding-top:14px;border-top:1px solid ${g.edge};color:${g.ink};font:400 12px/1.5 ${uiFont};">${venue}</p>`;
 
   return `<!doctype html>
 <html lang="en">
@@ -232,7 +240,7 @@ const createEmailHtml = (payload: ConfirmationPayload) => {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <meta name="supported-color-schemes" content="light dark">
-<title>You're in today's draw — MVL 2026</title>
+<title>Game on — MVL 2026</title>
 <style>
   :root { color-scheme: light dark; supported-color-schemes: light dark; }
 
@@ -274,7 +282,7 @@ const createEmailHtml = (payload: ConfirmationPayload) => {
 </style>
 </head>
 <body class="x-page" style="margin:0;padding:0;width:100%;background-color:${c.page};color:${c.ink};font-family:${uiFont};">
-  <div style="display:none;max-height:0;overflow:hidden;font-size:0;line-height:0;opacity:0;">Checked in at ${venue} &mdash; you're in today's raffle draw. Winners are drawn and claimed on-site.</div>
+  <div style="display:none;max-height:0;overflow:hidden;font-size:0;line-height:0;opacity:0;">${leadLine(team.name ?? team.id, games)}</div>
   <table role="presentation" class="x-page" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="${c.page}" style="background-color:${c.page};">
     <tr>
       <td align="center" style="padding:28px 12px;">
@@ -301,56 +309,40 @@ const createEmailHtml = (payload: ConfirmationPayload) => {
                          client; a long name is one unbreakable word wider than
                          that, so let it split rather than push the block.
                          word-wrap is the alias Outlook's Word engine reads. -->
-                    <h1 class="x-ink" style="margin:0 0 18px;color:${g.ink};font:800 34px/1.04 ${uiFont};letter-spacing:-.6px;text-transform:uppercase;overflow-wrap:break-word;word-wrap:break-word;">You're in<br>the draw, ${safeFirst}</h1>
+                    <h1 class="x-ink" style="margin:0 0 18px;color:${g.ink};font:800 34px/1.04 ${uiFont};letter-spacing:-.6px;text-transform:uppercase;overflow-wrap:break-word;word-wrap:break-word;">Game on,<br>${safeFirst}</h1>
                     <table role="presentation" cellspacing="0" cellpadding="0" border="0">
                       <tr>
                         <td class="x-dot" width="11" bgcolor="${teamA}" style="width:11px;height:11px;line-height:11px;font-size:0;background-color:${teamA};border-radius:999px;">&nbsp;</td>
-                        <td class="x-ink" style="padding-left:9px;color:${g.ink};font:800 11px/1 ${uiFont};letter-spacing:2px;text-transform:uppercase;white-space:nowrap;">${safeTeam}${jersey ? ` &middot; Jersey ${escapeHtml(jersey)}` : ''}</td>
+                        <td class="x-ink" style="padding-left:9px;color:${g.ink};font:800 11px/1 ${uiFont};letter-spacing:2px;text-transform:uppercase;white-space:nowrap;">${safeTeam}</td>
                       </tr>
                     </table>
-                    <p class="x-ink" style="margin:18px 0 0;color:${g.ink};font:400 15px/1.6 ${uiFont};">You're entered in the game-day raffle at ${venue}. <strong class="x-ink" style="color:${g.ink};font-weight:800;">You have to be present when your name is drawn</strong> &mdash; so stay close on draw days.</p>
+                    <p class="x-ink" style="margin:18px 0 0;color:${g.ink};font:400 15px/1.6 ${uiFont};">${leadLine(safeTeam, games)}</p>
                   </td>
                 </tr>
 
-                <!-- the receipt line: what was recorded, in one panel -->
+                <!-- the day's fixtures: the reason they turned up -->
                 <tr>
                   <td style="padding:0 28px 26px;">
                     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" class="x-panel" bgcolor="${g.panelSolid}" style="background-color:${g.panelFill};border:1px solid ${g.edge};">
                       <tr>
-                        <td style="padding:20px;">
-                          <p class="x-ink" style="margin:0 0 10px;color:${g.ink};font:700 10px/1 ${monoFont};letter-spacing:2px;text-transform:uppercase;">Your entry</p>
-                          <p class="x-ink" style="margin:0 0 4px;color:${g.ink};font:800 22px/1.22 ${uiFont};letter-spacing:-.2px;text-transform:uppercase;">${escapeHtml(manilaLongDate(dayToDate(checkin.checkin_day)))}</p>
-                          <p class="x-ink" style="margin:0 0 14px;color:${g.ink};font:800 22px/1.22 ${uiFont};letter-spacing:-.2px;text-transform:uppercase;">Checked in ${escapeHtml(checkedInAt)}</p>
-                          <p class="x-ink" style="margin:0;padding-top:14px;border-top:1px solid ${g.edge};color:${g.ink};font:400 13px/1.5 ${uiFont};">
-                            <span class="x-ink" style="color:${g.ink};font-weight:800;letter-spacing:1px;text-transform:uppercase;">${venue}</span><br>
-                            <span class="x-ink" style="color:${g.ink};font-size:12px;">One entry per player per game day &mdash; you're set for today.</span>
-                          </p>
+                        <td style="padding:20px;">${heroPanel}
                         </td>
                       </tr>
                     </table>
                   </td>
                 </tr>
-${gamesBlock}
 
-                <!-- when the draws actually happen: the one thing a player
-                     needs to plan around, since they must be there to win -->
+                <!-- the raffle rides along: one line, not a section. Checking
+                     in is about the league first. -->
                 <tr>
                   <td style="padding:0 28px 12px;">
-                    <p class="x-ink" style="margin:0 0 12px;color:${g.ink};font:700 10px/1 ${monoFont};letter-spacing:2px;text-transform:uppercase;">Draw days</p>
-                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">${drawDays.map((draw) => `
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" class="x-chip" bgcolor="${g.chipSolid}" style="background-color:${g.chipFill};border:1px solid ${g.chipEdge};">
                       <tr>
-                        <td class="x-chip" bgcolor="${g.chipSolid}" style="background-color:${g.chipFill};border:1px solid ${g.chipEdge};">
-                          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-                            <tr>
-                              <td style="padding:13px 16px;">
-                                <span class="x-ink" style="display:block;color:${g.ink};font:800 13px/1.3 ${uiFont};letter-spacing:.4px;">${draw.label}</span>
-                                <span class="x-ink" style="display:block;margin-top:3px;color:${g.ink};font:400 11px/1.4 ${uiFont};">${draw.when}</span>
-                              </td>
-                            </tr>
-                          </table>
+                        <td style="padding:14px 16px;">
+                          <span class="x-ink" style="display:block;color:${g.ink};font:800 12px/1.3 ${uiFont};letter-spacing:.4px;">You're in the raffle too</span>
+                          <span class="x-ink" style="display:block;margin-top:4px;color:${g.ink};font:400 11.5px/1.5 ${uiFont};">${drawDays.map((draw) => `${draw.label} on ${draw.when}`).join('. ')}. You have to be there when your name is drawn.</span>
                         </td>
                       </tr>
-                      <tr><td height="8" style="height:8px;line-height:8px;font-size:0;">&nbsp;</td></tr>`).join('')}
                     </table>
                   </td>
                 </tr>
@@ -378,7 +370,7 @@ ${gamesBlock}
               <p class="x-fine" style="margin:0 0 10px;color:${c.inkFaint};font:700 9px/1 ${monoFont};letter-spacing:1.6px;text-transform:uppercase;">Your check-in record</p>
               ${fineHeading('How you checked in')}
               ${finePara(escapeHtml(methodLabel(checkin.method)))}
-              ${finePara(`${escapeHtml(playerFullName(player) || firstName(player))}${jersey ? `, jersey ${escapeHtml(jersey)}` : ''}, ${safeTeam}.`, 'Recorded as')}
+              ${finePara(`${escapeHtml(playerFullName(player) || firstName(player))}, ${safeTeam}.`, 'Recorded as')}
               ${fineHeading('How the raffle works')}
               ${finePara('Players must be present at the time their names are drawn to be eligible to win.', 'Eligibility.')}
               ${finePara('There are separate draws for Major and Minor raffle prizes, so every player is eligible to win both a Minor and a Major prize.', 'Two draws.')}
@@ -397,7 +389,7 @@ ${gamesBlock}
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                 <tr>
                   <td valign="top" style="padding-right:14px;">
-                    <p class="x-fine" style="margin:0;color:${c.inkFaint};font:400 11px/1.6 ${uiFont};">Metarice Volleyball League 2026 &middot; ${venue}<br>You're getting this because you checked in for the MVL 2026 game-day raffle. This is an automated confirmation email, so please do not reply. For official announcements, visit <a class="x-fine-lead" href="${mvlUrl}" style="color:${c.inkMuted};">${mvlUrl}</a> or follow <a class="x-fine-lead" href="${instagramUrl}" style="color:${c.inkMuted};">@metaricevolley</a>.</p>
+                    <p class="x-fine" style="margin:0;color:${c.inkFaint};font:400 11px/1.6 ${uiFont};">Metarice Volleyball League 2026 &middot; ${venue}<br>You're getting this because you checked in on an MVL 2026 game day. This is an automated confirmation email, so please do not reply. For official announcements, visit <a class="x-fine-lead" href="${mvlUrl}" style="color:${c.inkMuted};">${mvlUrl}</a> or follow <a class="x-fine-lead" href="${instagramUrl}" style="color:${c.inkMuted};">@metaricevolley</a>.</p>
                   </td>
                   <td width="88" valign="bottom" align="right" style="width:88px;">
                     <img src="${siteUrl}/mvl/mascot/Mingu-Hooray-email.png" width="88" height="119" alt="" style="display:block;width:88px;height:119px;border:0;">
@@ -417,33 +409,28 @@ ${gamesBlock}
 const createEmailText = (payload: ConfirmationPayload) => {
   const { checkin, player, team, games, day_number } = payload;
   const teamName = team.name ?? team.id;
-  const jersey = (player.jersey_number ?? '').trim();
   const dayLabel = day_number ? `Game Day ${day_number}` : manilaLongDate(dayToDate(checkin.checkin_day));
 
   const fixtures = games.length
-    ? games.map((game) => `${manilaTime(game.starts_at)} - vs ${game.opponent ?? 'TBA'} (${game.venue ?? venue})`).join('\n')
-    : `${teamName} has no fixtures today - your entry is in all the same.`;
+    ? `${teamName.toUpperCase()} TODAY\n${games.map((game) =>
+      `${manilaTime(game.starts_at)} - vs ${game.opponent ?? 'TBA'} (${game.venue ?? venue})`).join('\n')}`
+    : `${manilaLongDate(dayToDate(checkin.checkin_day))}\n${venue}`;
 
   return `
-You're in the draw, ${firstName(player)}.
+Game on, ${firstName(player)}.
 
 Checked in - ${dayLabel}
-${teamName}${jersey ? ` - Jersey ${jersey}` : ''}
+${teamName}
 
-You're entered in the game-day raffle at ${venue}. You have to be present when
-your name is drawn - so stay close on draw days.
+${leadLine(teamName, games).replace(/&mdash;/g, '-')}
 
-YOUR ENTRY
-${manilaLongDate(dayToDate(checkin.checkin_day))}
-Checked in ${manilaTime(checkin.created_at)}
-${venue}
-One entry per player per game day - you're set for today.
-
-${teamName.toUpperCase()} TODAY
 ${fixtures}
 
-DRAW DAYS
-${drawDays.map((draw) => `${draw.label}: ${draw.when}`).join('\n')}
+Checked in ${manilaTime(checkin.created_at)} at ${venue}.
+
+YOU'RE IN THE RAFFLE TOO
+${drawDays.map((draw) => `${draw.label} on ${draw.when}`).join('. ')}. You have to be
+there when your name is drawn.
 
 Full schedule: ${siteUrl}/mvl/schedule
 Site: ${mvlUrl}
@@ -459,7 +446,7 @@ How you checked in
 ${methodLabel(checkin.method)}
 
 Recorded as
-${playerFullName(player) || firstName(player)}${jersey ? `, jersey ${jersey}` : ''}, ${teamName}.
+${playerFullName(player) || firstName(player)}, ${teamName}.
 
 How the raffle works
 Eligibility. Players must be present at the time their names are drawn to be
@@ -550,7 +537,7 @@ Deno.serve(async (req) => {
         from,
         to,
         ...(replyTo ? { reply_to: replyTo } : {}),
-        subject: `You're in today's draw — MVL 2026 ${dayLabel} with ${teamName}`,
+        subject: `${dayLabel} — you're checked in with ${teamName}`,
         html: createEmailHtml(payload),
         text: createEmailText(payload),
       }),
