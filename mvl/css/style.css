@@ -3721,11 +3721,16 @@ body:not(.admin-page) .video-filter select:focus-visible {
 }
 .prize-cta { margin-top: 16px; display: inline-flex; width: auto; }
 
+/* One column on phones: these are posters to look at, and two 160px thumbnails
+   show nothing worth tapping. */
 .prize-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 12px;
   margin-top: 12px;
+}
+@media (min-width: 560px) {
+  .prize-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 .prize-card {
   min-width: 0;
@@ -3738,20 +3743,50 @@ body:not(.admin-page) .video-filter select:focus-visible {
   grid-column: 1 / -1;
   border-color: rgba(124, 245, 180, .5);
 }
+/* 4:5 matches the posters' own 1080x1350, so `cover` crops nothing. */
 .prize-media {
   position: relative;
-  aspect-ratio: 4 / 3;
-  display: grid;
-  place-items: center;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  padding: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  background: transparent;
+  cursor: zoom-in;
+  overflow: hidden;
 }
-.prize-card--feature .prize-media { aspect-ratio: 16 / 9; }
 .prize-media img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform .3s ease;
 }
+.prize-media:hover img { transform: scale(1.03); }
+.prize-media:focus-visible { outline: 2px solid var(--mint); outline-offset: -2px; }
+/* the affordance has to survive whatever is behind it, hence the scrim */
+.prize-zoom {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: rgba(11, 7, 48, .78);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  font: 800 9.5px/1 var(--ui);
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+}
+.prize-zoom svg { width: 13px; height: 13px; display: block; }
 .prize-tag {
   position: absolute;
   top: 10px;
@@ -3776,24 +3811,182 @@ body:not(.admin-page) .video-filter select:focus-visible {
   margin-bottom: 4px;
 }
 .prize-copy h3 {
-  font-size: 14px;
-  font-weight: 800;
-  line-height: 1.25;
+  font-family: var(--stretch);
+  font-style: italic;
+  font-size: 22px;
+  line-height: 1;
+  text-transform: uppercase;
   color: #fff;
+}
+.prize-drawn {
+  margin-top: 6px;
+  color: var(--mint);
+  font: 700 10px/1.4 var(--mono);
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
 }
 
 @media (min-width: 960px) {
   .prize-banner { padding: 40px 38px 36px; }
   .prize-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 16px;
     margin-top: 16px;
-    align-items: start; /* don't stretch short cards to the feature's height */
+    align-items: start;
   }
-  .prize-card--feature { grid-column: span 2; }
-  .prize-card--feature .prize-media { aspect-ratio: 16 / 9; }
   .prize-blurb { font-size: 15px; }
-  .prize-copy h3 { font-size: 15px; }
+  .prize-copy h3 { font-size: 26px; }
+}
+
+/* ==========================================================================
+   Raffle mechanics
+   ========================================================================== */
+.mechanics-list {
+  list-style: none;
+  display: grid;
+  gap: 12px;
+  padding-top: 18px;
+}
+.mechanics-list li {
+  position: relative;
+  padding-left: 20px;
+  color: var(--ink-soft);
+  font-size: 14px;
+  line-height: 1.65;
+}
+.mechanics-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: .62em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent, var(--mint));
+}
+.mechanics-list strong { color: #fff; font-weight: 800; }
+
+.draw-days {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+}
+.draw-day {
+  padding: 16px 18px;
+  border: 1px solid rgba(124, 245, 180, .28);
+  border-radius: var(--control-radius, 12px);
+  background: rgba(11, 7, 48, .45);
+}
+.draw-day-label {
+  color: var(--accent, var(--mint));
+  font: 800 10px/1 var(--mono);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.draw-day-when {
+  margin-top: 8px;
+  color: #fff;
+  font-family: var(--stretch);
+  font-style: italic;
+  font-size: 22px;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+@media (min-width: 560px) {
+  .draw-days { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* ==========================================================================
+   Poster lightbox — fit by default, tap for natural size, drag to pan
+   ========================================================================== */
+.lightbox {
+  width: 100vw;
+  max-width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
+  /* dvh so the poster is not cut off behind mobile browser chrome */
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: hidden;
+}
+.lightbox::backdrop { background: rgba(4, 2, 20, .92); }
+.lightbox-stage {
+  width: 100%;
+  height: 100%;
+  padding: 56px 16px 52px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+/* The cap is in viewport units, not `max-height: 100%`: the percentage would
+   resolve against an auto-sized grid area — a circular dependency the spec
+   resolves to `none`, which is how a 1350px poster escaped the stage entirely.
+   108px is the stage's own 56px + 52px padding. */
+.lightbox-stage img {
+  display: block;
+  max-width: 100%;
+  max-height: calc(100vh - 108px);
+  max-height: calc(100dvh - 108px);
+  width: auto;
+  height: auto;
+  border-radius: 10px;
+  cursor: zoom-in;
+}
+/* zoomed: the stage becomes the scroll container and the image goes to its
+   natural size, so panning is plain scrolling — momentum and pinch stay native */
+.lightbox.is-zoomed .lightbox-stage {
+  overflow: auto;
+  place-items: start;
+  padding: 56px 0 52px;
+  cursor: grab;
+  -webkit-overflow-scrolling: touch;
+}
+.lightbox.is-zoomed .lightbox-stage:active { cursor: grabbing; }
+.lightbox.is-zoomed .lightbox-stage img {
+  max-width: none;
+  max-height: none;
+  width: auto;
+  border-radius: 0;
+  cursor: zoom-out;
+  /* keep a narrow poster centred once the stage starts scrolling */
+  margin: 0 auto;
+}
+.lightbox-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .12);
+  color: #fff;
+  cursor: pointer;
+  transition: background .15s ease;
+}
+.lightbox-close:hover { background: rgba(255, 255, 255, .22); }
+.lightbox-close:focus-visible { outline: 2px solid var(--mint); outline-offset: 3px; }
+.lightbox-close svg { width: 17px; height: 17px; display: block; }
+.lightbox-hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 16px;
+  z-index: 2;
+  text-align: center;
+  color: rgba(255, 255, 255, .72);
+  font: 700 10px/1 var(--ui);
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  pointer-events: none;
 }
 
 /* team colour marks on the Videos page */

@@ -157,6 +157,15 @@ const dayToDate = (day: string) => `${day}T12:00:00+08:00`;
 const methodLabel = (method: Checkin['method']) =>
   method === 'qr' ? 'Scanned at the registration booth' : 'Self check-in';
 
+// Straight off the raffle mechanics poster. Mirrors raffle.drawDays in
+// js/league-data.js — keep the two in step. Held here rather than read from the
+// DB for the same reason as the team palette: the mail must render the same
+// whether or not anything has been seeded.
+const drawDays = [
+  { label: 'Minor Raffle', when: 'Day 3 · Aug 31 and Day 4 · Sep 5' },
+  { label: 'Major Raffle', when: 'Day 5 · Sep 6' },
+];
+
 const playerFullName = (player: Player) =>
   [player.display_name, player.surname].filter(Boolean).join(' ').trim();
 
@@ -299,7 +308,7 @@ const createEmailHtml = (payload: ConfirmationPayload) => {
                         <td class="x-ink" style="padding-left:9px;color:${g.ink};font:800 11px/1 ${uiFont};letter-spacing:2px;text-transform:uppercase;white-space:nowrap;">${safeTeam}${jersey ? ` &middot; Jersey ${escapeHtml(jersey)}` : ''}</td>
                       </tr>
                     </table>
-                    <p class="x-ink" style="margin:18px 0 0;color:${g.ink};font:400 15px/1.6 ${uiFont};">You're entered in today's game-day raffle at ${venue}. Prizes are drawn and claimed on-site, so stay close &mdash; you have to be at the venue when your name comes up.</p>
+                    <p class="x-ink" style="margin:18px 0 0;color:${g.ink};font:400 15px/1.6 ${uiFont};">You're entered in the game-day raffle at ${venue}. <strong class="x-ink" style="color:${g.ink};font-weight:800;">You have to be present when your name is drawn</strong> &mdash; so stay close on draw days.</p>
                   </td>
                 </tr>
 
@@ -322,6 +331,29 @@ const createEmailHtml = (payload: ConfirmationPayload) => {
                   </td>
                 </tr>
 ${gamesBlock}
+
+                <!-- when the draws actually happen: the one thing a player
+                     needs to plan around, since they must be there to win -->
+                <tr>
+                  <td style="padding:0 28px 12px;">
+                    <p class="x-ink" style="margin:0 0 12px;color:${g.ink};font:700 10px/1 ${monoFont};letter-spacing:2px;text-transform:uppercase;">Draw days</p>
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">${drawDays.map((draw) => `
+                      <tr>
+                        <td class="x-chip" bgcolor="${g.chipSolid}" style="background-color:${g.chipFill};border:1px solid ${g.chipEdge};">
+                          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                            <tr>
+                              <td style="padding:13px 16px;">
+                                <span class="x-ink" style="display:block;color:${g.ink};font:800 13px/1.3 ${uiFont};letter-spacing:.4px;">${draw.label}</span>
+                                <span class="x-ink" style="display:block;margin-top:3px;color:${g.ink};font:400 11px/1.4 ${uiFont};">${draw.when}</span>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr><td height="8" style="height:8px;line-height:8px;font-size:0;">&nbsp;</td></tr>`).join('')}
+                    </table>
+                  </td>
+                </tr>
 
                 <!-- next step -->
                 <tr>
@@ -348,8 +380,10 @@ ${gamesBlock}
               ${finePara(escapeHtml(methodLabel(checkin.method)))}
               ${finePara(`${escapeHtml(playerFullName(player) || firstName(player))}${jersey ? `, jersey ${escapeHtml(jersey)}` : ''}, ${safeTeam}.`, 'Recorded as')}
               ${fineHeading('How the raffle works')}
-              ${finePara('Checking in enters you in that game day’s draw. Each game day has its own draw, and each player gets one entry per game day — checking in again on the same day will not add another.')}
-              ${finePara('Prizes are drawn and claimed at the venue. If your name is drawn and you are not there to claim it, we draw again.')}
+              ${finePara('Players must be present at the time their names are drawn to be eligible to win.', 'Eligibility.')}
+              ${finePara('There are separate draws for Major and Minor raffle prizes, so every player is eligible to win both a Minor and a Major prize.', 'Two draws.')}
+              ${finePara(drawDays.map((draw) => `${draw.label}: ${draw.when}.`).join(' '), 'Draw days.')}
+              ${finePara('Each player gets one entry per game day — checking in again on the same day will not add another. Prizes are claimed at the venue.')}
               ${finePara(`Questions on the day? Find us at the registration booth, or message <a class="x-fine-lead" href="${instagramUrl}" style="color:${c.inkMuted};">@metaricevolley</a>.`)}
             </td>
           </tr>
@@ -396,9 +430,8 @@ You're in the draw, ${firstName(player)}.
 Checked in - ${dayLabel}
 ${teamName}${jersey ? ` - Jersey ${jersey}` : ''}
 
-You're entered in today's game-day raffle at ${venue}. Prizes are drawn and
-claimed on-site, so stay close - you have to be at the venue when your name
-comes up.
+You're entered in the game-day raffle at ${venue}. You have to be present when
+your name is drawn - so stay close on draw days.
 
 YOUR ENTRY
 ${manilaLongDate(dayToDate(checkin.checkin_day))}
@@ -408,6 +441,9 @@ One entry per player per game day - you're set for today.
 
 ${teamName.toUpperCase()} TODAY
 ${fixtures}
+
+DRAW DAYS
+${drawDays.map((draw) => `${draw.label}: ${draw.when}`).join('\n')}
 
 Full schedule: ${siteUrl}/mvl/schedule
 Site: ${mvlUrl}
@@ -426,12 +462,16 @@ Recorded as
 ${playerFullName(player) || firstName(player)}${jersey ? `, jersey ${jersey}` : ''}, ${teamName}.
 
 How the raffle works
-Checking in enters you in that game day's draw. Each game day has its own draw,
-and each player gets one entry per game day - checking in again on the same day
-will not add another.
+Eligibility. Players must be present at the time their names are drawn to be
+eligible to win.
 
-Prizes are drawn and claimed at the venue. If your name is drawn and you are
-not there to claim it, we draw again.
+Two draws. There are separate draws for Major and Minor raffle prizes, so every
+player is eligible to win both a Minor and a Major prize.
+
+Draw days. ${drawDays.map((draw) => `${draw.label}: ${draw.when}.`).join(' ')}
+
+Each player gets one entry per game day - checking in again on the same day will
+not add another. Prizes are claimed at the venue.
 
 Questions on the day? Find us at the registration booth, or message
 @metaricevolley.

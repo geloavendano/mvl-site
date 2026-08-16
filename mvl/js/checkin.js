@@ -19,25 +19,119 @@ const VENUE_ID = '11111111-1111-4111-8111-111111111111';
 const el = (id) => document.getElementById(id);
 const teamById = Object.fromEntries(teams.map((t) => [t.id, t]));
 
+// Same helper as main/schedule/videos/admin.js. These are classic scripts
+// sharing one global lexical scope, so the copies only coexist because no two
+// of those bundles load on the same page — don't add main.js or schedule.js to
+// checkin.html without collapsing this into a shared file first.
+const escapeHtml = (value) => String(value ?? '')
+  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
 // ---- prize showcase ----------------------------------------------------------
 const prizeShowcase = el('prizeShowcase');
 if (prizeShowcase && raffle?.prizes?.length) {
   el('prizeHeadline').textContent = raffle.headline || 'Win big just for showing up';
   prizeShowcase.querySelector('.prize-blurb').textContent = raffle.blurb || '';
-  el('prizeGrid').innerHTML = raffle.prizes.map((prize, i) => `
-    <article class="prize-card${i === 0 ? ' prize-card--feature' : ''}">
-      ${prize.tag ? `<span class="prize-tag">${prize.tag}</span>` : ''}
-      <div class="prize-media${prize.image ? '' : ' is-empty'}">
-        ${prize.image ? `<img src="${prize.image}" alt="${prize.name}" loading="lazy">` : '<span>Prize photo</span>'}
-      </div>
+  // Each tile is a button, not a figure with a click handler: opening a viewer
+  // is an action, and this way it is keyboard- and screen-reader-reachable for
+  // free.
+  el('prizeGrid').innerHTML = raffle.prizes.map((prize) => `
+    <article class="prize-card">
+      <button class="prize-media" type="button" data-poster="${escapeHtml(prize.image)}" data-poster-label="${escapeHtml(prize.name)}">
+        <img src="${escapeHtml(prize.image)}" alt="${escapeHtml(prize.name)}" loading="lazy">
+        <span class="prize-zoom">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M10 2a8 8 0 1 1-4.9 14.32l-3.4 3.39-1.41-1.42 3.39-3.39A8 8 0 0 1 10 2Zm0 2a6 6 0 1 0 0 12 6 6 0 0 0 0-12Zm1 2v3h3v2h-3v3H9v-3H6V9h3V6h2Z"/></svg>
+          Tap to zoom
+        </span>
+      </button>
       <div class="prize-copy">
-        ${prize.sponsor ? `<p class="prize-sponsor">${prize.sponsor}</p>` : ''}
-        <h3>${prize.name}</h3>
+        <h3>${escapeHtml(prize.name)}</h3>
+        ${prize.drawn ? `<p class="prize-drawn">${escapeHtml(prize.drawn)}</p>` : ''}
       </div>
     </article>
   `).join('');
   prizeShowcase.classList.remove('is-hidden');
 }
+
+// ---- raffle mechanics --------------------------------------------------------
+const raffleMechanics = el('raffleMechanics');
+if (raffleMechanics && raffle?.mechanics?.length) {
+  el('mechanicsList').innerHTML = raffle.mechanics.map((rule) => `
+    <li><strong>${escapeHtml(rule.lead)}</strong> ${escapeHtml(rule.body)}</li>
+  `).join('');
+  el('drawDays').innerHTML = (raffle.drawDays || []).map((draw) => `
+    <div class="draw-day">
+      <p class="draw-day-label">${escapeHtml(draw.label)}</p>
+      <p class="draw-day-when">${draw.when.map(escapeHtml).join('<br>')}</p>
+    </div>
+  `).join('');
+  raffleMechanics.classList.remove('is-hidden');
+}
+
+// ---- poster lightbox ---------------------------------------------------------
+// Fit-to-screen by default, one tap to go to natural size. When zoomed the
+// stage scrolls, so panning is drag-to-scroll rather than a transform matrix —
+// that keeps momentum scrolling and pinch-zoom native on touch.
+const lightbox = el('prizeLightbox');
+const lightboxImg = el('lightboxImg');
+const lightboxStage = el('lightboxStage');
+const lightboxHint = el('lightboxHint');
+
+const setZoom = (on) => {
+  lightbox.classList.toggle('is-zoomed', on);
+  lightboxHint.textContent = on ? 'Drag to pan · tap to fit' : 'Tap the poster to zoom';
+  if (!on) { lightboxStage.scrollTop = 0; lightboxStage.scrollLeft = 0; }
+};
+
+const openLightbox = (src, label) => {
+  lightboxImg.src = src;
+  lightboxImg.alt = label;
+  setZoom(false);
+  if (typeof lightbox.showModal === 'function') lightbox.showModal();
+  else lightbox.setAttribute('open', '');
+};
+
+el('prizeGrid')?.addEventListener('click', (event) => {
+  const trigger = event.target.closest('[data-poster]');
+  if (!trigger) return;
+  openLightbox(trigger.dataset.poster, trigger.dataset.posterLabel || '');
+});
+
+lightboxImg.addEventListener('click', () => setZoom(!lightbox.classList.contains('is-zoomed')));
+
+lightbox.addEventListener('click', (event) => {
+  if (event.target.closest('[data-lightbox-close]')) { lightbox.close(); return; }
+  // the ::backdrop and the stage's own padding both register on those elements,
+  // never on the image — so a click there means "outside the poster"
+  if (event.target === lightbox || event.target === lightboxStage) lightbox.close();
+});
+
+// Release the decoded image rather than holding both posters in memory. The
+// close event is queued as a task, not fired synchronously, so a quick
+// close-then-reopen would land this after the new src was set and blank the
+// poster — hence the guard.
+lightbox.addEventListener('close', () => {
+  if (!lightbox.open) lightboxImg.removeAttribute('src');
+});
+
+// Drag-to-pan. Pointer events cover mouse, pen and single-finger touch; a
+// second finger falls through to the browser's own pinch-zoom.
+let panning = false;
+let panFrom = { x: 0, y: 0, left: 0, top: 0 };
+lightboxStage.addEventListener('pointerdown', (event) => {
+  if (!lightbox.classList.contains('is-zoomed') || event.button) return;
+  panning = true;
+  panFrom = { x: event.clientX, y: event.clientY, left: lightboxStage.scrollLeft, top: lightboxStage.scrollTop };
+});
+lightboxStage.addEventListener('pointermove', (event) => {
+  if (!panning) return;
+  lightboxStage.scrollLeft = panFrom.left - (event.clientX - panFrom.x);
+  lightboxStage.scrollTop = panFrom.top - (event.clientY - panFrom.y);
+});
+const endPan = () => { panning = false; };
+lightboxStage.addEventListener('pointerup', endPan);
+lightboxStage.addEventListener('pointercancel', endPan);
+lightboxStage.addEventListener('pointerleave', endPan);
 
 // ---- game-day gate (Manila) --------------------------------------------------
 // The client gate only decides what to show. The server re-checks the day on

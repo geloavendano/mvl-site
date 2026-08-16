@@ -69,12 +69,11 @@ window.MVL_DATA = {
   ],
 
   // ---- Raffle prizes (shown on /checkin) -----------------------------------
-  // Drop real prizes in here — no layout work needed. Each entry:
-  //   name    required. The prize itself.
-  //   sponsor optional. Shown as the small label above the name.
-  //   image   optional. Path under /mvl/assets/. Omit and the tile falls back
-  //           to a striped placeholder, so half-filled data still looks fine.
-  //   tag     optional. Small pill, e.g. 'Grand Prize' or 'Daily'.
+  // Prize posters. Each entry:
+  //   name    required. The tier, used as the caption and the lightbox label.
+  //   image   required. Path under /mvl/assets/. Opens in a zoomable lightbox,
+  //           which is the point: the minor-prize list is unreadable inline.
+  //   drawn   optional. When this tier is drawn, shown under the caption.
   // Set to [] to hide the prize section entirely.
   raffle: {
     // Dates (Asia/Manila, YYYY-MM-DD) when check-in is open even though no game
@@ -88,10 +87,25 @@ window.MVL_DATA = {
     // Sells the prizes; the mechanics are covered by the page intro above it.
     blurb: 'A fresh draw every game day, with prizes from the partners and sponsors behind the league.',
     prizes: [
-      { name: 'Grand Prize', sponsor: 'TBA', image: '', tag: 'Grand Prize' },
-      { name: 'Prize TBA', sponsor: 'TBA', image: '' },
-      { name: 'Prize TBA', sponsor: 'TBA', image: '' },
-      { name: 'Prize TBA', sponsor: 'TBA', image: '' },
+      { name: 'Major Prizes', image: '/mvl/assets/raffle-major-prizes.jpg', drawn: 'Drawn Day 5 · Sep 6' },
+      { name: 'Minor Prizes', image: '/mvl/assets/raffle-minor-prizes.jpg', drawn: 'Drawn Day 3 · Aug 31 and Day 4 · Sep 5' },
+    ],
+    // Straight off the raffle mechanics poster. The confirmation email repeats
+    // these two rules, so keep the wording in
+    // supabase/functions/send-checkin-confirmation in step with any edit here.
+    mechanics: [
+      {
+        lead: 'You have to be there.',
+        body: 'Players must be present at the time their names are drawn to be eligible to win.',
+      },
+      {
+        lead: 'Two separate draws.',
+        body: 'Major and Minor prizes are drawn separately, so every player is eligible to win both a Minor and a Major prize.',
+      },
+    ],
+    drawDays: [
+      { label: 'Minor Raffle', when: ['Day 3 · Aug 31', 'Day 4 · Sep 5'] },
+      { label: 'Major Raffle', when: ['Day 5 · Sep 6'] },
     ],
   },
 
