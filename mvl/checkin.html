@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Raffle Check-In — MVL 2026</title>
-<meta name="description" content="Metarice Volleyball League 2026 game-day raffle. Check in at Gameville Ball Park on game days to join the draw.">
+<title>Game Day Check-In — MVL 2026</title>
+<meta name="description" content="Check in at Gameville Ball Park on MVL 2026 game days: mark yourself in for your games and enter that day's raffle.">
 <link rel="icon" type="image/svg+xml" href="/mvl/assets/metarice-icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/mvl/css/style.css?v=raffle-lightbox">
+<link rel="stylesheet" href="/mvl/css/style.css?v=checkin-copy">
 <script src="/mvl/js/site-config.js"></script>
 <script src="/mvl/js/analytics.js"></script>
 <script src="/mvl/js/nav.js"></script>
@@ -32,12 +32,12 @@
 
 <main class="waiver-main">
   <section class="waiver-intro page-hero">
-    <h1 class="section-title">Raffle <em>Check-In</em></h1>
+    <h1 class="section-title">Game Day <em>Check-In</em></h1>
   </section>
 
   <div class="waiver-copy">
-    <p>Every player who checks in at Gameville Ball Park joins that day's raffle. Prizes are drawn and claimed on-site, so you have to be at the venue — and each player gets one entry per game day.</p>
-    <p>You can check in yourself from your phone, or show your QR code at the registration booth and we'll scan it for you.</p>
+    <p>Start today's winning streak before the first serve. Checking in at Gameville Ball Park marks you in for game day and drops your name into that day's raffle — so you can walk away with a win on the court and one off it.</p>
+    <p>Check in yourself from your phone, or show your QR code at the registration booth and we'll scan it for you. One entry per player, per game day.</p>
   </div>
 
   <!-- prize showcase — rendered from MVL_DATA.raffle in js/league-data.js -->
@@ -46,7 +46,7 @@
       <p class="section-kicker section-kicker--teal">Game-Day Raffle</p>
       <h2 id="prizeHeadline"></h2>
       <p class="prize-blurb"></p>
-      <button class="cta cta--primary prize-cta" type="button" id="openModes">Check In to Enter</button>
+      <button class="cta cta--primary prize-cta" type="button" id="openModes">Check In for Today</button>
     </div>
     <div class="prize-grid" id="prizeGrid"></div>
   </section>
@@ -67,7 +67,7 @@
       <p class="section-kicker section-kicker--teal">See You on Game Day</p>
       <h2>Check-in isn't open today</h2>
     </div>
-    <p class="raffle-closed-copy">Check-in opens on game days only: <strong>Aug 29, 30, 31 &amp; Sep 5, 6</strong> at Gameville Ball Park. Come back then!</p>
+    <p class="raffle-closed-copy">Check-in opens on game days only: <strong>Aug 29, 30, 31 &amp; Sep 5, 6</strong> at Gameville Ball Park. Come back on your next game day and start the streak.</p>
     <div class="raffle-closed-actions">
       <a class="cta cta--secondary" href="/mvl/schedule.html">View the Schedule</a>
     </div>
@@ -78,7 +78,7 @@
     <section class="form-panel" id="enterRaffle">
       <div class="form-panel-head">
         <button class="panel-back" type="button" data-back>Change method</button>
-        <p class="section-kicker section-kicker--teal">Join Today's Draw</p>
+        <p class="section-kicker section-kicker--teal">Mark Yourself In</p>
         <h2>Self Check-In</h2>
       </div>
 
@@ -152,7 +152,7 @@
 <dialog class="sheet checkin-sheet" id="modeSheet" aria-labelledby="modeSheetTitle">
   <div class="sheet-head">
     <h2 class="sheet-title" id="modeSheetTitle">Check In</h2>
-    <p class="sheet-sub">Two ways to join today's draw.</p>
+    <p class="sheet-sub">Two ways to check in for today.</p>
   </div>
 
   <button class="sheet-option" type="button" data-mode="self">

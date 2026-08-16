@@ -83,9 +83,10 @@ window.MVL_DATA = {
     // venue radius on Court 1 is temporarily widened to 2km to match.
     // Remove these dates and reset the radius to 500m when testing is done.
     openDates: ['2026-07-31', '2026-08-01', '2026-08-02', '2026-08-11'],
-    headline: 'Win big just for showing up',
-    // Sells the prizes; the mechanics are covered by the page intro above it.
-    blurb: 'A fresh draw every game day, with prizes from the partners and sponsors behind the league.',
+    headline: "Start today's winning streak",
+    // Ties the draw to the games rather than selling it on its own: checking in
+    // is how you take part in game day, and the raffle rides along with it.
+    blurb: 'Win on the court, win off it. Every check-in puts you in that day’s draw for prizes from the partners and sponsors behind the league.',
     prizes: [
       { name: 'Major Prizes', image: '/mvl/assets/raffle-major-prizes.jpg', drawn: 'Drawn Day 5 · Sep 6' },
       { name: 'Minor Prizes', image: '/mvl/assets/raffle-minor-prizes.jpg', drawn: 'Drawn Day 3 · Aug 31 and Day 4 · Sep 5' },
