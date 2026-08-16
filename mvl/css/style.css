@@ -4458,6 +4458,12 @@ body:not(.admin-page) .field {
   aspect-ratio: 5 / 7;
   height: auto;
   min-height: 0;
+  /* Explicit width, or the card collapses to 0x0 in Safari. Every child is
+     absolutely positioned, so the row has no content height; Safari resolves
+     the item's height first (0) and derives width from the ratio, landing on
+     nothing, where Chrome resolves width from the track first and derives
+     height. A definite width breaks the circularity the same way in both. */
+  width: 100%;
   /* the breakpoint blocks above still span cards across 2-3 tracks of the old
      4/8/12-column bento; one card, one cell now */
   grid-column: auto;
