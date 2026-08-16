@@ -32,27 +32,15 @@ if (teamsGrid) {
     ['8%', '-14%', '22deg'],
     ['62%', '58%', '-28deg'],
   ];
-  const bentoSlots = [
-    'team-card--bento-slot-1',
-    'team-card--bento-slot-2',
-    'team-card--bento-slot-3',
-    'team-card--bento-slot-4',
-    'team-card--bento-slot-5',
-    'team-card--bento-slot-6',
-    'team-card--bento-slot-7',
-    'team-card--bento-slot-8',
-  ];
-  for (let i = bentoSlots.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [bentoSlots[i], bentoSlots[j]] = [bentoSlots[j], bentoSlots[i]];
-  }
   // Teams with artwork use it as the card background; the CSS oval/shard
   // decoration is suppressed for those since the artwork already carries it.
+  // The grid is uniform (2 / 4 / 8 across), so there are no per-card size
+  // classes to shuffle any more — every card gets the same frame.
   teamsGrid.innerHTML = TEAMS.map((team, i) => `
-  <article class="team-card reveal${team.bg ? ' team-card--art' : ''} ${bentoSlots[i % bentoSlots.length]}"
+  <article class="team-card reveal${team.bg ? ' team-card--art' : ''}"
            style="--team-a:${team.grad[0]}; --team-b:${team.grad[1]}; ${team.bg ? `--team-art:url('${team.bg}'); ` : ''}--oval-x:${ovalPositions[i % ovalPositions.length][0]}; --oval-y:${ovalPositions[i % ovalPositions.length][1]}; --oval-rot:${ovalPositions[i % ovalPositions.length][2]}; --d:${(i % 4) * 55}ms">
     <div class="team-card-oval" aria-hidden="true"></div>
-    <div class="team-card-player-slot" aria-hidden="true"></div>
+    <div class="team-card-player-slot" aria-hidden="true">${team.photo ? `<img class="team-card-player" src="${team.photo}" alt="" loading="lazy" decoding="async">` : ''}</div>
     <div class="team-card-photo" aria-hidden="true"></div>
     <div class="team-card-shards" aria-hidden="true"></div>
     <div class="team-card-copy">

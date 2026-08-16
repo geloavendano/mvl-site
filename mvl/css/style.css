@@ -759,6 +759,12 @@ a.home-standing-row:hover {
 .teams {
   position: relative;
   min-height: 100svh;
+  /* A single row of eight is a short band, where the bento mosaic used to fill
+     the fold. Centre the head and grid as one group so the band sits in the
+     middle of the viewport rather than stranded against the top. */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   background:
     linear-gradient(180deg, rgba(22, 16, 74, 1) 0%, rgba(5, 9, 17, 1) 100%);
   padding-bottom: 28px;
@@ -4144,15 +4150,37 @@ body:not(.admin-page) .field {
 .team-card--art::after {
   background: linear-gradient(90deg, transparent 0 calc(100% - var(--team-card-rail)), rgba(255, 255, 255, .72) calc(100% - var(--team-card-rail)) 100%);
 }
-/* The stock player is a single generic cutout in a green jersey — it repeats
-   across all eight cards and fights the team artwork. Hidden until real
-   per-team player cutouts exist; restoring it is one rule. */
+/* The stock player was a single generic cutout in a green jersey, repeated
+   across all eight cards. Superseded by the per-team cutouts below. */
 .team-card--art .team-card-photo { display: none; }
+
+/* The cutout stands on the bottom edge of the card, tucked against the name
+   rail. The slot keeps clear of the rail so a raised elbow never disappears
+   behind it — tied to --team-card-rail rather than a fixed inset, since the
+   rail narrows at small breakpoints. */
 .team-card-player-slot {
   position: absolute;
-  inset: 8px 48px 0 8px;
+  inset: 10px calc(var(--team-card-rail) + 4px) 0 6px;
   z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  /* against the rail, not centred: the bento slots run up to 5x wider than
+     they are tall, and a centred cutout floats in the middle of all that
+     artwork with nothing to anchor it */
+  justify-content: flex-end;
   pointer-events: none;
+}
+.team-card-player {
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  /* the cutouts are bottom-cropped at the waist or knee, so they read as
+     standing on the card edge rather than floating */
+  object-position: bottom center;
+  /* the artwork behind is high-contrast; without a shadow the cutout's edge
+     dissolves into it */
+  filter: drop-shadow(0 10px 22px rgba(4, 2, 20, .45));
 }
 .team-card--art .team-card-copy {
   position: absolute;
@@ -4394,61 +4422,52 @@ body:not(.admin-page) .field {
   }
 }
 
-/* Packed bento slots. Every slot is assigned once per render, then shuffled
-   across the teams so the mosaic fills its rectangle without leaving holes. */
-@media (max-width: 719px) {
-  .teams-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    grid-auto-rows: clamp(70px, 20vw, 96px);
-    gap: 12px;
-    max-width: 620px;
-    padding: 0 16px;
-  }
-  .team-card--bento-slot-1 { grid-column: 1 / 3; grid-row: 1 / 4; }
-  .team-card--bento-slot-2 { grid-column: 3 / 5; grid-row: 1 / 3; }
-  .team-card--bento-slot-3 { grid-column: 3 / 5; grid-row: 3 / 5; }
-  .team-card--bento-slot-4 { grid-column: 1 / 3; grid-row: 4 / 6; }
-  .team-card--bento-slot-5 { grid-column: 3 / 5; grid-row: 5 / 8; }
-  .team-card--bento-slot-6 { grid-column: 1 / 3; grid-row: 6 / 8; }
-  .team-card--bento-slot-7 { grid-column: 1 / 3; grid-row: 8 / 10; }
-  .team-card--bento-slot-8 { grid-column: 3 / 5; grid-row: 8 / 10; }
+/* Uniform grid, 2 -> 4 -> 8 across. The bento mosaic sized every card
+   differently, which was fine for abstract artwork but not for player
+   cutouts: the wide slots left a figure stranded in a field of empty colour
+   while the tall ones ran it edge to edge, so no single treatment read well
+   across all eight. Equal portrait cards give every player the same frame. */
+.teams-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: auto;
+  gap: 12px;
+  max-width: 620px;
+  padding: 0 16px;
+  /* .teams is a flex column now, and this grid carries `margin: 0 auto` for
+     its centring. An auto cross-axis margin suppresses flex stretch, so
+     without an explicit width the grid shrink-to-fits and every column
+     collapses to 0. */
+  width: 100%;
 }
-
+/* portrait, so a standing figure has room; the cards are the same shape at
+   every breakpoint and only the column count changes. --art is named too
+   because the bento rules above set it back to `auto` with height:100%, which
+   only made sense when the grid rows dictated the size. */
+.team-card,
+.team-card--art {
+  aspect-ratio: 5 / 7;
+  height: auto;
+  min-height: 0;
+  /* the breakpoint blocks above still span cards across 2-3 tracks of the old
+     4/8/12-column bento; one card, one cell now */
+  grid-column: auto;
+  grid-row: auto;
+}
 @media (min-width: 720px) {
   .teams-grid {
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    grid-template-rows: repeat(6, minmax(clamp(58px, 5.4vw, 82px), 1fr));
-    grid-auto-rows: 0;
-    max-width: 1180px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    max-width: 1080px;
     gap: clamp(14px, 1.5vw, 22px);
     padding: 0 clamp(18px, 3vw, 48px);
   }
-  .team-card--bento-slot-1 { grid-column: 1 / 4; grid-row: 1 / 4; }
-  .team-card--bento-slot-2 { grid-column: 4 / 7; grid-row: 1 / 3; }
-  .team-card--bento-slot-3 { grid-column: 7 / 10; grid-row: 1 / 3; }
-  .team-card--bento-slot-4 { grid-column: 10 / 13; grid-row: 1 / 5; }
-  .team-card--bento-slot-5 { grid-column: 4 / 7; grid-row: 3 / 5; }
-  .team-card--bento-slot-6 { grid-column: 7 / 10; grid-row: 3 / 5; }
-  .team-card--bento-slot-7 { grid-column: 1 / 4; grid-row: 4 / 7; }
-  .team-card--bento-slot-8 { grid-column: 4 / 13; grid-row: 5 / 7; }
 }
 
-@media (min-width: 960px) {
+@media (min-width: 1180px) {
   .teams-grid {
-    max-width: 1240px;
-    grid-template-rows: repeat(6, minmax(clamp(60px, 4.8vw, 86px), 1fr));
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    max-width: 1560px;
+    gap: clamp(12px, 1vw, 18px);
   }
-}
-
-.team-card--bento-slot-1,
-.team-card--bento-slot-2,
-.team-card--bento-slot-3,
-.team-card--bento-slot-4,
-.team-card--bento-slot-5,
-.team-card--bento-slot-6,
-.team-card--bento-slot-7,
-.team-card--bento-slot-8 {
-  min-height: 0;
 }
 
 /* ==========================================================================
