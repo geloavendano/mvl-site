@@ -4173,11 +4173,18 @@ body:not(.admin-page) .field {
   justify-content: flex-end;
   pointer-events: none;
 }
+/* Every cutout is exported at the same pixel height with a tight crop, so
+   sizing purely on height renders them all at one scale — heads line up across
+   the row and nobody looks further away than their team-mates. Width is left
+   to each figure's own build, which means the broader stances run wider than
+   the slot; they are allowed to, and .team-card's overflow trims the excess at
+   the card edge. Capping the width instead is what threw the scale off, since
+   a wide figure would shrink below full height to fit. */
 .team-card-player {
   height: 100%;
   width: auto;
-  max-width: 100%;
-  object-fit: contain;
+  max-width: none;
+  flex: none;
   /* the cutouts are bottom-cropped at the waist or knee, so they read as
      standing on the card edge rather than floating */
   object-position: bottom center;
