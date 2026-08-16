@@ -41,11 +41,21 @@
       duration: videos[0]?.duration || '',
     };
   });
+  // Every JS-rendered section on the page — teams, standings, schedule,
+  // videos — comes from the entry script below, and it is only appended once
+  // this fetch settles. fetch() has no timeout of its own, so a request that
+  // hangs rather than fails (flaky mobile data, captive portal, a carrier
+  // stalling the connection) never settles and the page is left showing
+  // nothing but its static headings. The abort turns that into the same
+  // bundled-data fallback as any other failure.
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
   try {
     const response = await fetch(`${config.url}/rest/v1/rpc/mvl_get_public_data`, {
       method: 'POST',
       headers: { apikey: config.anonKey, Authorization: `Bearer ${config.anonKey}`, 'Content-Type': 'application/json' },
       body: '{}',
+      signal: controller.signal,
     });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const managed = await response.json();
@@ -61,8 +71,11 @@
       livestream: normalizeLivestream({}, fallback.livestream),
       games: normalizeGames(fallback.games),
     };
+  } finally {
+    // in `finally` so the page still renders even if the fallback path throws
+    clearTimeout(timeout);
+    const script = document.createElement('script');
+    script.src = `/mvl/js/${entry}.js${version ? `?v=${encodeURIComponent(version)}` : ''}`;
+    document.body.appendChild(script);
   }
-  const script = document.createElement('script');
-  script.src = `/mvl/js/${entry}.js${version ? `?v=${encodeURIComponent(version)}` : ''}`;
-  document.body.appendChild(script);
 })();
