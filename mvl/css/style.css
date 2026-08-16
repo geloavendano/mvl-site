@@ -767,6 +767,9 @@ a.home-standing-row:hover {
   justify-content: center;
   background:
     linear-gradient(180deg, rgba(22, 16, 74, 1) 0%, rgba(5, 9, 17, 1) 100%);
+  /* the nav is fixed and overlays this fold; without the top inset the centred
+     group pushes the heading up behind it */
+  padding-top: var(--nav-h);
   padding-bottom: 28px;
 }
 .teams::before {
@@ -4422,11 +4425,11 @@ body:not(.admin-page) .field {
   }
 }
 
-/* Uniform grid, 2 -> 4 -> 8 across. The bento mosaic sized every card
-   differently, which was fine for abstract artwork but not for player
-   cutouts: the wide slots left a figure stranded in a field of empty colour
-   while the tall ones ran it edge to edge, so no single treatment read well
-   across all eight. Equal portrait cards give every player the same frame. */
+/* Uniform grid: 2 across on phones, 4 from tablet up. The bento mosaic sized
+   every card differently, which was fine for abstract artwork but not for
+   player cutouts: the wide slots left a figure stranded in a field of empty
+   colour while the tall ones ran it edge to edge, so no single treatment read
+   well across all eight. Equal cards give every player the same frame. */
 .teams-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-auto-rows: auto;
@@ -4453,20 +4456,45 @@ body:not(.admin-page) .field {
   grid-column: auto;
   grid-row: auto;
 }
+/* From tablet up the 4x2 block fills the fold: the grid takes the height the
+   heading leaves behind and the two rows split it, so the cards grow with the
+   viewport instead of sitting as a short band in an empty gradient. Cards drop
+   their aspect ratio here — the rows dictate the height now.
+   min-height: 0 on the grid is what lets `flex: 1` actually shrink it; without
+   it the flex item floors at its content height and overflows short viewports. */
 @media (min-width: 720px) {
+  .teams {
+    /* the side inset moves off the grid so the grid's own box is pure
+       proportion — see the aspect-ratio below */
+    padding-left: clamp(18px, 3vw, 48px);
+    padding-right: clamp(18px, 3vw, 48px);
+  }
   .teams-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    max-width: 1080px;
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: 0;
+    min-height: 0;
+    /* 4 cards across by 2 down, held to one shape so the cutouts always get a
+       portrait frame. Width leads and height follows from the ratio; the third
+       arm of the min() is what keeps the block inside the fold, capping width
+       by the height actually available (fold minus nav, heading and padding).
+       Sizing the other way round — height from flex, width from the ratio —
+       breaks at both extremes: a short wide window stretches the cards into
+       landscape, a tall narrow one computes a block wider than the screen. */
+    width: 100%;
+    max-width: min(1240px, calc((100svh - 240px) * 10 / 7));
+    aspect-ratio: 10 / 7;
+    height: auto;
+    /* auto side margins would suppress flex stretch; align-self centres
+       without fighting the ratio */
+    align-self: center;
     gap: clamp(14px, 1.5vw, 22px);
-    padding: 0 clamp(18px, 3vw, 48px);
+    padding: 0;
   }
-}
-
-@media (min-width: 1180px) {
-  .teams-grid {
-    grid-template-columns: repeat(8, minmax(0, 1fr));
-    max-width: 1560px;
-    gap: clamp(12px, 1vw, 18px);
+  .team-card,
+  .team-card--art {
+    aspect-ratio: auto;
+    height: 100%;
   }
 }
 
