@@ -47,7 +47,9 @@ window.MVL_DATA = {
     { name: "Garnier", tier: 'Co-Presenters', order: 9, logoBg: 'mint', logo: '/mvl/assets/Sponsor Logos/Co-Presenters/garnier.PNG' },
     { name: "Listerine", tier: 'Co-Presenters', order: 10, logo: '/mvl/assets/Sponsor Logos/Co-Presenters/Listerine.png' },
     { name: "OFBANK", tier: 'Co-Presenters', order: 11, logo: '/mvl/assets/Sponsor Logos/Co-Presenters/OFBANK LOGO.jpg' },
-    { name: "The Resthouse Laiya", tier: 'Co-Presenters', order: 12, logo: '/mvl/assets/Sponsor Logos/Co-Presenters/The Resthouse Laiya.png' },
+    // dark grey wordmark on transparent — invisible on the navy strip without a chip
+    { name: "Strepsils", tier: 'Co-Presenters', order: 12, logoBg: 'mint', logo: '/mvl/assets/Sponsor Logos/Co-Presenters/Strepsils.png' },
+    { name: "The Resthouse Laiya", tier: 'Co-Presenters', order: 13, logo: '/mvl/assets/Sponsor Logos/Co-Presenters/The Resthouse Laiya.png' },
 
     { name: "Barkhaus", tier: 'Major Sponsors', order: 1, logo: '/mvl/assets/Sponsor Logos/Major Sponsors/Barkhaus.PNG' },
     { name: "BLITZ", tier: 'Major Sponsors', order: 2, logo: '/mvl/assets/Sponsor Logos/Major Sponsors/BLITZ LOGO WHITE.png' },
