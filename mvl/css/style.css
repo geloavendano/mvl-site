@@ -4188,9 +4188,11 @@ body:not(.admin-page) .field {
   /* the cutouts are bottom-cropped at the waist or knee, so they read as
      standing on the card edge rather than floating */
   object-position: bottom center;
-  /* the artwork behind is high-contrast; without a shadow the cutout's edge
-     dissolves into it */
-  filter: drop-shadow(0 10px 22px rgba(4, 2, 20, .45));
+  /* The cutout's edge needs some separation from the artwork behind it, but
+     drop-shadow blurs the image's alpha mask on every re-raster, and a large
+     radius over eight full-bleed figures is enough to make Safari drop tiles
+     mid-scroll. A tight radius keeps the edge reading without that cost. */
+  filter: drop-shadow(0 4px 8px rgba(4, 2, 20, .5));
 }
 .team-card--art .team-card-copy {
   position: absolute;
