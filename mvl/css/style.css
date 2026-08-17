@@ -1996,6 +1996,14 @@ html[data-phase='gameday'] .nav-links a[data-phase='registration'] { display: no
   }
 }
 
+/* Below 360px the five-item nav wraps to a second line. It degrades fine —
+   .nav is height:auto so the bar grows rather than clipping — but a tighter
+   tracking pulls it back onto one line without touching 375px and up. */
+@media (max-width: 360px) {
+  .nav-links { gap: 5px 6px; max-width: calc(100vw - 62px); }
+  .nav-links a { letter-spacing: .4px; }
+}
+
 /* ==========================================================================
    Desktop ≥ 960px
    ========================================================================== */
