@@ -39,9 +39,12 @@ const buildMarquee = (filter) => {
   const list = sortedSponsors.filter((s) => tiers.includes(s.tier));
   if (!list.length) return '';
 
-  // the full strip opens with the title presenter
+  // The title presenter outranks every tier, so it leads the full roster and
+  // whichever strip opens the tier order — today the partners strip, which
+  // carries 'Powered by'. Deriving it from sponsorTierOrder rather than naming
+  // the strip means a tier reshuffle keeps the presenter at the front.
   let markup = '';
-  if (showAll && TITLE_PRESENTER) {
+  if (TITLE_PRESENTER && (showAll || tiers.includes(sponsorTierOrder[0]))) {
     markup += `
       <span class="marquee-tier">Presented by</span>
       ${sponsorChip(TITLE_PRESENTER)}`;
