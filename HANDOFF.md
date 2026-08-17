@@ -12,16 +12,19 @@ Game-day raffle per client decisions (2026-07-17): one successful entry per pers
 
 Everything lives under **`mvl/`** because `metaricevolley.ph` is the *club's* domain and MVL 2026 is one event under it. `mvl/` holds the pages plus `assets/`, `css/`, `js/` — self-contained, so all links stay relative and the bundle previews locally at the same path shape as production.
 
-| URL | Now (registration) | After the flip |
-|---|---|---|
-| `/` | 307 -> `/mvl` | 307 -> `/mvl` |
-| `/mvl` | teaser (`mvl/index.html`) | gameday landing |
-| `/mvl/gametime` | parked, unlinked, robots-disallowed | alias of `/mvl` |
-| `/mvl/schedule`, `/videos`, `/rules`, `/waiver`, `/waiver-confirmation` | live | live |
-| `/mvl/checkin` | game-day raffle check-in (was `/registration`) | promoted into nav |
-| `/mvl/admin` | SSO console | unchanged |
+| URL | Serves |
+|---|---|
+| `/` | 307 -> `/mvl` |
+| `/mvl` | **gameday landing** (`mvl/index.html`) |
+| `/mvl/preregistration` | the teaser (`mvl/preregistration.html`) — still linked from nothing, but live while sign-ups are open |
+| `/mvl/gametime` | 307 -> `/mvl` (its old home) |
+| `/mvl/schedule`, `/videos`, `/rules`, `/waiver`, `/waiver-confirmation` | live |
+| `/mvl/checkin` | game-day raffle check-in (was `/registration`) |
+| `/mvl/admin` | SSO console |
 
 Legacy root paths (`/teaser`, `/raffle`, `/rules`, ...) all 307 to their new homes — verified on production.
+
+**The landing swap happened on 17 Aug 2026** by moving files, not by rewriting: `gametime.html` became `index.html`, and the teaser became `preregistration.html`. Every "home" link already pointed at `/mvl/index.html`, so nothing internal needed rewiring. `/mvl/gametime` redirects to `/mvl` temporarily rather than permanently — promote it to `permanent: true` once the URL has settled, since browsers cache a 308 hard.
 
 ### Navigation
 Every page ships **one byte-identical nav block**. `mvl/js/site-config.js` holds the phase; `mvl/js/nav.js` stamps it on `<html>` synchronously in `<head>` so CSS hides the wrong-phase links **before first paint** (no flash, no layout shift). `aria-current` is derived from the URL, not hardcoded. The page you are on is always shown even if its phase is hidden.
@@ -33,26 +36,21 @@ Without JS nothing is stamped, neither CSS rule matches, and all six links rende
 
 **Standing invariant — run this after touching any nav:**
 ```
-cd mvl && for f in gametime schedule videos rules checkin waiver waiver-confirmation; do
+cd mvl && for f in index schedule videos rules checkin waiver waiver-confirmation; do
   sed -n '/<nav class="nav-links"/,/<\/nav>/p' $f.html | shasum
 done | sort -u | wc -l    # must print 1
 ```
 This is the entire enforcement mechanism for "no page can drift out of sync again."
 
-### The game-day flip (Aug 29) — exactly two edits
-1. `mvl/js/site-config.js`: `phase: 'registration'` -> `'gameday'`
-2. `vercel.json`: add this key alongside `redirects`
-   ```json
-   "rewrites": [
-     { "source": "/mvl",  "destination": "/mvl/gametime.html" },
-     { "source": "/mvl/", "destination": "/mvl/gametime.html" }
-   ]
-   ```
-Commit and push; Vercel auto-deploys. **Rollback = revert both.** Do not use a `redirect` for this — it would change the visible URL and break every shared link to `/mvl`. `robots.txt` needs no change (post-flip `/mvl/gametime` is a duplicate of `/mvl`, so disallowing it stays correct).
+### The game-day flip (Aug 29) — now one edit
 
-Post-flip the teaser has no public URL. That is intended; to archive it, add `{ "source": "/mvl/teaser", "destination": "/mvl/index.html" }` as a rewrite at that time.
+The landing half is already done (see the table above). What remains:
 
-**Not yet rehearsed end-to-end:** the phase half is verified (toggling it locally produces the correct nav both ways), but the `vercel.json` rewrite half has not been exercised on a deploy — Vercel preview deployments are SSO-protected, so they can't be checked without a browser session. Rehearse it before Aug 29.
+`mvl/js/site-config.js`: `phase: 'registration'` -> `'gameday'`
+
+That swaps the nav from **Rules, Waiver** to **Schedule, Videos, Teams, Rules, Check-In**. Commit and push; Vercel auto-deploys. Rollback = revert the one word.
+
+**Deliberately not flipped yet.** `/mvl` is the gameday landing now, but sign-ups are still open, and `phase: 'gameday'` drops the Waiver link from every nav. Registration keeps priority in the nav until the tournament starts; the gameday sections are all reachable by scrolling the landing regardless. The cost of waiting is that Videos, Teams and Check-In stay out of the nav — flip the moment sign-ups close.
 
 ### Prerequisite for going public
 `metaricevolley.ph` is attached to the `mvl-site` project but its nameservers still point at `dns1.domains.ph`, **not Vercel** — the domain serves nothing yet. Until DNS is repointed, verify on `mvl-site.vercel.app`.
