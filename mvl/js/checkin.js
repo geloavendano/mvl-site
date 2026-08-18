@@ -193,6 +193,11 @@ const rpc = async (fn, body, token) => {
 
 // The server raises these; turn them into something a person can act on.
 const friendlyError = (message) => {
+  // the server appends the offending token so the booth can read it back
+  const unknownTeam = /^UNKNOWN_TEAM_CODE:(.*)$/.exec(message || '');
+  if (unknownTeam) {
+    return `"${unknownTeam[1].trim()}" isn't one of our team codes. Check the QR, or use the registration booth's list.`;
+  }
   if (message.startsWith('OUTSIDE_VENUE')) {
     const metres = Number(message.split(':')[1] || 0);
     const away = metres >= 1000 ? `${(metres / 1000).toFixed(1)}km` : `${Math.round(metres)}m`;
@@ -204,7 +209,7 @@ const friendlyError = (message) => {
     EMAIL_MISMATCH: "That email doesn't match the one on your registration. Use the address you registered with, or visit the booth.",
     NO_EMAIL_ON_FILE: 'There is no email on your registration, so self check-in is unavailable. Please check in at the registration booth.',
     NOT_AUTHORISED: 'This Google account is not an MVL administrator.',
-    BAD_CODE: "That code isn't in the expected format.",
+    BAD_CODE: "That code isn't in the expected format. A player QR reads like THT-23 — team code, dash, jersey number.",
     VENUE_NOT_FOUND: 'Venue is not configured. Please check in at the booth.',
     VENUE_LOCATION_MISSING: 'Venue location is not configured. Please check in at the booth.',
   }[message] || message;
@@ -519,11 +524,41 @@ const submitCode = async (code) => {
 // A booth scanner behaves as a keyboard: it types the payload then presses
 // Enter. That covers any USB or Bluetooth reader with no camera permission and
 // no decoding library, and typing a code by hand works the same way.
+// Printed QR payloads read <TEAM CODE>-<JERSEY>, e.g. THT-23. Split on the
+// LAST separator so a raw team id containing a hyphen ('metarice-x-8') and the
+// original underscore payload ('gizmo_31') both still parse — same rule the
+// server uses, kept here only to fail an obvious mis-scan without a round trip.
+const teamByCode = Object.fromEntries(
+  teams.filter((team) => team.code).map((team) => [team.code.toUpperCase(), team])
+);
+
+const parseScan = (raw) => {
+  const parts = /^(.*)[-_]([^-_]+)$/.exec(raw.trim());
+  if (!parts) return { error: 'BAD_CODE' };
+  const token = parts[1].trim();
+  const team = teamByCode[token.toUpperCase()] || teamById[token.toLowerCase()];
+  // an unrecognised token is still sent on: the server's team list is the
+  // authority, and this copy could be stale
+  return { team, token, jersey: parts[2].trim() };
+};
+
 qrInput.addEventListener('keydown', (event) => {
   if (event.key !== 'Enter') return;
   event.preventDefault();
   const code = qrInput.value.trim();
   qrInput.value = '';
+  if (!code) return;
+
+  const scan = parseScan(code);
+  if (scan.error) {
+    setStatus(qrStatus, friendlyError(scan.error), 'error');
+    focusScanner();
+    return;
+  }
+  // name the team back before the request so staff can catch a wrong badge
+  setStatus(qrStatus, scan.team
+    ? `Checking in ${scan.team.name} #${scan.jersey}\u2026`
+    : 'Checking in\u2026');
   submitCode(code);
 });
 
