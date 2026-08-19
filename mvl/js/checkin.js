@@ -215,6 +215,49 @@ const friendlyError = (message) => {
   }[message] || message;
 };
 
+// ---- verifying stage ----------------------------------------------------------
+// A booth scan resolves in well under a second, so the confirmation used to
+// appear as though nothing had happened in between. This holds a "checking"
+// screen over the gap. It is a FLOOR, not a delay: if the request already took
+// longer than the floor, nothing extra is added — a bad connection at the venue
+// never gets padded on top.
+const PENDING_FLOOR_MS = 950;
+const pending = el('checkinPending');
+let pendingSince = 0;
+
+const beginPending = (team, who) => {
+  // carry the team colour in, so the swap to the confirmation does not change
+  // hue mid-moment
+  if (team?.grad) {
+    pending.style.setProperty('--team-a', team.grad[0]);
+    pending.style.setProperty('--team-b', team.grad[1]);
+  } else {
+    pending.style.removeProperty('--team-a');
+    pending.style.removeProperty('--team-b');
+  }
+  el('pendingWho').textContent = who || '';
+  // reuse the confirmation's takeover so the swap happens on one surface
+  document.body.classList.add('checkin-complete');
+  hide(done);
+  show(pending);
+  pendingSince = performance.now();
+};
+
+const settlePending = async () => {
+  if (!pendingSince) return;
+  const left = PENDING_FLOOR_MS - (performance.now() - pendingSince);
+  pendingSince = 0;
+  if (left > 0) await new Promise((resolve) => setTimeout(resolve, left));
+  hide(pending);
+};
+
+// a failed check-in has to put the page back the way it was
+const cancelPending = () => {
+  pendingSince = 0;
+  hide(pending);
+  document.body.classList.remove('checkin-complete');
+};
+
 // ---- confirmation --------------------------------------------------------------
 const CHEERS = [
   'Go get it out there.',
@@ -432,6 +475,8 @@ selfForm.addEventListener('submit', async (event) => {
   try {
     const position = await getPosition();
     setStatus(formStatus, 'Checking you in…');
+    const chosen = teamById[teamId];
+    beginPending(chosen, chosen ? `${chosen.name} \u00b7 #${jersey}` : `#${jersey}`);
     const payload = await rpc('mvl_self_checkin', {
       p_team_id: teamId,
       p_jersey_number: jersey,
@@ -443,8 +488,10 @@ selfForm.addEventListener('submit', async (event) => {
       p_user_agent: navigator.userAgent,
     });
     setStatus(formStatus, '');
+    await settlePending();
     showConfirmation(payload);
   } catch (error) {
+    cancelPending();
     setStatus(formStatus, friendlyError(error.message), 'error');
   } finally {
     submitBtn.disabled = false;
@@ -514,14 +561,17 @@ const submitCode = async (code) => {
   setStatus(qrStatus, scan.team
     ? `Checking in ${scan.team.name} #${scan.jersey}\u2026`
     : 'Checking in\u2026');
+  beginPending(scan.team, scan.team ? `${scan.team.name} \u00b7 #${scan.jersey}` : code);
   try {
     const { data } = await authClient.auth.getSession();
     const payload = await rpc('mvl_qr_checkin',
       { p_code: code, p_user_agent: navigator.userAgent },
       data?.session?.access_token);
     setStatus(qrStatus, '');
+    await settlePending();
     showConfirmation(payload);
   } catch (error) {
+    cancelPending();
     setStatus(qrStatus, friendlyError(error.message), 'error');
     focusScanner();
   }

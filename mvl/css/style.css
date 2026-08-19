@@ -5009,7 +5009,7 @@ body.gametime-v3 .rules-preview {
 /* The confirmation is the end of the flow, and at the booth it is read across
    a table rather than held at arm's length — so it takes the whole viewport
    and everything behind it is hidden rather than merely scrolled past. */
-body.checkin-complete > *:not(.checkin-done) { display: none; }
+body.checkin-complete > *:not(.checkin-done):not(.checkin-pending) { display: none; }
 body.checkin-complete { overflow: hidden; }
 
 .checkin-done {
@@ -5025,6 +5025,74 @@ body.checkin-complete { overflow: hidden; }
     var(--navy-deep);
 }
 .checkin-done.is-hidden { display: none; }
+
+/* ---- verifying, between scan and confirmation ---- */
+.checkin-pending {
+  position: fixed;
+  inset: 0;
+  z-index: 61;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  text-align: center;
+  background:
+    radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--team-a, var(--mint)) 20%, transparent), transparent 60%),
+    var(--navy-deep);
+}
+.checkin-pending.is-hidden { display: none; }
+.pending-ring {
+  position: relative;
+  width: 132px;
+  height: 132px;
+  margin: 0 auto 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--team-a, var(--mint)) 34%, transparent);
+  color: var(--team-a, var(--mint));
+}
+.pending-ring svg { width: 46px; height: 46px; display: block; }
+/* one arc sweeping the ring — reads as "working" without a spinner cliché */
+.pending-sweep {
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: var(--team-a, var(--mint));
+  border-right-color: var(--team-a, var(--mint));
+  animation: pendingSpin 900ms linear infinite;
+}
+@keyframes pendingSpin { to { transform: rotate(360deg); } }
+.pending-label {
+  color: #fff;
+  font-family: var(--stretch);
+  font-style: italic;
+  font-size: clamp(26px, 7vw, 38px);
+  line-height: 1;
+  text-transform: uppercase;
+}
+.pending-label::after {
+  content: '';
+  animation: pendingDots 1.2s steps(4, end) infinite;
+}
+@keyframes pendingDots {
+  0%   { content: ''; }
+  25%  { content: '.'; }
+  50%  { content: '..'; }
+  75%  { content: '...'; }
+}
+.pending-who {
+  margin-top: 12px;
+  color: var(--team-a, var(--mint));
+  font: 800 12px var(--mono);
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  min-height: 1em;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pending-sweep { animation: none; border-color: color-mix(in srgb, var(--team-a, var(--mint)) 60%, transparent); }
+  .pending-label::after { animation: none; content: '…'; }
+}
 
 .checkin-card {
   width: min(560px, 100%);
