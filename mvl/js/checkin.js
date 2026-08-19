@@ -507,7 +507,13 @@ el('qrSignOutBtn').addEventListener('click', async () => {
 
 const submitCode = async (code) => {
   if (!code) return;
-  setStatus(qrStatus, 'Checking in…');
+  // Name the team and jersey back while the request is in flight, so staff can
+  // catch a wrong badge mid-queue. Set here rather than at each call site: this
+  // used to overwrite a more specific message the caller had just set.
+  const scan = parseScan(code);
+  setStatus(qrStatus, scan.team
+    ? `Checking in ${scan.team.name} #${scan.jersey}\u2026`
+    : 'Checking in\u2026');
   try {
     const { data } = await authClient.auth.getSession();
     const payload = await rpc('mvl_qr_checkin',
@@ -521,9 +527,6 @@ const submitCode = async (code) => {
   }
 };
 
-// A booth scanner behaves as a keyboard: it types the payload then presses
-// Enter. That covers any USB or Bluetooth reader with no camera permission and
-// no decoding library, and typing a code by hand works the same way.
 // Printed QR payloads read <TEAM CODE>-<JERSEY>, e.g. THT-23. Split on the
 // LAST separator so a raw team id containing a hyphen ('metarice-x-8') and the
 // original underscore payload ('gizmo_31') both still parse — same rule the
@@ -542,6 +545,132 @@ const parseScan = (raw) => {
   return { team, token, jersey: parts[2].trim() };
 };
 
+// ---- camera fallback ---------------------------------------------------------
+// The booth's reader is the fast path; this covers it being missing, unpaired
+// or jammed. Two decoders because coverage is split: BarcodeDetector is native
+// in Chrome and Android but absent from Safari and Firefox, so those lazy-load
+// jsQR — same on-demand pattern as supabase-js, nothing shipped to a visitor
+// who never opens the camera.
+const camSheet = el('camSheet');
+const camVideo = el('camVideo');
+const camStatus = el('camStatus');
+let camStream = null;
+let camLoop = 0;
+let jsqrLoader = null;
+
+const loadJsQr = () => {
+  if (window.jsQR) return Promise.resolve(window.jsQR);
+  jsqrLoader = jsqrLoader || new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js';
+    script.onload = () => resolve(window.jsQR);
+    script.onerror = () => reject(new Error('Could not load the camera decoder.'));
+    document.head.appendChild(script);
+  });
+  return jsqrLoader;
+};
+
+const stopCamera = () => {
+  cancelAnimationFrame(camLoop);
+  camLoop = 0;
+  // tracks must be stopped explicitly or the camera light stays on
+  camStream?.getTracks().forEach((track) => track.stop());
+  camStream = null;
+  camVideo.srcObject = null;
+};
+
+const closeCamera = () => {
+  stopCamera();
+  if (camSheet.open) camSheet.close();
+};
+
+// Fed whatever the decoder found; the keyboard path runs the same checks.
+const handleScan = (raw) => {
+  const scan = parseScan(raw);
+  if (scan.error) {
+    setStatus(camStatus, friendlyError(scan.error), 'error');
+    return false; // keep looking — a half-read frame should not close the sheet
+  }
+  closeCamera();
+  qrInput.value = '';
+  submitCode(raw.trim());
+  return true;
+};
+
+const runDetectorLoop = (detect) => {
+  const tick = async () => {
+    if (!camStream) return;
+    try {
+      const found = await detect();
+      if (found && handleScan(found)) return;
+    } catch { /* a frame that will not decode is normal; try the next one */ }
+    camLoop = requestAnimationFrame(tick);
+  };
+  camLoop = requestAnimationFrame(tick);
+};
+
+const startDecoding = async () => {
+  if ('BarcodeDetector' in window) {
+    try {
+      const formats = await window.BarcodeDetector.getSupportedFormats();
+      if (formats.includes('qr_code')) {
+        const detector = new window.BarcodeDetector({ formats: ['qr_code'] });
+        runDetectorLoop(async () => (await detector.detect(camVideo))[0]?.rawValue);
+        return;
+      }
+    } catch { /* fall through to jsQR */ }
+  }
+  const jsQR = await loadJsQr();
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  runDetectorLoop(() => {
+    if (!camVideo.videoWidth) return null;
+    canvas.width = camVideo.videoWidth;
+    canvas.height = camVideo.videoHeight;
+    ctx.drawImage(camVideo, 0, 0, canvas.width, canvas.height);
+    const px = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    return jsQR(px.data, px.width, px.height)?.data || null;
+  });
+};
+
+const cameraError = (error) => {
+  if (!window.isSecureContext) return 'The camera needs a secure (https) connection.';
+  const name = error?.name || '';
+  if (name === 'NotAllowedError') return 'Camera access was blocked. Allow it in the browser\u2019s site settings, then try again.';
+  if (name === 'NotFoundError' || name === 'OverconstrainedError') return 'No camera found on this device.';
+  if (name === 'NotReadableError') return 'The camera is already in use by another app.';
+  return error?.message || 'Could not start the camera.';
+};
+
+el('qrCamBtn')?.addEventListener('click', async () => {
+  setStatus(camStatus, 'Starting the camera\u2026');
+  if (typeof camSheet.showModal === 'function') camSheet.showModal();
+  else camSheet.setAttribute('open', '');
+  try {
+    // the rear camera on a phone; a laptop just gets its only one
+    camStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' } },
+      audio: false,
+    });
+    camVideo.srcObject = camStream;
+    await camVideo.play();
+    setStatus(camStatus, '');
+    await startDecoding();
+  } catch (error) {
+    stopCamera();
+    setStatus(camStatus, cameraError(error), 'error');
+  }
+});
+
+camSheet.addEventListener('click', (event) => {
+  if (event.target.closest('[data-cam-close]') || event.target === camSheet) closeCamera();
+});
+// Esc closes a <dialog> on its own, but the stream would keep running
+camSheet.addEventListener('close', stopCamera);
+
+// A booth scanner behaves as a keyboard: it types the payload then presses
+// Enter. That covers any USB or Bluetooth reader with no camera permission and
+// no decoding library, and typing a code by hand works the same way.
 qrInput.addEventListener('keydown', (event) => {
   if (event.key !== 'Enter') return;
   event.preventDefault();
@@ -555,10 +684,6 @@ qrInput.addEventListener('keydown', (event) => {
     focusScanner();
     return;
   }
-  // name the team back before the request so staff can catch a wrong badge
-  setStatus(qrStatus, scan.team
-    ? `Checking in ${scan.team.name} #${scan.jersey}\u2026`
-    : 'Checking in\u2026');
   submitCode(code);
 });
 

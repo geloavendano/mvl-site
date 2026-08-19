@@ -9,10 +9,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/mvl/css/style.css?v=open-today">
-<script src="/mvl/js/site-config.js"></script>
-<script src="/mvl/js/analytics.js"></script>
-<script src="/mvl/js/nav.js"></script>
+<link rel="stylesheet" href="/mvl/css/style.css?v=cam-scan">
+<script src="/mvl/js/site-config.js?v=cam-scan"></script>
+<script src="/mvl/js/analytics.js?v=cam-scan"></script>
+<script src="/mvl/js/nav.js?v=cam-scan"></script>
 </head>
 <body class="raffle-page" id="top">
 
@@ -133,13 +133,21 @@
         <button class="panel-link" type="button" id="qrSignOutBtn">Sign out</button>
       </div>
       <div class="form-grid">
-        <label class="field field--code">
-          <span>Scan or type a code</span>
-          <!-- no placeholder: the payload format is not something the page
-               should spell out to anyone who opens it -->
-          <input id="qrInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false">
-          <small>A booth scanner types the code and submits it automatically.</small>
-        </label>
+        <!-- a div, not a label: the camera button lives inside the control row,
+             and a button nested in a label steals the label's activation -->
+        <div class="field field--code">
+          <label for="qrInput">Scan or type a code</label>
+          <div class="code-row">
+            <!-- no placeholder: the payload format is not something the page
+                 should spell out to anyone who opens it -->
+            <input id="qrInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false">
+            <button class="code-cam" type="button" id="qrCamBtn" title="Scan with the camera">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9.4 4h5.2l1.2 2H19a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3.2l1.2-2Zm2.6 5a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9Zm0 2a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5Z"/></svg>
+              <span>Camera</span>
+            </button>
+          </div>
+          <small>A booth scanner types the code and submits it automatically. No scanner? Use the camera.</small>
+        </div>
       </div>
       <p class="form-status" id="qrStatus" role="status" aria-live="polite"></p>
     </div>
@@ -172,6 +180,21 @@
   </button>
 
   <button class="sheet-cancel" type="button" data-sheet-close>Cancel</button>
+</dialog>
+
+<!-- Camera scanner — the fallback when the booth's barcode reader is missing
+     or misbehaving. Opened from the code field, closed as soon as it decodes. -->
+<dialog class="sheet cam-sheet" id="camSheet" aria-labelledby="camSheetTitle">
+  <div class="sheet-head">
+    <h2 class="sheet-title" id="camSheetTitle">Scan a code</h2>
+    <p class="sheet-sub">Hold the player's QR code inside the frame.</p>
+  </div>
+  <div class="cam-stage">
+    <video id="camVideo" playsinline muted autoplay></video>
+    <div class="cam-reticle" aria-hidden="true"></div>
+  </div>
+  <p class="cam-status form-status" id="camStatus" role="status" aria-live="polite"></p>
+  <button class="sheet-cancel" type="button" data-cam-close>Cancel</button>
 </dialog>
 
 <!-- Prize poster viewer. The posters are 1080x1350 with a prize list set small
@@ -234,9 +257,9 @@
   </div>
 </footer>
 
-<script src="/mvl/js/league-data.js"></script>
-<script src="/mvl/js/marquee.js?v=open-today"></script>
-<script src="/mvl/js/supabase-config.js"></script>
-<script src="/mvl/js/checkin.js"></script>
+<script src="/mvl/js/league-data.js?v=cam-scan"></script>
+<script src="/mvl/js/marquee.js?v=cam-scan"></script>
+<script src="/mvl/js/supabase-config.js?v=cam-scan"></script>
+<script src="/mvl/js/checkin.js?v=cam-scan"></script>
 </body>
 </html>
