@@ -84,7 +84,7 @@ window.MVL_DATA = {
     // TEMP: client testing window. Mirrors mvl.raffle_open_dates, and the
     // venue radius on Court 1 is temporarily widened to 2km to match.
     // Remove these dates and reset the radius to 500m when testing is done.
-    openDates: ['2026-07-31', '2026-08-01', '2026-08-02', '2026-08-11'],
+    openDates: ['2026-07-31', '2026-08-01', '2026-08-02', '2026-08-11', '2026-08-19'],
     headline: "Start today's winning streak",
     // Ties the draw to the games rather than selling it on its own: checking in
     // is how you take part in game day, and the raffle rides along with it.
