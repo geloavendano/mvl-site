@@ -544,6 +544,10 @@ button.cta--secondary { border: 2px solid var(--mint); color: var(--mint); }
   display: inline;
 }
 .marquee-sep { color: var(--indigo); font-size: 10px; }
+/* Members of a brand-house group sit shoulder to shoulder. Dropping the
+   diamond alone still leaves the track's 20px gap on both sides, so pull the
+   follower back to read as one cluster rather than as separate sponsors. */
+.marquee-item--tight { margin-left: -12px; }
 .marquee--footer { border-bottom: 0; }
 .marquee--footer .marquee-tier { color: rgba(255, 255, 255, .82); }
 .marquee--footer .marquee-item--logo {

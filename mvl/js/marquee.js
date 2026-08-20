@@ -18,12 +18,12 @@ const sortedSponsors = [...SPONSORS].sort((a, b) =>
 
 // not lazy-loaded: the track is overflow:hidden, so a lazy image parked outside
 // the clip would never intersect the viewport and never load.
-const sponsorChip = (sponsor) => `
-    <span class="marquee-item marquee-item--logo${sponsor.logoBg ? ` marquee-item--bg-${sponsor.logoBg}` : ''}" title="${sponsor.name}">
+const sponsorChip = (sponsor, { sep = true, tight = false } = {}) => `
+    <span class="marquee-item marquee-item--logo${sponsor.logoBg ? ` marquee-item--bg-${sponsor.logoBg}` : ''}${tight ? ' marquee-item--tight' : ''}" title="${sponsor.name}">
       <img src="${sponsor.logo}" alt="${sponsor.name}" onerror="this.hidden=true;this.nextElementSibling.style.display='inline';">
       <span class="marquee-fallback">${sponsor.name}</span>
-    </span>
-    <span class="marquee-sep">&#9670;</span>
+    </span>${sep ? `
+    <span class="marquee-sep">&#9670;</span>` : ''}
   `;
 
 // A strip can carry more than one tier. Converge sits in its own "Powered by"
@@ -53,7 +53,12 @@ const buildMarquee = (filter) => {
   // tier gets a single label per loop and a strip carrying several gets each
   markup += list.map((sponsor, index, arr) => {
     const tierChanged = index === 0 || sponsor.tier !== arr[index - 1].tier;
-    return `${tierChanged ? `<span class="marquee-tier">${sponsor.tier}</span>` : ''}${sponsorChip(sponsor)}`;
+    // A `group` runs its members together as one cluster: no diamond between
+    // them and a tighter gap, so a brand house reads as one sponsor rather than
+    // several unrelated ones. The separator returns after the last member.
+    const runsInto = Boolean(sponsor.group && arr[index + 1]?.group === sponsor.group);
+    const runsFrom = Boolean(sponsor.group && index > 0 && arr[index - 1].group === sponsor.group);
+    return `${tierChanged ? `<span class="marquee-tier">${sponsor.tier}</span>` : ''}${sponsorChip(sponsor, { sep: !runsInto, tight: runsFrom })}`;
   }).join('');
   return markup;
 };

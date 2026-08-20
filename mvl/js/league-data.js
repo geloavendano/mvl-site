@@ -25,21 +25,25 @@ window.MVL_DATA = {
   // full sponsor marquee above the footer.
   titlePresenter: { name: 'Mizuno', logo: '/mvl/assets/Sponsor Logos/Title Presentor/Mizuno Logo White.png' },
 
+  // `group` runs several logos together as one cluster in the strip — no
+  // diamond between them and a tighter gap — for a brand house shown under
+  // its parent. The separator returns after the last member.
   sponsors: [
     { name: "Converge SuperFiberX", tier: 'Powered by', order: 1, logo: '/mvl/assets/Sponsor Logos/Official Partners/Converge.png' },
 
     { name: "AquaFlask", tier: 'Official Partners', order: 1, logo: '/mvl/assets/Sponsor Logos/Official Partners/AQUAFLASK_WHITE (left).png' },
     { name: "Durex", tier: 'Official Partners', order: 2, logo: '/mvl/assets/Sponsor Logos/Official Partners/Durex.png' },
     { name: "Future Glow", tier: 'Official Partners', order: 3, logo: '/mvl/assets/Sponsor Logos/Official Partners/future glow.png' },
-    { name: "Vitanature", tier: 'Official Partners', order: 4, logo: '/mvl/assets/Sponsor Logos/Official Partners/future glow - VITANATURE White Logo.png' },
-    { name: "Tropicana", tier: 'Official Partners', order: 5, logo: '/mvl/assets/Sponsor Logos/Official Partners/future glow - tropicana.png' },
-    { name: "Oxecure", tier: 'Official Partners', order: 6, logo: '/mvl/assets/Sponsor Logos/Official Partners/future glow - Oxecure.png' },
-    { name: "Dr. O Skin Lab", tier: 'Official Partners', order: 7, logo: '/mvl/assets/Sponsor Logos/Official Partners/future glow - Dr O White Logo.png' },
-    { name: "Gaviscon", tier: 'Official Partners', order: 8, logo: '/mvl/assets/Sponsor Logos/Official Partners/Gaviscon.png' },
-    { name: "Immuni", tier: 'Official Partners', order: 9, logo: '/mvl/assets/Sponsor Logos/Official Partners/Immuni - Company 1.png' },
-    { name: "JBL", tier: 'Official Partners', order: 10, logo: '/mvl/assets/Sponsor Logos/Official Partners/JBL.png' },
-    { name: "KG Body Recovery", tier: 'Official Partners', order: 11, logo: '/mvl/assets/Sponsor Logos/Official Partners/KG Body Recovery.png' },
-    { name: "Lysol", tier: 'Official Partners', order: 12, logo: '/mvl/assets/Sponsor Logos/Official Partners/Lysol Logo-01.png' },
+    { name: "Vitanature", tier: 'Official Partners', order: 4, group: 'future-glow', logo: '/mvl/assets/Sponsor Logos/Official Partners/future glow - VITANATURE White Logo.png' },
+    { name: "Tropicana", tier: 'Official Partners', order: 5, group: 'future-glow', logo: '/mvl/assets/Sponsor Logos/Official Partners/future glow - tropicana.png' },
+    { name: "Oxecure", tier: 'Official Partners', order: 6, group: 'future-glow', logo: '/mvl/assets/Sponsor Logos/Official Partners/future glow - Oxecure.png' },
+    { name: "Dr. O Skin Lab", tier: 'Official Partners', order: 7, group: 'future-glow', logo: '/mvl/assets/Sponsor Logos/Official Partners/future glow - Dr O White Logo.png' },
+    { name: "Snake Brand", tier: 'Official Partners', order: 8, group: 'future-glow', logo: '/mvl/assets/Sponsor Logos/Official Partners/future glow - snake brand.png' },
+    { name: "Gaviscon", tier: 'Official Partners', order: 9, logo: '/mvl/assets/Sponsor Logos/Official Partners/Gaviscon.png' },
+    { name: "Immuni", tier: 'Official Partners', order: 10, logo: '/mvl/assets/Sponsor Logos/Official Partners/Immuni - Company 1.png' },
+    { name: "JBL", tier: 'Official Partners', order: 11, logo: '/mvl/assets/Sponsor Logos/Official Partners/JBL.png' },
+    { name: "KG Body Recovery", tier: 'Official Partners', order: 12, logo: '/mvl/assets/Sponsor Logos/Official Partners/KG Body Recovery.png' },
+    { name: "Lysol", tier: 'Official Partners', order: 13, logo: '/mvl/assets/Sponsor Logos/Official Partners/Lysol Logo-01.png' },
 
     { name: "Aveeno", tier: 'Co-Presenters', order: 1, logo: '/mvl/assets/Sponsor Logos/Co-Presenters/Aveeno.png' },
     { name: "Camou", tier: 'Co-Presenters', order: 2, logo: '/mvl/assets/Sponsor Logos/Co-Presenters/Camou.png' },
