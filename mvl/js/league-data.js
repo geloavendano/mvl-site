@@ -33,7 +33,7 @@ window.MVL_DATA = {
 
     { name: "AquaFlask", tier: 'Official Partners', order: 1, logo: '/mvl/assets/Sponsor Logos/Official Partners/AQUAFLASK_WHITE (left).png' },
     { name: "Durex", tier: 'Official Partners', order: 2, logo: '/mvl/assets/Sponsor Logos/Official Partners/Durex.png' },
-    { name: "Future Glow", tier: 'Official Partners', order: 3, logo: '/mvl/assets/Sponsor Logos/Official Partners/future glow.png' },
+    { name: "Future Glow", tier: 'Official Partners', order: 3, group: 'future-glow', logo: '/mvl/assets/Sponsor Logos/Official Partners/future glow.png' },
     { name: "Vitanature", tier: 'Official Partners', order: 4, group: 'future-glow', logo: '/mvl/assets/Sponsor Logos/Official Partners/future glow - VITANATURE White Logo.png' },
     { name: "Tropicana", tier: 'Official Partners', order: 5, group: 'future-glow', logo: '/mvl/assets/Sponsor Logos/Official Partners/future glow - tropicana.png' },
     { name: "Oxecure", tier: 'Official Partners', order: 6, group: 'future-glow', logo: '/mvl/assets/Sponsor Logos/Official Partners/future glow - Oxecure.png' },
