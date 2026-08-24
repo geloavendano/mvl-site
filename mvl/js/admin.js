@@ -24,6 +24,12 @@ const emergencyCallLink = document.getElementById('emergencyCallLink');
 const scoreboardCreateForm = document.getElementById('scoreboardCreateForm');
 const scoreboardList = document.getElementById('scoreboardList');
 const newScoreboardBtn = document.getElementById('newScoreboardBtn');
+const raffleExportForm = document.getElementById('raffleExportForm');
+const raffleBlacklistForm = document.getElementById('raffleBlacklistForm');
+const raffleBlacklistTeam = document.getElementById('raffleBlacklistTeam');
+const raffleBlacklistPlayer = document.getElementById('raffleBlacklistPlayer');
+const raffleBlacklistList = document.getElementById('raffleBlacklistList');
+let rafflePlayerRequest = 0;
 const adminTabs = [...document.querySelectorAll('[data-admin-tab]')];
 const adminTabPanels = [...document.querySelectorAll('[data-admin-panel]')];
 const adminTabNames = new Set(adminTabs.map((tab) => tab.dataset.adminTab));
@@ -242,6 +248,85 @@ const formatAdminDate = (iso) => new Intl.DateTimeFormat('en-PH', {
 const formatAdminTime = (iso) => iso ? new Intl.DateTimeFormat('en-PH', {
   timeZone: 'Asia/Manila', hour: 'numeric', minute: '2-digit',
 }).format(new Date(iso)) : '';
+const manilaDateInput = (date = new Date()) => new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit',
+}).format(date);
+const furparentLabel = (value) => ({
+  dog: 'Dog', cat: 'Cat', dog_cat: 'Dog & cat', other_pet: 'Other pet', not_now: 'Not a furparent',
+}[value] || 'Not provided');
+const csvCell = (value) => {
+  let clean = String(value ?? '');
+  if (/^[=+\-@]/.test(clean)) clean = `'${clean}`;
+  return `"${clean.replace(/"/g, '""')}"`;
+};
+const downloadRaffleCsv = (payload) => {
+  const rows = [
+    ['Check-in date', 'Check-in time', 'Team', 'Player', 'Jersey number', 'Furparent type'],
+    ...(payload.entries || []).map((entry) => [
+      entry.checkinDay,
+      formatAdminTime(entry.checkedInAt),
+      entry.teamName,
+      entry.playerName,
+      entry.jerseyNumber || '',
+      furparentLabel(entry.furparentType),
+    ]),
+  ];
+  const csv = `\uFEFF${rows.map((row) => row.map(csvCell).join(',')).join('\r\n')}\r\n`;
+  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  const link = document.createElement('a');
+  const suffix = payload.furparentOnly ? '-furparents' : '';
+  link.href = url;
+  link.download = `mvl-raffle-entries-${payload.startDate}-${payload.endDate}${suffix}.csv`;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+};
+const populateRaffleTeams = () => {
+  raffleBlacklistTeam.innerHTML = window.MVL_DATA.teams.map((team) => (
+    `<option value="${escapeHtml(team.id)}" style="color:${adminTeamColor(team.id)}">${escapeHtml(team.name)}</option>`
+  )).join('');
+};
+const loadRafflePlayers = async (teamId) => {
+  const request = ++rafflePlayerRequest;
+  raffleBlacklistPlayer.disabled = true;
+  raffleBlacklistPlayer.innerHTML = '<option value="">Loading players…</option>';
+  try {
+    const players = await rpc('mvl_get_team_players', { p_team_id: teamId });
+    if (request !== rafflePlayerRequest) return;
+    raffleBlacklistPlayer.innerHTML = players.length
+      ? `<option value="">Choose player</option>${players.map((player) => `<option value="${escapeHtml(player.id)}">${escapeHtml(player.name)}${player.jerseyNumber ? ` · #${escapeHtml(player.jerseyNumber)}` : ''}</option>`).join('')}`
+      : '<option value="">No rostered players</option>';
+    raffleBlacklistPlayer.disabled = !players.length;
+  } catch (error) {
+    if (request !== rafflePlayerRequest) return;
+    raffleBlacklistPlayer.innerHTML = '<option value="">Could not load players</option>';
+    status(raffleBlacklistForm.querySelector('.form-status'), error.message, 'error');
+  }
+};
+const renderRaffleBlacklist = (entries) => {
+  if (!entries.length) {
+    raffleBlacklistList.innerHTML = '<p class="admin-readiness-empty">No players are currently blacklisted.</p>';
+    return;
+  }
+  raffleBlacklistList.innerHTML = `<table class="admin-raffle-table">
+    <thead><tr><th>Player</th><th>Prize / note</th><th>Added</th><th></th></tr></thead>
+    <tbody>${entries.map((entry) => `<tr>
+      <td><strong>${escapeHtml(entry.playerName)}</strong><span>${teamNameMarkup(entry.teamId, entry.teamName)}${entry.jerseyNumber ? ` · #${escapeHtml(entry.jerseyNumber)}` : ''}</span></td>
+      <td>${escapeHtml(entry.note)}</td>
+      <td>${escapeHtml(formatAdminDate(entry.createdAt))}</td>
+      <td><button class="admin-raffle-remove" type="button" data-raffle-remove="${escapeHtml(entry.id)}" aria-label="Remove ${escapeHtml(entry.playerName)} from raffle blacklist">Remove</button></td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+};
+const loadRaffleBlacklist = async () => {
+  raffleBlacklistList.innerHTML = '<p class="admin-readiness-empty">Loading blacklist…</p>';
+  try {
+    renderRaffleBlacklist(await rpc('mvl_admin_get_raffle_blacklist'));
+  } catch (error) {
+    raffleBlacklistList.innerHTML = `<p class="form-status is-error">${escapeHtml(error.message)}</p>`;
+  }
+};
 const readinessCount = (count, total, completeClass = true) => {
   const isComplete = total > 0 && count === total;
   return `<span class="admin-readiness-count ${isComplete && completeClass ? 'is-complete' : ''}"><strong>${count}</strong> / ${total}</span>`;
@@ -416,7 +501,7 @@ const show = async () => {
     form.court2Url.value = streams[1]?.youtube_url || '';
     render();
     activateAdminTab(adminTabFromHash());
-    await Promise.all([loadReadiness(), loadScoreboards()]);
+    await Promise.all([loadReadiness(), loadScoreboards(), loadRaffleBlacklist()]);
   } catch (e) {
     session = null;
     authClient.auth.signOut();
@@ -506,6 +591,69 @@ livestreamForm.addEventListener('submit', async (e) => {
     status(s, 'Court livestreams updated.', 'success');
   } catch (err) {
     status(s, err.message, 'error');
+  }
+});
+raffleExportForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const formStatus = form.querySelector('.form-status');
+  const submitButton = form.querySelector('button[type="submit"]');
+  status(formStatus, 'Preparing export…');
+  submitButton.disabled = true;
+  try {
+    const payload = await rpc('mvl_admin_get_raffle_entries', {
+      p_start_date: form.elements.startDate.value,
+      p_end_date: form.elements.endDate.value,
+      p_furparent_only: form.elements.furparentOnly.checked,
+    });
+    if (!payload.entries?.length) {
+      const excluded = payload.blacklistedExcluded ? ` ${payload.blacklistedExcluded} blacklisted player${payload.blacklistedExcluded === 1 ? ' was' : 's were'} excluded.` : '';
+      status(formStatus, `No eligible check-ins found for this selection.${excluded}`, 'error');
+      return;
+    }
+    downloadRaffleCsv(payload);
+    const excluded = payload.blacklistedExcluded ? ` · ${payload.blacklistedExcluded} blacklisted excluded` : '';
+    status(formStatus, `${payload.entryCount} raffle ${payload.entryCount === 1 ? 'entry' : 'entries'} downloaded${excluded}.`, 'success');
+  } catch (error) {
+    status(formStatus, error.message, 'error');
+  } finally {
+    submitButton.disabled = false;
+  }
+});
+raffleBlacklistTeam.addEventListener('change', () => loadRafflePlayers(raffleBlacklistTeam.value));
+raffleBlacklistForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const formStatus = form.querySelector('.form-status');
+  const submitButton = form.querySelector('button[type="submit"]');
+  status(formStatus, 'Saving…');
+  submitButton.disabled = true;
+  try {
+    await rpc('mvl_admin_add_raffle_blacklist', {
+      p_player_id: form.elements.player.value,
+      p_note: form.elements.note.value,
+    });
+    form.elements.note.value = '';
+    form.elements.player.value = '';
+    await loadRaffleBlacklist();
+    status(formStatus, 'Player added to the raffle blacklist.', 'success');
+  } catch (error) {
+    status(formStatus, error.message, 'error');
+  } finally {
+    submitButton.disabled = false;
+  }
+});
+raffleBlacklistList.addEventListener('click', async (event) => {
+  const button = event.target.closest('[data-raffle-remove]');
+  if (!button || !window.confirm('Remove this player from the raffle blacklist?')) return;
+  button.disabled = true;
+  try {
+    await rpc('mvl_admin_remove_raffle_blacklist', { p_blacklist_id: button.dataset.raffleRemove });
+    await loadRaffleBlacklist();
+    status(raffleBlacklistForm.querySelector('.form-status'), 'Player removed from the raffle blacklist.', 'success');
+  } catch (error) {
+    button.disabled = false;
+    status(raffleBlacklistForm.querySelector('.form-status'), error.message, 'error');
   }
 });
 adminDayFilter.addEventListener('change', () => { activeAdminDay = Number(adminDayFilter.value); render(); });
@@ -645,3 +793,7 @@ authClient.auth.getSession().then(({ data: authData }) => {
 });
 activateAdminTab(adminTabFromHash());
 populateScoreboardTeams();
+populateRaffleTeams();
+raffleExportForm.elements.startDate.value = manilaDateInput();
+raffleExportForm.elements.endDate.value = manilaDateInput();
+loadRafflePlayers(raffleBlacklistTeam.value);
