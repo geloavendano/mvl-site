@@ -7,3 +7,4 @@
 # Patterns are path-agnostic so they survive the site living under mvl/.
 *.mov
 mvl-video-1-web.mp4
+scripts/bin/facebox
