@@ -5188,12 +5188,38 @@ body.checkin-complete { overflow: hidden; }
   background-position: center, center, center, center;
   background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
 }
+/* The rail is painted as a background gradient on .checkin-photo so it also
+   covers the no-photo state, but the name needs a real element to sit in —
+   above ::after, which washes the same strip with white. */
+.checkin-photo-rail {
+  position: absolute;
+  inset: 0 0 0 auto;
+  z-index: 4;
+  width: var(--checkin-card-rail);
+  min-height: 100%;
+  display: flex;
+  /* the rail's rounded corner is at the top, so the square end is where type
+     sits */
+  align-items: flex-end;
+  justify-content: center;
+  padding: 14px 0 16px;
+  background: #f5f7f2;
+  border-radius: 0 44px 0 0;
+}
 .checkin-team {
   margin: 0;
   color: var(--team-a, var(--mint));
-  font: 800 12px var(--mono);
-  letter-spacing: 2.2px;
+  font-family: 'STRRETCH Sans Free', var(--ui);
+  font-weight: 700;
+  font-size: clamp(14px, 3.4vw, 19px);
+  /* em, not px: fitTeamName scales font-size, and fixed px tracking would stay
+     behind as a constant the ratio can never remove */
+  letter-spacing: .1em;
+  line-height: .92;
+  text-align: center;
   text-transform: uppercase;
+  /* vertical-rl reads top-to-bottom with the glyphs turned clockwise */
+  writing-mode: vertical-rl;
 }
 .checkin-name {
   margin: 8px 0 4px;

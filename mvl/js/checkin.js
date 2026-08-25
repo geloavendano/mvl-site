@@ -178,6 +178,36 @@ const playerPhotoUrl = (payload) => {
 
 const cssUrl = (value) => `url(${JSON.stringify(value)})`;
 
+// ---- fit: the team name to the card's rail ---------------------------------
+// Mirrors fitTeamNames() in main.js. The rail is only as tall as the card, so
+// a long name set vertically can outrun it; scale any name that overruns down
+// to fit and leave the rest at the size the stylesheet picked.
+const fitTeamName = () => {
+  const name = el('checkinTeam');
+  const rail = name?.parentElement;
+  if (!name || !rail) return;
+  name.style.fontSize = '';
+  const railStyle = getComputedStyle(rail);
+  const room = rail.clientHeight
+    - parseFloat(railStyle.paddingTop)
+    - parseFloat(railStyle.paddingBottom);
+  const needed = name.getBoundingClientRect().height;
+  if (!room || !needed || needed <= room) return;
+  const base = parseFloat(getComputedStyle(name).fontSize);
+  // a hair under the exact ratio so rounding never leaves a clipped glyph
+  name.style.fontSize = `${Math.max(9, base * (room / needed) * 0.97)}px`;
+};
+
+// STRRETCH loads async and is far narrower than the fallback, so a measurement
+// taken before it lands would be against the wrong metrics
+if (document.fonts?.ready) document.fonts.ready.then(fitTeamName);
+
+let fitTimer = 0;
+window.addEventListener('resize', () => {
+  window.clearTimeout(fitTimer);
+  fitTimer = window.setTimeout(fitTeamName, 120);
+});
+
 const setTeamTheme = (node, team) => {
   if (!node) return;
   if (!team) {
@@ -329,6 +359,7 @@ const showConfirmation = (payload) => {
   const player = payload.player;
   const full = [player.display_name, player.surname].filter(Boolean).join(' ');
   el('checkinTeam').textContent = payload.team.name || '';
+  fitTeamName();
   el('checkinName').textContent = full;
   el('checkinJersey').textContent = player.jersey_number ? `Jersey ${player.jersey_number}` : '';
 
