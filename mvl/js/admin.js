@@ -33,6 +33,8 @@ let rafflePlayerRequest = 0;
 const adminTabs = [...document.querySelectorAll('[data-admin-tab]')];
 const adminTabPanels = [...document.querySelectorAll('[data-admin-panel]')];
 const adminTabNames = new Set(adminTabs.map((tab) => tab.dataset.adminTab));
+const streamSetupGuide = document.getElementById('streamSetupGuide');
+const streamCameraTabs = [...streamSetupGuide.querySelectorAll('[data-stream-camera-tab]')];
 const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
 }[char]));
@@ -78,6 +80,19 @@ const activateAdminTab = (name, { updateUrl = false, focus = false } = {}) => {
   if (updateUrl && window.location.hash !== `#${activeName}`) {
     window.history.pushState(null, '', `#${activeName}`);
   }
+};
+const activateStreamCamera = (camera, { focus = false } = {}) => {
+  streamSetupGuide.dataset.streamCamera = camera;
+  streamCameraTabs.forEach((tab) => {
+    const isActive = tab.dataset.streamCameraTab === camera;
+    tab.classList.toggle('is-active', isActive);
+    tab.setAttribute('aria-selected', String(isActive));
+    tab.tabIndex = isActive ? 0 : -1;
+    if (isActive && focus) tab.focus();
+  });
+  streamSetupGuide.querySelectorAll('[data-stream-camera-content]').forEach((content) => {
+    content.hidden = content.dataset.streamCameraContent !== camera;
+  });
 };
 const playerPhotoUrl = (value) => {
   if (!value) return '';
@@ -532,6 +547,21 @@ document.querySelector('.admin-tabs').addEventListener('keydown', (event) => {
 });
 window.addEventListener('popstate', () => activateAdminTab(adminTabFromHash()));
 window.addEventListener('hashchange', () => activateAdminTab(adminTabFromHash()));
+streamSetupGuide.addEventListener('click', (event) => {
+  const tab = event.target.closest('[data-stream-camera-tab]');
+  if (tab) activateStreamCamera(tab.dataset.streamCameraTab);
+});
+streamSetupGuide.addEventListener('keydown', (event) => {
+  const tab = event.target.closest('[data-stream-camera-tab]');
+  if (!tab || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+  event.preventDefault();
+  const index = streamCameraTabs.indexOf(tab);
+  const nextIndex = event.key === 'Home' ? 0
+    : event.key === 'End' ? streamCameraTabs.length - 1
+      : event.key === 'ArrowRight' ? (index + 1) % streamCameraTabs.length
+        : (index - 1 + streamCameraTabs.length) % streamCameraTabs.length;
+  activateStreamCamera(streamCameraTabs[nextIndex].dataset.streamCameraTab, { focus: true });
+});
 newScoreboardBtn.addEventListener('click', () => {
   scoreboardCreateForm.classList.remove('is-hidden');
   newScoreboardBtn.classList.add('is-hidden');
