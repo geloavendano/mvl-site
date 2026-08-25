@@ -315,10 +315,19 @@ const CHEERS = [
   'Make it count today.',
 ];
 
+// TEMP: off while the check-in flow is being tested, so a rehearsal scan does
+// not mail a real participant. Set back to true before game day — this is the
+// only switch; the edge function and the RPC are both still live.
+const SEND_CONFIRMATION_EMAIL = false;
+
 // The screen is the real receipt; the email is a bonus. So this never blocks
 // the confirmation and never surfaces an error — at the booth there is a queue
 // behind the player, and a Resend hiccup is not their problem.
 const sendConfirmationEmail = (checkinId) => {
+  if (!SEND_CONFIRMATION_EMAIL) {
+    console.info('[checkin] confirmation email suppressed (SEND_CONFIRMATION_EMAIL is false)');
+    return;
+  }
   fetch(`${cfg.url}/functions/v1/send-checkin-confirmation`, {
     method: 'POST',
     headers: {
