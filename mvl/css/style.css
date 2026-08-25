@@ -5110,32 +5110,66 @@ body.checkin-complete { overflow: hidden; }
     var(--surface-deep);
 }
 .checkin-photo {
-  width: clamp(140px, 34vw, 190px);
-  aspect-ratio: 1;
+  --checkin-card-rail: 36px;
+  width: clamp(190px, 56vw, 280px);
+  aspect-ratio: .82;
   margin: 0 auto 22px;
   display: grid;
   place-items: center;
+  position: relative;
   overflow: hidden;
-  border-radius: 50%;
-  padding: 5px;
-  background: linear-gradient(135deg, var(--team-a, var(--mint)), var(--team-b, var(--teal)));
+  border-radius: 0 44px 0 44px;
+  background-image:
+    linear-gradient(90deg, rgba(255, 255, 255, 0) 0 calc(100% - var(--checkin-card-rail)), #f5f7f2 calc(100% - var(--checkin-card-rail)) 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0) 46%, color-mix(in srgb, var(--team-a, var(--mint)) 40%, transparent) 100%),
+    var(--team-art, linear-gradient(135deg, var(--team-b, var(--teal)), var(--team-a, var(--mint))));
+  background-size: cover, cover, cover;
+  background-position: center, center, center;
+  background-repeat: no-repeat, no-repeat, no-repeat;
   color: color-mix(in srgb, var(--team-a, var(--mint)) 55%, #ffffff);
+  box-shadow: 0 20px 52px rgba(4, 2, 20, .34);
+}
+.checkin-photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent 0 calc(100% - var(--checkin-card-rail)), rgba(255, 255, 255, .7) calc(100% - var(--checkin-card-rail)) 100%),
+    linear-gradient(180deg, transparent 44%, rgba(4, 2, 20, .18) 100%);
 }
 .checkin-photo img {
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  inset: 12px calc(var(--checkin-card-rail) + 8px) 12px 12px;
+  z-index: 2;
+  width: calc(100% - var(--checkin-card-rail) - 20px);
+  height: calc(100% - 24px);
   object-fit: cover;
-  border-radius: 50%;
+  object-position: center top;
+  border-radius: 0 30px 0 30px;
   display: block;
+  filter: saturate(1.04) contrast(1.04) drop-shadow(0 8px 14px rgba(4, 2, 20, .42));
 }
-.checkin-silhouette { width: 46%; height: auto; display: block; }
+.checkin-silhouette {
+  position: relative;
+  z-index: 2;
+  width: 42%;
+  height: auto;
+  display: block;
+  transform: translateX(calc(var(--checkin-card-rail) / -2));
+  filter: drop-shadow(0 8px 12px rgba(4, 2, 20, .34));
+}
 .checkin-photo.has-photo .checkin-silhouette { display: none; }
 .checkin-photo:not(.has-photo) {
-  /* no photo on file: sink the middle so the gradient reads as a ring and the
-     silhouette looks deliberate rather than like a failed image */
-  background:
-    radial-gradient(circle at 50% 50%, var(--navy-deep) 0 62%, transparent 62%),
-    linear-gradient(135deg, var(--team-a, var(--mint)), var(--team-b, var(--teal)));
+  background-image:
+    linear-gradient(90deg, rgba(255, 255, 255, 0) 0 calc(100% - var(--checkin-card-rail)), #f5f7f2 calc(100% - var(--checkin-card-rail)) 100%),
+    radial-gradient(circle at 42% 45%, rgba(4, 2, 20, .58) 0 32%, transparent 33%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0) 46%, color-mix(in srgb, var(--team-a, var(--mint)) 40%, transparent) 100%),
+    var(--team-art, linear-gradient(135deg, var(--team-b, var(--teal)), var(--team-a, var(--mint))));
+  background-size: cover, cover, cover, cover;
+  background-position: center, center, center, center;
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
 }
 .checkin-team {
   margin: 0;

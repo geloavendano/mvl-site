@@ -176,6 +176,25 @@ const playerPhotoUrl = (payload) => {
   return `${cfg.url}/storage/v1/object/public/mvl-player-photos/${clean}`;
 };
 
+const cssUrl = (value) => `url(${JSON.stringify(value)})`;
+
+const setTeamTheme = (node, team) => {
+  if (!node) return;
+  if (!team) {
+    node.style.removeProperty('--team-a');
+    node.style.removeProperty('--team-b');
+    node.style.removeProperty('--team-art');
+    node.classList.remove('has-team-art');
+    return;
+  }
+
+  node.style.setProperty('--team-a', team.grad[0]);
+  node.style.setProperty('--team-b', team.grad[1]);
+  if (team.bg) node.style.setProperty('--team-art', cssUrl(team.bg));
+  else node.style.removeProperty('--team-art');
+  node.classList.toggle('has-team-art', Boolean(team.bg));
+};
+
 const rpc = async (fn, body, token) => {
   const res = await fetch(`${cfg.url}/rest/v1/rpc/${fn}`, {
     method: 'POST',
@@ -288,12 +307,10 @@ const sendConfirmationEmail = (checkinId) => {
 const showConfirmation = (payload) => {
   const team = teamById[payload.team.id];
   const card = el('checkinCard');
-  // Colours come from league-data.js, not the row: the client is the source of
-  // truth for the 2026 palette.
-  if (team) {
-    card.style.setProperty('--team-a', team.grad[0]);
-    card.style.setProperty('--team-b', team.grad[1]);
-  }
+  // Colours and art come from league-data.js, not the row: the client is the
+  // source of truth for the 2026 palette.
+  setTeamTheme(done, team);
+  setTeamTheme(card, team);
 
   const img = el('checkinPhotoImg');
   const src = playerPhotoUrl(payload);
