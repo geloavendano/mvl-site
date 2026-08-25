@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/mvl/css/style.css?v=checkin-team-frame">
+<link rel="stylesheet" href="/mvl/css/style.css?v=checkin-cutout">
 <script src="/mvl/js/site-config.js?v=fg-cluster"></script>
 <script src="/mvl/js/analytics.js?v=fg-cluster"></script>
 <script src="/mvl/js/nav.js?v=fg-cluster"></script>
@@ -230,7 +230,9 @@
 <section class="checkin-done is-hidden" id="checkinDone" role="status" aria-live="polite">
   <div class="checkin-card" id="checkinCard">
     <div class="checkin-photo" id="checkinPhoto">
-      <img id="checkinPhotoImg" alt="" hidden>
+      <div class="checkin-photo-slot">
+        <img id="checkinPhotoImg" alt="" hidden>
+      </div>
       <svg class="checkin-silhouette" viewBox="0 0 120 140" aria-hidden="true">
         <path fill="currentColor" d="M60 18a24 24 0 1 1 0 48 24 24 0 0 1 0-48Zm0 58c26 0 47 17 47 38v6H13v-6c0-21 21-38 47-38Z"/>
       </svg>
@@ -275,6 +277,6 @@
 <script src="/mvl/js/league-data.js?v=fg-cluster"></script>
 <script src="/mvl/js/marquee.js?v=fg-cluster"></script>
 <script src="/mvl/js/supabase-config.js?v=fg-cluster"></script>
-<script src="/mvl/js/checkin.js?v=checkin-team-frame"></script>
+<script src="/mvl/js/checkin.js?v=checkin-cutout"></script>
 </body>
 </html>

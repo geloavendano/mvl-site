@@ -5139,18 +5139,35 @@ body.checkin-complete { overflow: hidden; }
     linear-gradient(90deg, transparent 0 calc(100% - var(--checkin-card-rail)), rgba(255, 255, 255, .7) calc(100% - var(--checkin-card-rail)) 100%),
     linear-gradient(180deg, transparent 44%, rgba(4, 2, 20, .18) 100%);
 }
-.checkin-photo img {
+/* Same treatment as the team cards on the landing page: the cut-out stands on
+   the bottom edge, tucked against the name rail, rather than sitting inside a
+   rounded thumbnail. See .team-card-player-slot for the full reasoning. */
+.checkin-photo-slot {
   position: absolute;
-  inset: 12px calc(var(--checkin-card-rail) + 8px) 12px 12px;
+  inset: 12px calc(var(--checkin-card-rail) + 4px) 0 6px;
   z-index: 2;
-  width: calc(100% - var(--checkin-card-rail) - 20px);
-  height: calc(100% - 24px);
-  object-fit: cover;
-  object-position: center top;
-  border-radius: 0 30px 0 30px;
-  display: block;
-  filter: saturate(1.04) contrast(1.04) drop-shadow(0 8px 14px rgba(4, 2, 20, .42));
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  pointer-events: none;
 }
+/* Every cut-out is exported at one pixel height, so sizing on height alone
+   renders them all at the same scale. Width is left to each figure's own
+   build; a broad stance runs wider than the slot and .checkin-photo's
+   overflow trims it at the card edge. */
+.checkin-photo img {
+  height: 100%;
+  width: auto;
+  max-width: none;
+  flex: none;
+  object-fit: contain;
+  object-position: bottom center;
+  display: block;
+  filter: drop-shadow(0 4px 8px rgba(4, 2, 20, .5));
+}
+/* author display:block beats the UA [hidden] rule whatever the specificity,
+   so the JS fallback to the silhouette needs this to actually hide */
+.checkin-photo img[hidden] { display: none; }
 .checkin-silhouette {
   position: relative;
   z-index: 2;

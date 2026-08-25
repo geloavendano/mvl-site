@@ -18,14 +18,12 @@ square on a portrait cuts foreheads.
 import argparse, json, os, re, subprocess, sys, tempfile
 from pathlib import Path
 
-SIZE = 600
+# The confirmation card frames the player the way the team cards on the landing
+# do: the whole cut-out standing on the team artwork, not a face crop. So the
+# only processing is trim-to-content and scale — height drives it, width falls
+# where it falls, and the card's CSS does the placing.
+HEIGHT = 900          # ~300 CSS px at 3x
 QUALITY = 82
-# How much of the crop the head should occupy. 2.6 face-heights gives a
-# head-and-shoulders frame with a little air above — the source photos are
-# full-body studio shots, so a geometric crop leaves the face a speck.
-FACE_ZOOM = 2.6
-FACE_BIAS = 0.36  # fallback only, when no face is detected
-FACEBOX = Path(__file__).parent / "bin" / "facebox"
 READABLE = {".jpg", ".jpeg", ".png", ".webp", ".heic", ".nef", ".cr2", ".arw", ".dng", ".tif", ".tiff"}
 
 
@@ -42,59 +40,42 @@ def roster():
     return {r["code"].upper(): r for r in rows}
 
 
-def face_of(path: Path):
-    """Largest face as a normalised rect, or None."""
-    if not FACEBOX.exists():
-        return None
-    out = subprocess.run([str(FACEBOX), str(path)], capture_output=True, text=True).stdout
-    try:
-        d = json.loads(out)
-    except json.JSONDecodeError:
-        return None
-    return d if d.get("found") else None
-
-
-def to_square_webp(src: Path, dst: Path):
+def to_card_webp(src: Path, dst: Path):
+    """Trim to the cut-out's own bounds, scale to HEIGHT, keep the alpha."""
     from PIL import Image, ImageOps
     tmp = None
     if src.suffix.lower() not in {".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff"}:
         # RAW/HEIC: let macOS decode it first, PIL will not
-        tmp = Path(tempfile.mkstemp(suffix=".jpg")[1])
-        subprocess.run(["sips", "-s", "format", "jpeg", str(src), "--out", str(tmp)],
+        tmp = Path(tempfile.mkstemp(suffix=".png")[1])
+        subprocess.run(["sips", "-s", "format", "png", str(src), "--out", str(tmp)],
                        capture_output=True)
         src = tmp
 
     im = Image.open(src)
     im = ImageOps.exif_transpose(im)          # honour the camera's rotation flag
-    im = im.convert("RGB")
+    has_alpha = im.mode in ("RGBA", "LA") or "transparency" in im.info
+    im = im.convert("RGBA" if has_alpha else "RGB")
+
+    if has_alpha:
+        # Background-removed sources carry a lot of empty margin. Trimming to
+        # the figure means the card's own padding decides the framing, rather
+        # than however much space the cut-out happened to leave.
+        box = im.getchannel("A").getbbox()
+        if box:
+            im = im.crop(box)
+
     w, h = im.size
+    if h != HEIGHT:
+        im = im.resize((max(1, round(w * HEIGHT / h)), HEIGHT), Image.LANCZOS)
 
-    face = face_of(src)
-    if face:
-        fx, fy = face["x"] * w, face["y"] * h
-        fw, fh = face["w"] * w, face["h"] * h
-        side = max(fh * FACE_ZOOM, fw * FACE_ZOOM)
-        side = min(side, w, h)                # never ask for more than exists
-        cx = fx + fw / 2
-        # sit the face above centre so the frame reads as a portrait, not a chin
-        cy = fy + fh / 2 + side * 0.06
-        left, top = cx - side / 2, cy - side / 2
-    else:
-        side = min(w, h)
-        left = (w - side) / 2
-        top = (h - side) * (1 - FACE_BIAS) if h > w else (h - side) / 2
-
-    # keep the window inside the frame rather than letting the crop go negative
-    left = max(0, min(left, w - side))
-    top = max(0, min(top, h - side))
-    box = (int(left), int(top), int(left + side), int(top + side))
-
-    im = im.crop(box).resize((SIZE, SIZE), Image.LANCZOS)
     dst.parent.mkdir(parents=True, exist_ok=True)
-    im.save(dst, "WEBP", quality=QUALITY, method=6)
+    if im.mode == "RGBA":
+        im.save(dst, "WEBP", quality=QUALITY, method=6, alpha_quality=90)
+    else:
+        im.save(dst, "WEBP", quality=QUALITY, method=6)
     if tmp:
         tmp.unlink(missing_ok=True)
-    return bool(face)
+    return has_alpha
 
 
 def main():
@@ -107,7 +88,18 @@ def main():
 
     people = roster()
     src = Path(args.src)
-    files = sorted(f for f in src.iterdir() if f.is_file() and f.suffix.lower() in READABLE)
+    # A folder may hold the same player twice (e.g. GML-1.png and GML-1.webp).
+    # Keep one per stem, preferring the least-lossy source available.
+    PREF = {".png": 0, ".tif": 1, ".tiff": 1, ".nef": 2, ".cr2": 2, ".arw": 2, ".dng": 2,
+            ".heic": 3, ".jpg": 4, ".jpeg": 4, ".webp": 5}
+    best = {}
+    for f in sorted(src.iterdir()):
+        if not f.is_file() or f.suffix.lower() not in READABLE:
+            continue
+        key = f.stem.upper()
+        if key not in best or PREF.get(f.suffix.lower(), 9) < PREF.get(best[key].suffix.lower(), 9):
+            best[key] = f
+    files = [best[k] for k in sorted(best)]
 
     matched, unmatched, noface = [], [], []
     for f in files:
@@ -117,7 +109,7 @@ def main():
     out = Path(args.out)
     for code, f in matched:
         if args.build:
-            if not to_square_webp(f, out / f"{code}.webp"):
+            if not to_card_webp(f, out / f"{code}.webp"):
                 noface.append(code)
 
     print(f"source        {len(files)} readable file(s) in {src}")
@@ -135,7 +127,7 @@ def main():
             print(f"  {f.name}  (read as '{code}')")
 
     if noface:
-        print(f"\nno face found  {len(noface)} — centre-cropped, check these by eye")
+        print(f"\nno transparency {len(noface)} — these still carry their background")
         print("  " + "  ".join(noface))
 
     have = {c for c, _ in matched}
