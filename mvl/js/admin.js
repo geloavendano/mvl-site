@@ -37,6 +37,7 @@ const raffleWinnerView = document.getElementById('raffleWinnerView');
 const raffleDrawCount = document.getElementById('raffleDrawCount');
 const raffleDrawPool = document.getElementById('raffleDrawPool');
 const raffleDrawCountdown = document.getElementById('raffleDrawCountdown');
+const raffleWinnerPhotoFrame = document.getElementById('raffleWinnerPhotoFrame');
 const raffleWinnerPhoto = document.getElementById('raffleWinnerPhoto');
 const raffleWinnerPhotoFallback = document.getElementById('raffleWinnerPhotoFallback');
 const raffleWinnerName = document.getElementById('raffleWinnerName');
@@ -407,6 +408,12 @@ const renderRaffleRoulette = (pool, winner) => {
 };
 const revealRaffleWinner = (winner) => {
   currentRaffleWinner = winner;
+  const winnerTeam = teams[winner.teamId];
+  const [winnerStart, winnerEnd] = raffleGradient(winner.teamId);
+  const winnerBackground = winnerTeam?.bg?.replace(/["'\\\n\r]/g, '');
+  raffleWinnerPhotoFrame.style.setProperty('--raffle-winner-start', winnerStart);
+  raffleWinnerPhotoFrame.style.setProperty('--raffle-winner-end', winnerEnd);
+  raffleWinnerPhotoFrame.style.setProperty('--raffle-winner-bg', winnerBackground ? `url("${winnerBackground}")` : 'none');
   raffleDrawTitle.textContent = 'We have a winner!';
   raffleDrawingView.classList.add('is-hidden');
   raffleDrawingView.classList.remove('is-animating');
