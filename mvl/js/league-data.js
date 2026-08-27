@@ -69,9 +69,10 @@ window.MVL_DATA = {
     { name: "Western Appliances", tier: 'Major Sponsors', order: 12, logo: '/mvl/assets/Sponsor Logos/Major Sponsors/Western Appliances.png' },
 
     { name: "Mang Juan", tier: 'Minor Sponsors', order: 1, logo: '/mvl/assets/Sponsor Logos/Minor Sponsors/Mang Juan.PNG' },
-    { name: "Nature's Spring", tier: 'Minor Sponsors', order: 2, logo: '/mvl/assets/Sponsor Logos/Minor Sponsors/Natures Spring-Logo-TransparentBG-(Low Resolution).png' },
-    { name: "Potato Corner", tier: 'Minor Sponsors', order: 3, logo: '/mvl/assets/Sponsor Logos/Minor Sponsors/Potato Corner PPS Logo.png' },
-    { name: "Samgyupsalamat", tier: 'Minor Sponsors', order: 4, logo: '/mvl/assets/Sponsor Logos/Minor Sponsors/Samgyupsalamat Logo.png' },
+    { name: "Monster Energy", tier: 'Minor Sponsors', order: 2, logo: '/mvl/assets/Sponsor Logos/Minor Sponsors/Monster Energy.png' },
+    { name: "Nature's Spring", tier: 'Minor Sponsors', order: 3, logo: '/mvl/assets/Sponsor Logos/Minor Sponsors/Natures Spring-Logo-TransparentBG-(Low Resolution).png' },
+    { name: "Potato Corner", tier: 'Minor Sponsors', order: 4, logo: '/mvl/assets/Sponsor Logos/Minor Sponsors/Potato Corner PPS Logo.png' },
+    { name: "Samgyupsalamat", tier: 'Minor Sponsors', order: 5, logo: '/mvl/assets/Sponsor Logos/Minor Sponsors/Samgyupsalamat Logo.png' },
   ],
 
   // ---- Raffle prizes (shown on /checkin) -----------------------------------
