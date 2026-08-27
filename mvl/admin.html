@@ -4,7 +4,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><title>MVL Admin</title>
 <link rel="icon" type="image/svg+xml" href="/mvl/assets/metarice-icon.svg">
-<link rel="stylesheet" href="/mvl/css/style.css?v=raffle-winner">
+<link rel="stylesheet" href="/mvl/css/style.css?v=raffle-roulette">
 </head>
 <body class="admin-page">
 <header class="admin-topbar"><a href="/mvl/index.html"><img src="/mvl/assets/hero-mvl-2026-logo.png" alt="MVL 2026"></a><button id="signOutBtn" class="admin-link is-hidden" type="button">Sign out</button></header>
@@ -141,7 +141,7 @@
     <div class="admin-raffle-dialog-head"><div><p>MVL raffle draw</p><h2 id="raffleDrawTitle">Drawing a winner</h2></div><form method="dialog"><button class="admin-contact-close" type="submit" aria-label="Close raffle draw">×</button></form></div>
     <section id="raffleDrawingView" class="admin-raffle-drawing" aria-live="polite">
       <p>Drawing from <strong id="raffleDrawCount">0</strong> eligible entries</p>
-      <div class="admin-raffle-name-stage"><div id="raffleDrawPool" class="admin-raffle-name-pool" aria-hidden="true"></div><strong id="raffleDrawTicker" class="admin-raffle-ticker">Preparing names…</strong></div>
+      <div class="admin-raffle-roulette" aria-hidden="true"><div id="raffleDrawPool" class="admin-raffle-roulette-track"></div><span class="admin-raffle-roulette-marker"></span></div>
       <div class="admin-raffle-progress" aria-hidden="true"><span></span></div>
       <p id="raffleDrawCountdown">Winner in 5 seconds</p>
     </section>
@@ -159,5 +159,5 @@
     </section>
   </div>
 </dialog>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/mvl/js/supabase-config.js?v=stream-guide"></script><script src="/mvl/js/league-data.js?v=open-0826"></script><script src="/mvl/js/admin.js?v=raffle-winner"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/mvl/js/supabase-config.js?v=stream-guide"></script><script src="/mvl/js/league-data.js?v=open-0826"></script><script src="/mvl/js/admin.js?v=raffle-roulette"></script>
 </body></html>

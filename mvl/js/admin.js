@@ -36,7 +36,6 @@ const raffleDrawingView = document.getElementById('raffleDrawingView');
 const raffleWinnerView = document.getElementById('raffleWinnerView');
 const raffleDrawCount = document.getElementById('raffleDrawCount');
 const raffleDrawPool = document.getElementById('raffleDrawPool');
-const raffleDrawTicker = document.getElementById('raffleDrawTicker');
 const raffleDrawCountdown = document.getElementById('raffleDrawCountdown');
 const raffleWinnerPhoto = document.getElementById('raffleWinnerPhoto');
 const raffleWinnerPhotoFallback = document.getElementById('raffleWinnerPhotoFallback');
@@ -46,7 +45,7 @@ const raffleWinnerFurparent = document.getElementById('raffleWinnerFurparent');
 const raffleWinnerForm = document.getElementById('raffleWinnerForm');
 let rafflePlayerRequest = 0;
 let raffleDrawToken = 0;
-let raffleTickerInterval = null;
+let raffleSpinFrame = null;
 let currentRaffleWinner = null;
 const adminTabs = [...document.querySelectorAll('[data-admin-tab]')];
 const adminTabPanels = [...document.querySelectorAll('[data-admin-panel]')];
@@ -362,18 +361,49 @@ const loadRaffleBlacklist = async () => {
 };
 const clearRaffleAnimation = () => {
   raffleDrawToken += 1;
-  if (raffleTickerInterval) window.clearInterval(raffleTickerInterval);
-  raffleTickerInterval = null;
+  if (raffleSpinFrame) window.cancelAnimationFrame(raffleSpinFrame);
+  raffleSpinFrame = null;
+  raffleDrawPool.style.transition = 'none';
   raffleDrawingView.classList.remove('is-animating');
 };
-const renderRaffleNamePool = (pool) => {
-  const names = [...new Set(pool)].slice(0, 36);
-  raffleDrawPool.innerHTML = names.map((name, index) => {
-    const x = 7 + ((index * 37) % 82);
-    const y = 8 + ((index * 53) % 78);
-    const delay = -((index % 12) * .17).toFixed(2);
-    return `<span style="--pool-x:${x}%;--pool-y:${y}%;--pool-delay:${delay}s">${escapeHtml(name)}</span>`;
+const rafflePoolEntry = (entry) => typeof entry === 'string'
+  ? { playerName: entry, teamId: '', teamName: '' }
+  : {
+    playerName: entry?.playerName || 'Player',
+    teamId: entry?.teamId || '',
+    teamName: entry?.teamName || teams[entry?.teamId]?.name || '',
+  };
+const shuffleRaffleEntries = (entries) => {
+  const shuffled = [...entries];
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+  }
+  return shuffled;
+};
+const raffleGradient = (teamId) => {
+  const fallback = ['#475467', '#25324a'];
+  const gradient = teams[teamId]?.grad || fallback;
+  return gradient.map((color, index) => (/^#[0-9a-f]{6}$/i.test(color || '') ? color : fallback[index]));
+};
+const renderRaffleRoulette = (pool, winner) => {
+  const entries = pool.map(rafflePoolEntry);
+  const visualRows = [];
+  const rowCount = Math.max(42, Math.min(70, entries.length * 2));
+  while (visualRows.length < rowCount) {
+    visualRows.push(...shuffleRaffleEntries(entries));
+  }
+  visualRows.length = rowCount;
+  const winnerIndex = visualRows.length;
+  visualRows.push(rafflePoolEntry(winner));
+  visualRows.push(entries[Math.floor(Math.random() * entries.length)] || rafflePoolEntry(winner));
+  raffleDrawPool.innerHTML = visualRows.map((entry, index) => {
+    const [start, end] = raffleGradient(entry.teamId);
+    return `<div class="admin-raffle-roulette-row${index === winnerIndex ? ' is-winner' : ''}" style="--raffle-start:${start};--raffle-end:${end}"><strong>${escapeHtml(entry.playerName)}</strong><span>${escapeHtml(entry.teamName)}</span></div>`;
   }).join('');
+  const rowHeight = 64;
+  const viewportHeight = 192;
+  return (viewportHeight / 2) - (rowHeight / 2) - (winnerIndex * rowHeight);
 };
 const revealRaffleWinner = (winner) => {
   currentRaffleWinner = winner;
@@ -408,28 +438,29 @@ const animateRaffleDraw = async (payload) => {
   currentRaffleWinner = null;
   raffleDrawTitle.textContent = 'Drawing a winner';
   raffleDrawCount.textContent = payload.entryCount;
-  raffleDrawTicker.textContent = pool[0] || 'Preparing names…';
   raffleDrawCountdown.textContent = 'Winner in 5 seconds';
   raffleWinnerView.classList.add('is-hidden');
   raffleDrawingView.classList.remove('is-hidden');
   raffleDrawingView.classList.remove('is-animating');
   void raffleDrawingView.offsetWidth;
   raffleDrawingView.classList.add('is-animating');
-  renderRaffleNamePool(pool);
+  const rouletteOffset = renderRaffleRoulette(pool, payload.winner);
+  raffleDrawPool.style.transition = 'none';
+  raffleDrawPool.style.transform = 'translateY(0)';
   if (!raffleDrawDialog.open) raffleDrawDialog.showModal();
-
-  let tickerIndex = 0;
-  raffleTickerInterval = window.setInterval(() => {
-    tickerIndex = (tickerIndex + 7) % pool.length;
-    raffleDrawTicker.textContent = pool[tickerIndex];
-  }, 90);
+  void raffleDrawPool.offsetHeight;
+  raffleSpinFrame = window.requestAnimationFrame(() => {
+    raffleDrawPool.style.transition = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      ? 'none'
+      : 'transform 5s cubic-bezier(.12,.72,.08,1)';
+    raffleDrawPool.style.transform = `translateY(${rouletteOffset}px)`;
+  });
   for (let remaining = 5; remaining > 0; remaining -= 1) {
     raffleDrawCountdown.textContent = `Winner in ${remaining} second${remaining === 1 ? '' : 's'}`;
     await new Promise((resolve) => window.setTimeout(resolve, 1000));
     if (token !== raffleDrawToken || !raffleDrawDialog.open) return;
   }
-  if (raffleTickerInterval) window.clearInterval(raffleTickerInterval);
-  raffleTickerInterval = null;
+  raffleSpinFrame = null;
   revealRaffleWinner(payload.winner);
 };
 const readinessCount = (count, total, completeClass = true) => {
