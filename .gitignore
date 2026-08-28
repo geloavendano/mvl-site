@@ -18,3 +18,7 @@ mvl/assets/player-photos/
 # Roster reveal masters: 2160x2700 PNGs, ~97MB. scripts build the WebPs in
 # mvl/assets/teams/roster/, which is what the lightbox loads.
 mvl/assets/team-photos/
+
+# Scratch and working files. Holds DB exports with participant emails and
+# phone numbers — must never be committed.
+tmp/
