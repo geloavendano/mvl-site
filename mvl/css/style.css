@@ -5322,12 +5322,11 @@ body.checkin-complete { overflow: hidden; }
 
 /* ==========================================================================
    Schedule card header — time and court
-   The card used to lead with three mono chips: a status ("Upcoming"), the
-   time, and the full venue. The status only repeated what the winner pill
-   below already says, and every game is at Gameville Ball Park, so the venue
-   was the same on every card. What is left is the two facts someone actually
-   scans for, in the display face rather than 9px microcopy.
-   Declared here, after the wide-screen grid above, so the row survives it.
+   The card used to lead with three mono chips at 9px: a status, the time and
+   the full venue. The status only repeated the winner pill below, and every
+   game is at Gameville Ball Park, so the venue read the same on all forty
+   cards. What is left is the two facts someone scans for.
+   Declared after the wide-screen grid above so these win.
    ========================================================================== */
 .match-meta {
   display: flex;
@@ -5335,6 +5334,8 @@ body.checkin-complete { overflow: hidden; }
   align-items: stretch;
   gap: 10px;
 }
+/* Narrow: .match-meta spans the full card width, so the pair reads as a header
+   row — time anchored left, court right. */
 .match-when {
   display: flex;
   align-items: baseline;
@@ -5343,11 +5344,11 @@ body.checkin-complete { overflow: hidden; }
 }
 .match-meta .match-time,
 .match-meta .match-court {
-  font-family: 'STRRETCH Sans Free', var(--ui);
-  font-weight: 700;
-  font-size: clamp(19px, 4.4vw, 26px);
-  line-height: 1;
-  letter-spacing: .06em;
+  font-family: var(--ui);
+  font-weight: 800;
+  font-size: clamp(18px, 3.6vw, 22px);
+  line-height: 1.05;
+  letter-spacing: .04em;
   text-transform: uppercase;
   color: var(--mint);
   /* these inherited the chip treatment from .match-meta span */
@@ -5358,6 +5359,20 @@ body.checkin-complete { overflow: hidden; }
 }
 /* the court is the secondary of the pair — same face, stepped back */
 .match-meta .match-court {
-  text-align: right;
-  color: color-mix(in srgb, var(--mint) 70%, transparent);
+  font-size: clamp(14px, 2.8vw, 17px);
+  color: color-mix(in srgb, var(--mint) 68%, transparent);
+}
+
+@media (min-width: 960px) {
+  /* Desktop turns .match-meta into a fixed 190px rail — 154px of content once
+     padding is off. A side-by-side pair does not fit there at display sizes and
+     overflowed the column, so the rail stacks instead. */
+  .match-when {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 4px;
+  }
+  .match-meta .match-time { font-size: 24px; }
+  .match-meta .match-court { font-size: 16px; text-align: left; }
 }
