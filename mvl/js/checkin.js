@@ -69,69 +69,21 @@ if (raffleMechanics && raffle?.mechanics?.length) {
 }
 
 // ---- poster lightbox ---------------------------------------------------------
-// Fit-to-screen by default, one tap to go to natural size. When zoomed the
-// stage scrolls, so panning is drag-to-scroll rather than a transform matrix —
-// that keeps momentum scrolling and pinch-zoom native on touch.
-const lightbox = el('prizeLightbox');
-const lightboxImg = el('lightboxImg');
-const lightboxStage = el('lightboxStage');
-const lightboxHint = el('lightboxHint');
-
-const setZoom = (on) => {
-  lightbox.classList.toggle('is-zoomed', on);
-  lightboxHint.textContent = on ? 'Drag to pan · tap to fit' : 'Tap the poster to zoom';
-  if (!on) { lightboxStage.scrollTop = 0; lightboxStage.scrollLeft = 0; }
-};
-
-const openLightbox = (src, label) => {
-  lightboxImg.src = src;
-  lightboxImg.alt = label;
-  setZoom(false);
-  if (typeof lightbox.showModal === 'function') lightbox.showModal();
-  else lightbox.setAttribute('open', '');
-};
+// Behaviour lives in lightbox.js, shared with the roster reveals on the landing
+// page so the two cannot drift.
+const posterLightbox = window.createLightbox({
+  dialog: el('prizeLightbox'),
+  img: el('lightboxImg'),
+  stage: el('lightboxStage'),
+  hint: el('lightboxHint'),
+  fitHint: 'Tap the poster to zoom',
+});
 
 el('prizeGrid')?.addEventListener('click', (event) => {
   const trigger = event.target.closest('[data-poster]');
   if (!trigger) return;
-  openLightbox(trigger.dataset.poster, trigger.dataset.posterLabel || '');
+  posterLightbox?.open(trigger.dataset.poster, trigger.dataset.posterLabel || '');
 });
-
-lightboxImg.addEventListener('click', () => setZoom(!lightbox.classList.contains('is-zoomed')));
-
-lightbox.addEventListener('click', (event) => {
-  if (event.target.closest('[data-lightbox-close]')) { lightbox.close(); return; }
-  // the ::backdrop and the stage's own padding both register on those elements,
-  // never on the image — so a click there means "outside the poster"
-  if (event.target === lightbox || event.target === lightboxStage) lightbox.close();
-});
-
-// Release the decoded image rather than holding both posters in memory. The
-// close event is queued as a task, not fired synchronously, so a quick
-// close-then-reopen would land this after the new src was set and blank the
-// poster — hence the guard.
-lightbox.addEventListener('close', () => {
-  if (!lightbox.open) lightboxImg.removeAttribute('src');
-});
-
-// Drag-to-pan. Pointer events cover mouse, pen and single-finger touch; a
-// second finger falls through to the browser's own pinch-zoom.
-let panning = false;
-let panFrom = { x: 0, y: 0, left: 0, top: 0 };
-lightboxStage.addEventListener('pointerdown', (event) => {
-  if (!lightbox.classList.contains('is-zoomed') || event.button) return;
-  panning = true;
-  panFrom = { x: event.clientX, y: event.clientY, left: lightboxStage.scrollLeft, top: lightboxStage.scrollTop };
-});
-lightboxStage.addEventListener('pointermove', (event) => {
-  if (!panning) return;
-  lightboxStage.scrollLeft = panFrom.left - (event.clientX - panFrom.x);
-  lightboxStage.scrollTop = panFrom.top - (event.clientY - panFrom.y);
-});
-const endPan = () => { panning = false; };
-lightboxStage.addEventListener('pointerup', endPan);
-lightboxStage.addEventListener('pointercancel', endPan);
-lightboxStage.addEventListener('pointerleave', endPan);
 
 // ---- game-day gate (Manila) --------------------------------------------------
 // The client gate only decides what to show. The server re-checks the day on

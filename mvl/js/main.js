@@ -45,10 +45,30 @@ if (teamsGrid) {
     <div class="team-card-shards" aria-hidden="true"></div>
     <div class="team-card-copy">
       <h3 class="team-card-name">${team.name}</h3>
-    </div>
+    </div>${team.roster ? `
+    <button class="team-card-hit" type="button"
+            data-roster="${team.roster}" data-roster-label="${team.name} roster">
+      <span class="sr-only">View the ${team.name} roster</span>
+    </button>` : ''}
   </article>
   `).join('');
 }
+
+// ---- roster reveal lightbox -------------------------------------------------
+// Same component as the prize posters on the check-in page (see lightbox.js).
+const rosterLightbox = window.createLightbox?.({
+  dialog: document.getElementById('rosterLightbox'),
+  img: document.getElementById('rosterLightboxImg'),
+  stage: document.getElementById('rosterLightboxStage'),
+  hint: document.getElementById('rosterLightboxHint'),
+  fitHint: 'Tap the roster to zoom',
+});
+
+teamsGrid?.addEventListener('click', (event) => {
+  const trigger = event.target.closest('[data-roster]');
+  if (!trigger) return;
+  rosterLightbox?.open(trigger.dataset.roster, trigger.dataset.rosterLabel || '');
+});
 
 // ---- fit: team names to their rail -----------------------------------------
 // The rail length varies per bento slot, so no single font-size fits every

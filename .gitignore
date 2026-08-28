@@ -14,3 +14,7 @@ scripts/bin/facebox
 # scripts/player-photos.py builds from these and uploads the WebPs to the
 # mvl-player-photos Supabase bucket, which is what the pages actually fetch.
 mvl/assets/player-photos/
+
+# Roster reveal masters: 2160x2700 PNGs, ~97MB. scripts build the WebPs in
+# mvl/assets/teams/roster/, which is what the lightbox loads.
+mvl/assets/team-photos/

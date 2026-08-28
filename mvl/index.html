@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/mvl/css/style.css?v=fg-cluster">
+<link rel="stylesheet" href="/mvl/css/style.css?v=roster-lightbox">
 <script src="/mvl/js/site-config.js?v=cutover-gameday"></script>
 <script src="/mvl/js/analytics.js?v=fg-cluster"></script>
 <script src="/mvl/js/nav.js?v=fg-cluster"></script>
@@ -25,7 +25,7 @@
     <a href="/mvl/schedule.html">Schedule</a>
     <a href="/mvl/videos.html">Videos</a>
     <a href="/mvl/rules.html">Rules</a>
-    <a href="/mvl/waiver.html">Waiver</a>
+    <a href="/mvl/index.html#teams">Teams</a>
     <a href="/mvl/checkin.html">Check-In</a>
   </nav>
 </header>
@@ -201,6 +201,18 @@
   <div class="teams-grid" id="teamsGrid"><!-- rendered by js --></div>
 </section>
 
+<!-- Roster reveals are 4:5 posters with the line-up set small, so zoom is the
+     point rather than a nicety — same component as the prize posters. -->
+<dialog class="lightbox" id="rosterLightbox" aria-label="Team roster">
+  <button class="lightbox-close" type="button" data-lightbox-close aria-label="Close">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.3 5.71 12 12l6.3 6.29-1.42 1.42L10.59 13.4 4.3 19.71 2.88 18.3 9.17 12 2.88 5.71 4.3 4.29l6.29 6.3 6.29-6.3z"/></svg>
+  </button>
+  <div class="lightbox-stage" id="rosterLightboxStage">
+    <img id="rosterLightboxImg" alt="">
+  </div>
+  <p class="lightbox-hint" id="rosterLightboxHint"></p>
+</dialog>
+
 </div><!-- /.poster-flow -->
 
 <div class="marquee" aria-label="Minor sponsors">
@@ -277,6 +289,7 @@
 </footer>
 
 <script src="/mvl/js/league-data.js?v=cutover-gameday"></script>
+<script src="/mvl/js/lightbox.js?v=roster-lightbox"></script>
 <script src="/mvl/js/marquee.js?v=fg-cluster"></script>
 <script src="/mvl/js/supabase-config.js?v=fg-cluster"></script>
 <!-- data-version is the cache key for the entry script public-data.js
@@ -284,7 +297,7 @@
      this has to change: a returning visitor holding the old main.js under
      the previous key would load it alongside marquee.js and hit duplicate
      top-level declarations, killing the whole entry script. -->
-<script src="/mvl/js/public-data.js?v=fg-cluster" data-entry="main" data-version="strepsils"></script>
+<script src="/mvl/js/public-data.js?v=fg-cluster" data-entry="main" data-version="roster-lightbox"></script>
 <script src="/mvl/js/faq.js?v=fg-cluster"></script>
 </body>
 </html>
