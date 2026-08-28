@@ -83,13 +83,10 @@ window.MVL_DATA = {
   //   drawn   optional. When this tier is drawn, shown under the caption.
   // Set to [] to hide the prize section entirely.
   raffle: {
-    // Dates (Asia/Manila, YYYY-MM-DD) when check-in is open even though no game
-    // is scheduled. Mirrors mvl.raffle_open_dates in Supabase, which is the
-    // authority — this list only decides whether the form is shown.
-    // TEMP: client testing window. Mirrors mvl.raffle_open_dates, and the
-    // venue radius on Court 1 is temporarily widened to 2km to match.
-    // Remove these dates and reset the radius to 500m when testing is done.
-    openDates: ['2026-07-31', '2026-08-01', '2026-08-02', '2026-08-11', '2026-08-19', '2026-08-24', '2026-08-26'],
+    // Dates (Asia/Manila, YYYY-MM-DD) when check-in is open. Mirrors
+    // mvl.raffle_open_dates in Supabase, which is the authority — this list
+    // only decides whether the form is shown. These are the five game days.
+    openDates: ['2026-08-29', '2026-08-30', '2026-08-31', '2026-09-05', '2026-09-06'],
     headline: "Start today's winning streak",
     // Ties the draw to the games rather than selling it on its own: checking in
     // is how you take part in game day, and the raffle rides along with it.

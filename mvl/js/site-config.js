@@ -9,6 +9,6 @@
 // Add the GA4 Measurement ID once the Google Analytics web stream is ready.
 // Example: gaMeasurementId: 'G-XXXXXXXXXX'
 window.MVL_SITE = {
-  phase: 'registration',
+  phase: 'gameday',
   gaMeasurementId: 'G-4150LLQDCJ',
 };
