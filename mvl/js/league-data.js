@@ -29,7 +29,7 @@ window.MVL_DATA = {
   // diamond between them and a tighter gap — for a brand house shown under
   // its parent. The separator returns after the last member.
   sponsors: [
-    { name: "Converge SuperFiberX", tier: 'Powered by', order: 1, logo: '/mvl/assets/Sponsor Logos/Official Partners/Converge.png' },
+    { name: "Converge SuperFiberX", tier: 'Powered by', order: 1, logo: '/mvl/assets/Sponsor Logos/Official Partners/Converge_FiberX_White Color.png' },
 
     { name: "AquaFlask", tier: 'Official Partners', order: 1, logo: '/mvl/assets/Sponsor Logos/Official Partners/AQUAFLASK_WHITE (left).png' },
     { name: "Durex", tier: 'Official Partners', order: 2, logo: '/mvl/assets/Sponsor Logos/Official Partners/Durex.png' },
