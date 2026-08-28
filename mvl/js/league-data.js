@@ -5,8 +5,8 @@ window.MVL_DATA = {
     youtubeId: '',
     isLive: false,
     streams: [
-      { court: 'Court 1', youtubeUrl: 'https://www.youtube.com/', youtubeId: '', isLive: false },
-      { court: 'Court 2', youtubeUrl: 'https://www.youtube.com/', youtubeId: '', isLive: false },
+      { court: 'Left Court', youtubeUrl: 'https://www.youtube.com/', youtubeId: '', isLive: false },
+      { court: 'Right Court', youtubeUrl: 'https://www.youtube.com/', youtubeId: '', isLive: false },
     ],
   },
 
