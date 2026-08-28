@@ -5326,17 +5326,15 @@ body.checkin-complete { overflow: hidden; }
    the full venue. The status only repeated the winner pill below, and every
    game is at Gameville Ball Park, so the venue read the same on all forty
    cards. What is left is the two facts someone scans for.
-   Declared after the wide-screen grid above so these win.
+
+   .match-meta keeps its own layout — a wrapping flex row when narrow, a grid
+   in the 190px rail on desktop. .match-when claims a full row inside it the
+   same way .match-stage does, rather than the container being restructured:
+   .match-stage is `flex: 0 0 100%`, which in a column container sets its
+   HEIGHT to 100% and swallowed the rail on playoff cards.
    ========================================================================== */
-.match-meta {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 10px;
-}
-/* Narrow: .match-meta spans the full card width, so the pair reads as a header
-   row — time anchored left, court right. */
 .match-when {
+  flex: 0 0 100%;
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -5364,15 +5362,16 @@ body.checkin-complete { overflow: hidden; }
 }
 
 @media (min-width: 960px) {
-  /* Desktop turns .match-meta into a fixed 190px rail — 154px of content once
-     padding is off. A side-by-side pair does not fit there at display sizes and
-     overflowed the column, so the rail stacks instead. */
+  /* The rail is a fixed 190px track — 154px of content once padding is off.
+     A side-by-side pair does not fit there at display sizes, so it stacks;
+     and it spans both grid columns like .match-stage above it. */
   .match-when {
+    grid-column: 1 / -1;
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
     gap: 4px;
   }
   .match-meta .match-time { font-size: 24px; }
-  .match-meta .match-court { font-size: 16px; text-align: left; }
+  .match-meta .match-court { font-size: 16px; }
 }
