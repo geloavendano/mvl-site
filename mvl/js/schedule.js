@@ -206,12 +206,9 @@ const scoreLine = (game, teamId) => {
   }).join('');
 };
 
-const gameStatus = (game) => {
-  if (game.status === 'final') return 'Final';
-  const now = new Date();
-  const startsAt = new Date(game.startsAt);
-  return startsAt > now ? 'Upcoming' : 'Pending';
-};
+// Venue names arrive as "Gameville Ball Park · Court 1". Every game is at
+// the same venue, so only the court half earns its place on the card.
+const courtLabel = (venue) => (venue || '').split('·').pop().trim();
 
 const renderMatches = () => {
   const gamesForDay = games
@@ -254,9 +251,10 @@ const renderMatches = () => {
               <small>${playoffNote.matchup}</small>
             </div>
           ` : ''}
-          <span>${gameStatus(game)}</span>
-          <span>${formatTime(game.startsAt)}</span>
-          <span>${game.court}</span>
+          <div class="match-when">
+            <span class="match-time">${formatTime(game.startsAt)}</span>
+            <span class="match-court">${escapeHtml(courtLabel(game.court))}</span>
+          </div>
         </div>
 
         <div class="match-teams">

@@ -2211,9 +2211,6 @@ html[data-phase='gameday'] .nav-links a[data-phase='registration'] { display: no
   .match-stage {
     grid-column: 1 / -1;
   }
-  .match-meta > span:last-child {
-    grid-column: 1 / -1;
-  }
   .match-teams {
     padding: 18px;
     align-items: center;
@@ -5322,3 +5319,45 @@ body.checkin-complete { overflow: hidden; }
 .admin-raffle-winner-photo::after{content:'';position:absolute;z-index:1;inset:0;border:1px solid rgba(255,255,255,.22);border-radius:inherit;pointer-events:none;box-shadow:inset 0 -42px 58px color-mix(in srgb,var(--raffle-winner-end,#25324a) 34%,transparent)}
 .admin-raffle-winner-photo img{position:relative;z-index:1;width:88%;height:94%;margin-top:auto;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 8px 10px rgba(16,24,40,.28))}
 .admin-raffle-winner-photo span{position:relative;z-index:2;margin:16px;padding:8px 10px;border-radius:8px;background:rgba(16,24,40,.58);color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.4)}
+
+/* ==========================================================================
+   Schedule card header — time and court
+   The card used to lead with three mono chips: a status ("Upcoming"), the
+   time, and the full venue. The status only repeated what the winner pill
+   below already says, and every game is at Gameville Ball Park, so the venue
+   was the same on every card. What is left is the two facts someone actually
+   scans for, in the display face rather than 9px microcopy.
+   Declared here, after the wide-screen grid above, so the row survives it.
+   ========================================================================== */
+.match-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+.match-when {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.match-meta .match-time,
+.match-meta .match-court {
+  font-family: 'STRRETCH Sans Free', var(--ui);
+  font-weight: 700;
+  font-size: clamp(19px, 4.4vw, 26px);
+  line-height: 1;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--mint);
+  /* these inherited the chip treatment from .match-meta span */
+  background: none;
+  border: 0;
+  padding: 0;
+  border-radius: 0;
+}
+/* the court is the secondary of the pair — same face, stepped back */
+.match-meta .match-court {
+  text-align: right;
+  color: color-mix(in srgb, var(--mint) 70%, transparent);
+}
