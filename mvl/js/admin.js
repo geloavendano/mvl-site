@@ -134,8 +134,9 @@ const call = async (path, body, token = session?.access_token) => {
   return json;
 };
 const rpc = (name, body) => call(`/rest/v1/rpc/${name}`, body);
+const courtDisplayOrigin = window.location.hostname === 'www.metaricevolley.ph' ? 'https://metaricevolley.ph' : window.location.origin;
 const scoreboardUrls = (board) => ({
-  court: `${window.location.origin}/mvl/scoreboard-court?board=${encodeURIComponent(board.id)}`,
+  court: `${courtDisplayOrigin}/mvl/scoreboard-court?board=${encodeURIComponent(board.publicCode || board.id)}`,
   obs: `${window.location.origin}/mvl/scoreboard?board=${encodeURIComponent(board.id)}`,
   control: `${window.location.origin}/mvl/scoreboard-control?board=${encodeURIComponent(board.id)}&key=${encodeURIComponent(board.controlToken)}`,
 });
@@ -162,14 +163,11 @@ const renderScoreboards = (boards) => {
         <div><strong>${escapeHtml(board.name)}</strong><span>${board.game ? `Game: ${escapeHtml(board.game.id)} · Set ${board.currentSet} · ` : ''}Updated ${escapeHtml(new Date(board.updatedAt).toLocaleString('en-PH'))}</span></div>
         <div class="admin-scoreboard-score"><span style="--team-color:${escapeHtml(board.leftTeam.colorB)}">${escapeHtml(board.leftTeam.name)} <b>${board.leftScore}</b></span><i>–</i><span style="--team-color:${escapeHtml(board.rightTeam.colorB)}"><b>${board.rightScore}</b> ${escapeHtml(board.rightTeam.name)}</span></div>
       </div>
-      <div class="admin-scoreboard-court-actions">
-        <a class="cta cta--primary" href="${escapeHtml(urls.court)}" target="_blank" rel="noopener">Open court display</a>
-        <button class="cta cta--secondary" type="button" data-copy-url="${escapeHtml(urls.court)}" data-copy-label="Court display">Copy court link</button>
-      </div>
       <div class="admin-scoreboard-actions">
         <a class="cta cta--primary" href="${escapeHtml(urls.control)}" target="_blank" rel="noopener">Manage</a>
         <button class="cta cta--secondary" type="button" data-copy-url="${escapeHtml(urls.obs)}" data-copy-label="OBS">Copy OBS link</button>
         <button class="cta cta--secondary" type="button" data-copy-url="${escapeHtml(urls.control)}" data-copy-label="Control">Copy control link</button>
+        <button class="cta cta--secondary" type="button" data-copy-url="${escapeHtml(urls.court)}" data-copy-label="Court display">Copy court link</button>
       </div>
       <p class="form-status"></p>
     </article>`;

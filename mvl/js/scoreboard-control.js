@@ -203,6 +203,17 @@ const copyObsLink = async () => {
     window.prompt('Copy this OBS link:', url);
   }
 };
+const copyCourtLink = async () => {
+  const publicCode = currentBoard?.publicCode || boardId;
+  const origin = window.location.hostname === 'www.metaricevolley.ph' ? 'https://metaricevolley.ph' : window.location.origin;
+  const url = `${origin}/mvl/scoreboard-court?board=${encodeURIComponent(publicCode)}`;
+  try {
+    await navigator.clipboard.writeText(url);
+    setStatus('Court link copied', 'success');
+  } catch {
+    window.prompt('Copy this court display link:', url);
+  }
+};
 
 const teamOptions = window.MVL_DATA.teams.map((team) => `<option value="${team.id}">${team.name}</option>`).join('');
 leftTeamSelect.innerHTML = teamOptions;
@@ -245,6 +256,7 @@ document.getElementById('resetScoresBtn').addEventListener('click', () => {
   if (window.confirm('Reset both scores to zero? Set wins will stay unchanged.')) runAction('reset-scores');
 });
 document.getElementById('copyObsBtn').addEventListener('click', copyObsLink);
+document.getElementById('copyCourtBtn').addEventListener('click', copyCourtLink);
 
 refresh(true).then(loadGames).catch(showError);
 window.setInterval(() => refresh(false), 900);

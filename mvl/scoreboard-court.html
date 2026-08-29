@@ -6,15 +6,11 @@
   <meta name="robots" content="noindex,nofollow">
   <title>MVL Court Scoreboard</title>
   <link rel="icon" type="image/svg+xml" href="/mvl/assets/metarice-icon.svg">
-  <link rel="stylesheet" href="/mvl/css/scoreboard-court.css?v=court-display">
+  <link rel="stylesheet" href="/mvl/css/scoreboard-court.css?v=score-focus">
 </head>
 <body>
   <main class="court-stage" aria-live="polite">
-    <header class="court-header">
-      <img src="/mvl/assets/hero-mvl-2026-logo.png" alt="Metarice Volleyball League 2026">
-      <div><p>Live court scoreboard</p><h1 id="boardName">Connecting…</h1></div>
-      <div class="court-context"><strong id="currentSetLabel">Set 1</strong><span id="gameContext">Waiting for match details</span></div>
-    </header>
+    <img class="court-logo" src="/mvl/assets/hero-mvl-2026-logo.png" alt="Metarice Volleyball League 2026">
 
     <section id="courtScoreboard" class="court-scoreboard is-loading" aria-label="Current match score">
       <article id="leftTeamPanel" class="court-team-panel">
@@ -41,7 +37,7 @@
   </main>
   <script src="/mvl/js/supabase-config.js?v=fg-cluster"></script>
   <script src="/mvl/js/league-data.js?v=courts-original"></script>
-  <script src="/mvl/js/scoreboard-court.js?v=court-display"></script>
+  <script src="/mvl/js/scoreboard-court.js?v=short-court-links"></script>
   <script src="/mvl/js/marquee.js?v=full-roster"></script>
 </body>
 </html>

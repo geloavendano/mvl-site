@@ -6,9 +6,6 @@ const setScores = document.getElementById('setScores');
 let lastUpdate = '';
 
 const elements = {
-  boardName: document.getElementById('boardName'),
-  gameContext: document.getElementById('gameContext'),
-  currentSetLabel: document.getElementById('currentSetLabel'),
   leftPanel: document.getElementById('leftTeamPanel'),
   rightPanel: document.getElementById('rightTeamPanel'),
   leftName: document.getElementById('leftName'),
@@ -73,9 +70,6 @@ const renderSetScores = (board) => {
 const render = (board) => {
   if (lastUpdate === board.updatedAt) return;
   lastUpdate = board.updatedAt;
-  elements.boardName.textContent = board.name;
-  elements.currentSetLabel.textContent = `Set ${board.currentSet || 1}`;
-  elements.gameContext.textContent = board.game ? `Day ${board.game.day} · ${board.game.court}` : 'Live court scoreboard';
   elements.leftName.textContent = board.leftTeam.name;
   elements.rightName.textContent = board.rightTeam.name;
   elements.leftScore.textContent = board.leftScore;
@@ -100,7 +94,11 @@ const refresh = async () => {
     return;
   }
   try {
-    render(await rpc('mvl_get_scoreboard', { p_scoreboard_id: boardId }));
+    const shortCode = /^[0-9a-z]{1,3}$/i.test(boardId);
+    render(await rpc(
+      shortCode ? 'mvl_get_scoreboard_by_code' : 'mvl_get_scoreboard',
+      shortCode ? { p_board_code: boardId } : { p_scoreboard_id: boardId },
+    ));
   } catch (error) {
     statusElement.textContent = error.message;
     statusElement.classList.add('is-error');
