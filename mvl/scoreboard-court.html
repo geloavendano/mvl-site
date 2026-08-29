@@ -6,12 +6,10 @@
   <meta name="robots" content="noindex,nofollow">
   <title>MVL Court Scoreboard</title>
   <link rel="icon" type="image/svg+xml" href="/mvl/assets/metarice-icon.svg">
-  <link rel="stylesheet" href="/mvl/css/scoreboard-court.css?v=distance-scale">
+  <link rel="stylesheet" href="/mvl/css/scoreboard-court.css?v=sponsor-dock">
 </head>
 <body>
   <main class="court-stage" aria-live="polite">
-    <img class="court-logo" src="/mvl/assets/hero-mvl-2026-logo.png" alt="Metarice Volleyball League 2026">
-
     <section id="courtScoreboard" class="court-scoreboard is-loading" aria-label="Current match score">
       <article id="leftTeamPanel" class="court-team-panel">
         <div class="court-team-heading"><span id="leftService" class="court-service">Serving</span><h2 id="leftName">Team A</h2></div>
@@ -30,9 +28,15 @@
       <div id="setScores" class="court-set-scores"><p>Set scores will appear here.</p></div>
     </section>
 
-    <section class="court-sponsors marquee" aria-label="MVL sponsors">
-      <div class="marquee-track" data-marquee="all"></div>
-    </section>
+    <footer class="court-sponsor-dock">
+      <div class="court-brand-frame">
+        <img class="court-brand-star" src="/mvl/assets/main-star.png" alt="">
+        <img class="court-brand-logo" src="/mvl/assets/hero-mvl-2026-logo.png" alt="Metarice Volleyball League 2026">
+      </div>
+      <section class="court-sponsors marquee" aria-label="MVL sponsors">
+        <div class="marquee-track" data-marquee="all"></div>
+      </section>
+    </footer>
     <p id="courtStatus" class="court-status">Connecting to scoreboard…</p>
   </main>
   <script src="/mvl/js/supabase-config.js?v=fg-cluster"></script>
