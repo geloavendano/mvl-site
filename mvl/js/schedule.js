@@ -173,7 +173,17 @@ const filterableTeams = teams
     !game.teamBLabel &&
     [game.teamA, game.teamB].includes(team.id)))
   .sort((a, b) => a.name.localeCompare(b.name));
-let activeDay = days[0];
+// #day-2 in the URL opens that day directly, so a link from an email or a post
+// can point at the day it is talking about. The tabs are rendered by JS and
+// carry no ids, so the browser cannot resolve the fragment itself — dayFromHash
+// reads it and the load-time scroll below does the jump the browser would.
+const dayFromHash = () => {
+  const found = /^#day-(\d+)$/.exec(window.location.hash || '');
+  const day = found ? Number(found[1]) : NaN;
+  return days.includes(day) ? day : null;
+};
+
+let activeDay = dayFromHash() ?? days[0];
 let selectedTeamId = '';
 
 const dayTabs = document.getElementById('dayTabs');
@@ -307,6 +317,18 @@ dayTabs.addEventListener('click', (event) => {
   activeDay = Number(button.dataset.day);
   renderTabs();
   renderMatches();
+  // replaceState, not a hash assignment: the latter scrolls the page and stacks
+  // a history entry per tab, so Back would walk the tabs instead of leaving.
+  window.history.replaceState(null, '', `#day-${activeDay}`);
+});
+
+// back/forward between shared day links
+window.addEventListener('hashchange', () => {
+  const day = dayFromHash();
+  if (day === null || day === activeDay) return;
+  activeDay = day;
+  renderTabs();
+  renderMatches();
 });
 
 teamFilter?.addEventListener('change', () => {
@@ -317,3 +339,15 @@ teamFilter?.addEventListener('change', () => {
 renderTeamFilter();
 renderTabs();
 renderMatches();
+
+// Both panels are filled in by JS, so the browser's own fragment jump fires
+// against an empty page and lands nowhere. Redo it once the content exists:
+// #day-N names a day rather than an element, so it aims at the games board;
+// anything else is a real id (#standings) the browser would have handled.
+const scrollToHash = () => {
+  const target = dayFromHash() !== null
+    ? document.getElementById('games')
+    : (window.location.hash.length > 1 && document.getElementById(window.location.hash.slice(1)));
+  target?.scrollIntoView({ block: 'start' });
+};
+if (window.location.hash) scrollToHash();
