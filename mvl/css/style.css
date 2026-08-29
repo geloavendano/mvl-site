@@ -5375,3 +5375,89 @@ body.checkin-complete { overflow: hidden; }
   .match-meta .match-time { font-size: 24px; }
   .match-meta .match-court { font-size: 16px; }
 }
+
+/* ==========================================================================
+   Schedule card — player of the game, winner emphasis, watch-video button
+   ========================================================================== */
+/* The portrait sat on the panel's flat background, so the cut-out had nothing
+   behind it. Same treatment as the team cards: the team's artwork, darkened
+   under the figure so a light jersey still separates from it. */
+.player-portrait {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+}
+/* two classes, not one: .player-portrait.has-photo above uses the `background`
+   shorthand, which resets background-image to none, and it outranks a single
+   class whatever the source order */
+.player-portrait.player-portrait--art {
+  background-image:
+    linear-gradient(180deg, rgba(4, 2, 20, .12) 0 46%, rgba(4, 2, 20, .55) 100%),
+    var(--team-art);
+  background-size: cover, cover;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+}
+/* no artwork for this team — fall back to its gradient rather than a flat box */
+.player-portrait:not(.player-portrait--art) {
+  background: linear-gradient(135deg, var(--team-b, #1b2340), var(--team-a, #2c3557));
+}
+.player-portrait img {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  filter: drop-shadow(0 3px 6px rgba(4, 2, 20, .5));
+}
+
+/* The winner is now carried by the card itself rather than a "Winner: x" pill
+   repeating the name two rows down. Inset so it reads on the artwork's edge
+   without changing the card's footprint. */
+.match-team.is-winner {
+  box-shadow: inset 0 0 0 2px var(--mint), 0 0 18px rgba(124, 245, 180, .16);
+}
+
+/* The video link read as body text; the glyph makes it look pressable. */
+.watch-video {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.watch-video-icon {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  /* optical centring against uppercase 9px type */
+  margin-top: -1px;
+}
+
+/* ==========================================================================
+   Video library filters — team, day, game
+   The grid was built for two selects; the game picker's labels are far longer
+   (day, time and both team names), so it takes a full row of its own rather
+   than being squeezed into a half-width column.
+   ========================================================================== */
+.video-filters {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+}
+.video-filter--game { grid-column: 1 / -1; }
+.video-filter select { width: 100%; }
+.video-filter-clear {
+  grid-column: 1 / -1;
+  justify-self: start;
+  appearance: none;
+  padding: 7px 12px;
+  border: 1px solid rgba(255, 255, 255, .18);
+  border-radius: 999px;
+  background: none;
+  color: var(--ink-muted);
+  font: 700 10px var(--mono);
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.video-filter-clear:hover { color: var(--mint); border-color: var(--mint); }
+.video-filter-clear:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }

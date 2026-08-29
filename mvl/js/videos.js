@@ -2,6 +2,8 @@ const { teams, games, livestream } = window.MVL_DATA;
 const teamById = Object.fromEntries(teams.map((team) => [team.id, team]));
 const teamFilter = document.getElementById('videoTeamFilter');
 const dayFilter = document.getElementById('videoDayFilter');
+const gameFilter = document.getElementById('videoGameFilter');
+const filterClear = document.getElementById('videoFilterClear');
 const libraryGrid = document.getElementById('videoLibraryGrid');
 const emptyState = document.getElementById('videoLibraryEmpty');
 const resultCount = document.getElementById('videoResultCount');
@@ -124,12 +126,48 @@ dayFilter.insertAdjacentHTML('beforeend', [...dayGames.entries()]
   .map(([day, game]) => `<option value="${day}">Day ${day} · ${formatDate(game.startsAt)}</option>`)
   .join(''));
 
+// Same shape as the admin console's game picker: day, time, then the matchup.
+// Rebuilt whenever team or day changes so the list only offers games that are
+// still reachable under the other two filters.
+const gameOptionLabel = (game) =>
+  `Day ${game.day} · ${formatTime(game.startsAt)} · ${gameTeamName(game, 'A')} vs ${gameTeamName(game, 'B')}`;
+
+const syncGameOptions = () => {
+  const selectedTeam = teamFilter.value;
+  const selectedDay = dayFilter.value;
+  const keep = gameFilter.value;
+  const options = videoGames.filter((game) =>
+    (!selectedTeam || [game.teamA, game.teamB].includes(selectedTeam)) &&
+    (!selectedDay || String(game.day) === selectedDay)
+  );
+  gameFilter.innerHTML = '<option value="">All games</option>' + options
+    .map((game) => `<option value="${escapeHtml(game.id)}">${escapeHtml(gameOptionLabel(game))}</option>`)
+    .join('');
+  // a game that no longer survives the other filters cannot stay selected
+  gameFilter.value = options.some((game) => game.id === keep) ? keep : '';
+};
+
+// Filters live in the query string so a view can be linked to — the schedule's
+// "Watch video" points straight at ?game=<id>. replaceState rather than push:
+// changing a dropdown is not a navigation the back button should replay.
+const syncUrl = () => {
+  const params = new URLSearchParams();
+  if (teamFilter.value) params.set('team', teamFilter.value);
+  if (dayFilter.value) params.set('day', dayFilter.value);
+  if (gameFilter.value) params.set('game', gameFilter.value);
+  const query = params.toString();
+  history.replaceState(null, '', query ? `${location.pathname}?${query}` : location.pathname);
+};
+
 const renderVideos = () => {
   const selectedTeam = teamFilter.value;
   const selectedDay = dayFilter.value;
+  const selectedGame = gameFilter.value;
+  filterClear.classList.toggle('is-hidden', !(selectedTeam || selectedDay || selectedGame));
   const filtered = videoRecords.filter(({ game }) =>
     (!selectedTeam || [game.teamA, game.teamB].includes(selectedTeam)) &&
-    (!selectedDay || String(game.day) === selectedDay)
+    (!selectedDay || String(game.day) === selectedDay) &&
+    (!selectedGame || game.id === selectedGame)
   );
 
   resultCount.textContent = `${filtered.length} ${filtered.length === 1 ? 'video' : 'videos'}`;
@@ -163,8 +201,16 @@ const renderVideos = () => {
   }).join('');
 };
 
-teamFilter.addEventListener('change', renderVideos);
-dayFilter.addEventListener('change', renderVideos);
+const onFilterChange = () => { syncGameOptions(); syncUrl(); renderVideos(); };
+teamFilter.addEventListener('change', onFilterChange);
+dayFilter.addEventListener('change', onFilterChange);
+gameFilter.addEventListener('change', () => { syncUrl(); renderVideos(); });
+filterClear.addEventListener('click', () => {
+  teamFilter.value = '';
+  dayFilter.value = '';
+  gameFilter.value = '';
+  onFilterChange();
+});
 libraryGrid.addEventListener('click', (event) => {
   const button = event.target.closest('[data-play-video]');
   if (!button) return;
@@ -212,5 +258,30 @@ featureClose.addEventListener('click', () => {
   featurePlay.focus();
 });
 
+// ---- open on whatever the URL asked for -------------------------------------
+// ?team=&day=&game= from the schedule's "Watch video" and from any shared link.
+// #game-<id> is the older anchor form those links used, so it still resolves —
+// it selects the game rather than only scrolling to a card.
+const applyUrlFilters = () => {
+  const params = new URLSearchParams(location.search);
+  const team = params.get('team') || '';
+  const day = params.get('day') || '';
+  let game = params.get('game') || '';
+
+  const hash = decodeURIComponent(location.hash.replace(/^#/, ''));
+  const legacy = hash.match(/^game-([^-]+(?:-[^-]+)*?)(?:-video-\d+)?$/);
+  if (!game && legacy && videoGames.some((g) => g.id === legacy[1])) game = legacy[1];
+
+  if ([...teamFilter.options].some((o) => o.value === team)) teamFilter.value = team;
+  if ([...dayFilter.options].some((o) => o.value === day)) dayFilter.value = day;
+  syncGameOptions();
+  if ([...gameFilter.options].some((o) => o.value === game)) gameFilter.value = game;
+
+  // a game filter that matched nothing would leave an empty library with no
+  // explanation, so fall back to unfiltered rather than a dead end
+  if (game && gameFilter.value !== game) gameFilter.value = '';
+};
+
 renderLatestGame();
+applyUrlFilters();
 renderVideos();

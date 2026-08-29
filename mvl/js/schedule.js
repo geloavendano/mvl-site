@@ -210,6 +210,14 @@ const scoreLine = (game, teamId) => {
 // the same venue, so only the court half earns its place on the card.
 const courtLabel = (venue) => (venue || '').split('·').pop().trim();
 
+// A rounded-rect play glyph rather than the YouTube wordmark: the label sits at
+// 9px where the brand mark is unreadable, and it would wrongly imply the link
+// leaves the site when it goes to /mvl/videos.
+const playIcon =
+  '<svg class="watch-video-icon" viewBox="0 0 24 24" aria-hidden="true">' +
+  '<rect x="1.5" y="4.5" width="21" height="15" rx="4.5" fill="currentColor"/>' +
+  '<path d="M10 9.2v5.6l4.8-2.8z" fill="#0b0718"/></svg>';
+
 const renderMatches = () => {
   const gamesForDay = games
     .filter((game) => game.day === activeDay)
@@ -239,7 +247,7 @@ const renderMatches = () => {
     const videoCount = Array.isArray(game.videos)
       ? game.videos.length
       : (game.youtubeId ? 1 : 0);
-    const videoHref = videoCount ? `/mvl/videos.html#game-${game.id}` : '';
+    const videoHref = videoCount ? `/mvl/videos.html?game=${encodeURIComponent(game.id)}` : '';
     const playoffNote = playoffNotes[game.id];
 
     return `
@@ -258,13 +266,13 @@ const renderMatches = () => {
         </div>
 
         <div class="match-teams">
-          <div class="match-team${teamA.bg ? ' match-team--art' : ''}" style="--team-a:${teamA.grad[0]}; --team-b:${teamA.grad[1]}${teamA.bg ? `; --team-art:url('${teamA.bg}')` : ''}">
+          <div class="match-team${teamA.bg ? ' match-team--art' : ''}${winner?.id === teamA.id ? ' is-winner' : ''}" style="--team-a:${teamA.grad[0]}; --team-b:${teamA.grad[1]}${teamA.bg ? `; --team-art:url('${teamA.bg}')` : ''}">
             <small>${winner?.id === teamA.id ? 'Winner' : '&nbsp;'}</small>
             <p>${teamA.name}</p>
             <div class="match-score">${scoreLine(game, game.teamA)}</div>
           </div>
           <span class="match-vs">VS</span>
-          <div class="match-team match-team--right${teamB.bg ? ' match-team--art' : ''}" style="--team-a:${teamB.grad[0]}; --team-b:${teamB.grad[1]}${teamB.bg ? `; --team-art:url('${teamB.bg}')` : ''}">
+          <div class="match-team match-team--right${teamB.bg ? ' match-team--art' : ''}${winner?.id === teamB.id ? ' is-winner' : ''}" style="--team-a:${teamB.grad[0]}; --team-b:${teamB.grad[1]}${teamB.bg ? `; --team-art:url('${teamB.bg}')` : ''}">
             <small>${winner?.id === teamB.id ? 'Winner' : '&nbsp;'}</small>
             <p>${teamB.name}</p>
             <div class="match-score">${scoreLine(game, game.teamB)}</div>
@@ -272,7 +280,7 @@ const renderMatches = () => {
         </div>
 
         <div class="match-feature">
-          <div class="player-portrait ${pogPhoto ? 'has-photo' : ''}">
+          <div class="player-portrait ${pogPhoto ? 'has-photo' : ''}${pogTeam?.bg ? ' player-portrait--art' : ''}"${pogTeam ? ` style="--team-a:${pogTeam.grad[0]}; --team-b:${pogTeam.grad[1]}${pogTeam.bg ? `; --team-art:url('${pogTeam.bg}')` : ''}"` : ''}>
             ${pogPhoto
               ? `<img src="${escapeHtml(pogPhoto)}" alt="${escapeHtml(game.playerOfGame?.name || 'Player of the Game')}">`
               : '<div class="player-silhouette" aria-hidden="true"></div>'}
@@ -285,8 +293,8 @@ const renderMatches = () => {
         </div>
 
         <div class="match-actions">
-          ${winner ? `<span class="winner-pill">Winner: ${winner.name}</span>` : '<span class="winner-pill winner-pill--pending">Awaiting score</span>'}
-          ${videoHref ? `<a href="${videoHref}">Watch ${videoCount > 1 ? `${videoCount} videos` : 'video'}</a>` : '<span class="video-pending">Video pending</span>'}
+          ${winner ? '' : '<span class="winner-pill winner-pill--pending">Awaiting score</span>'}
+          ${videoHref ? `<a class="watch-video" href="${videoHref}">${playIcon}Watch ${videoCount > 1 ? `${videoCount} videos` : 'video'}</a>` : '<span class="video-pending">Video pending</span>'}
         </div>
       </article>
     `;
