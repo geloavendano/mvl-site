@@ -5424,11 +5424,19 @@ body.checkin-complete { overflow: hidden; }
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  /* the glyph and the label are one control — never let them break apart */
+  flex-wrap: nowrap;
+  white-space: nowrap;
 }
+/* The svg also carries width/height attributes. Safari sizes an inline svg
+   that has none from its containing block rather than from these rules, and
+   the glyph filled the whole action row on iOS while Chromium looked right. */
 .watch-video-icon {
   width: 16px;
   height: 16px;
-  flex: none;
+  min-width: 16px;
+  max-width: 16px;
+  flex: 0 0 16px;
   /* optical centring against uppercase 9px type */
   margin-top: -1px;
 }

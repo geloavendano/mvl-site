@@ -214,7 +214,7 @@ const courtLabel = (venue) => (venue || '').split('·').pop().trim();
 // 9px where the brand mark is unreadable, and it would wrongly imply the link
 // leaves the site when it goes to /mvl/videos.
 const playIcon =
-  '<svg class="watch-video-icon" viewBox="0 0 24 24" aria-hidden="true">' +
+  '<svg class="watch-video-icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">' +
   '<rect x="1.5" y="4.5" width="21" height="15" rx="4.5" fill="currentColor"/>' +
   '<path d="M10 9.2v5.6l4.8-2.8z" fill="#0b0718"/></svg>';
 
@@ -294,7 +294,7 @@ const renderMatches = () => {
 
         <div class="match-actions">
           ${winner ? '' : '<span class="winner-pill winner-pill--pending">Awaiting score</span>'}
-          ${videoHref ? `<a class="watch-video" href="${videoHref}">${playIcon}Watch ${videoCount > 1 ? `${videoCount} videos` : 'video'}</a>` : '<span class="video-pending">Video pending</span>'}
+          ${videoHref ? `<a class="watch-video" href="${videoHref}">${playIcon}Watch Video</a>` : '<span class="video-pending">Video pending</span>'}
         </div>
       </article>
     `;
