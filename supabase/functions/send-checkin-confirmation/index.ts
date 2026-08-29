@@ -183,7 +183,7 @@ const leadLine = (teamName: string, games: Game[]) => {
   const plural = games.length === 1 ? 'one game' : `${countWord(games.length)} games`;
   return `${teamName} has ${plural} today &mdash; ` +
     `first serve ${manilaTime(first.starts_at)} against ${first.opponent ?? 'TBA'}` +
-    // "Gameville Ball Park · Court 2" -> "Court 2"; the venue is already stated
+    // "Gameville Ball Park · Court 1" -> "Court 1"; the venue is already stated
     `${first.venue ? `, ${first.venue.replace(`${venue} · `, '')}` : ''}. Go get it.`;
 };
 

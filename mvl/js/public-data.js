@@ -7,7 +7,7 @@
   const normalizeLivestream = (managed = {}, fallbackLivestream = {}) => {
     const fallbackStreams = Array.isArray(fallbackLivestream.streams) ? fallbackLivestream.streams : [];
     const managedStreams = Array.isArray(managed.streams) ? managed.streams : [];
-    const streams = ['Court 2', 'Court 1'].map((court, index) => {
+    const streams = ['Court 1', 'Court 2'].map((court, index) => {
       const stream = managedStreams[index] || (index === 0 ? managed : {}) || {};
       const fallbackStream = fallbackStreams[index] || {};
       return {

@@ -13,7 +13,7 @@ const { teams, games, raffle } = window.MVL_DATA;
 // declaration then throws and window.supabase never exists.
 const cfg = window.MVL_SUPABASE;
 
-// Gameville Ball Park · Court 2 (seeded UUID) — the row that carries a location
+// Gameville Ball Park · Court 1 (seeded UUID) — the row that carries a location
 const VENUE_ID = '11111111-1111-4111-8111-111111111111';
 
 const el = (id) => document.getElementById(id);

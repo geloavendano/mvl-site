@@ -741,8 +741,8 @@ livestreamForm.addEventListener('submit', async (e) => {
   status(s, 'Saving…');
   try {
     const streams = [
-      { court: 'Court 2', is_live: f.court1Live.checked, youtube_url: f.court1Url.value.trim(), youtube_id: youtubeId(f.court1Url.value) || '' },
-      { court: 'Court 1', is_live: f.court2Live.checked, youtube_url: f.court2Url.value.trim(), youtube_id: youtubeId(f.court2Url.value) || '' },
+      { court: 'Court 1', is_live: f.court1Live.checked, youtube_url: f.court1Url.value.trim(), youtube_id: youtubeId(f.court1Url.value) || '' },
+      { court: 'Court 2', is_live: f.court2Live.checked, youtube_url: f.court2Url.value.trim(), youtube_id: youtubeId(f.court2Url.value) || '' },
     ];
     await rpc('mvl_admin_update_livestreams', { p_streams: streams });
     data = await rpc('mvl_admin_get_dashboard');

@@ -57,7 +57,7 @@
       </div>
     </section>
     <section id="livestreamPanel" class="admin-tab-panel" role="tabpanel" aria-labelledby="livestreamTab" data-admin-panel="livestream" hidden>
-      <form id="livestreamForm" class="admin-panel admin-form"><div class="admin-panel-head"><div><h2>Livestreams</h2><p>Manage the two courts independently. Court 2 is shown first on the public site.</p></div></div><div class="admin-livestream-grid"><section class="admin-livestream-court"><div class="admin-livestream-court-head"><h3>Court 2</h3><label class="admin-switch"><input name="court1Live" type="checkbox"> Live now</label></div><label class="field"><span>YouTube livestream link</span><input name="court1Url" type="url" placeholder="https://youtube.com/watch?v=..."></label></section><section class="admin-livestream-court"><div class="admin-livestream-court-head"><h3>Court 1</h3><label class="admin-switch"><input name="court2Live" type="checkbox"> Live now</label></div><label class="field"><span>YouTube livestream link</span><input name="court2Url" type="url" placeholder="https://youtube.com/watch?v=..."></label></section></div><div class="admin-form-actions"><button class="cta cta--primary" type="submit">Save livestreams</button><p class="form-status"></p></div></form>
+      <form id="livestreamForm" class="admin-panel admin-form"><div class="admin-panel-head"><div><h2>Livestreams</h2><p>Manage the two courts independently. Court 1 is shown first on the public site.</p></div></div><div class="admin-livestream-grid"><section class="admin-livestream-court"><div class="admin-livestream-court-head"><h3>Court 1</h3><label class="admin-switch"><input name="court1Live" type="checkbox"> Live now</label></div><label class="field"><span>YouTube livestream link</span><input name="court1Url" type="url" placeholder="https://youtube.com/watch?v=..."></label></section><section class="admin-livestream-court"><div class="admin-livestream-court-head"><h3>Court 2</h3><label class="admin-switch"><input name="court2Live" type="checkbox"> Live now</label></div><label class="field"><span>YouTube livestream link</span><input name="court2Url" type="url" placeholder="https://youtube.com/watch?v=..."></label></section></div><div class="admin-form-actions"><button class="cta cta--primary" type="submit">Save livestreams</button><p class="form-status"></p></div></form>
       <section id="streamSetupGuide" class="admin-panel admin-stream-guide" data-stream-camera="pocket3" aria-labelledby="streamSetupTitle">
         <div class="admin-panel-head"><div><h2 id="streamSetupTitle">How to set up the livestream</h2><p>Courtside checklist for camera → OBS → YouTube Live.</p></div></div>
         <div class="admin-stream-alert"><strong>Do this at least one day before</strong><span>Enable live streaming in YouTube Studio. First-time channel activation can take up to 24 hours.</span></div>
@@ -107,7 +107,7 @@
       <section class="admin-panel admin-scoreboards" aria-labelledby="scoreboardsTitle">
         <div class="admin-panel-head"><div><h2 id="scoreboardsTitle">Live scoreboards</h2><p>Run multiple OBS overlays and share phone-friendly controls.</p></div><button id="newScoreboardBtn" class="cta cta--primary" type="button">New scoreboard</button></div>
         <form id="scoreboardCreateForm" class="admin-scoreboard-create is-hidden">
-          <label class="field"><span>Scoreboard name</span><input name="name" type="text" maxlength="80" placeholder="Court 2 · Match 3" required></label>
+          <label class="field"><span>Scoreboard name</span><input name="name" type="text" maxlength="80" placeholder="Court 1 · Match 3" required></label>
           <label class="field"><span>Left team</span><select name="leftTeam" required></select></label>
           <label class="field"><span>Right team</span><select name="rightTeam" required></select></label>
           <div class="admin-scoreboard-create-actions"><button class="cta cta--primary" type="submit">Create scoreboard</button><button class="admin-link" type="button" data-cancel-scoreboard>Cancel</button></div>
@@ -159,5 +159,5 @@
     </section>
   </div>
 </dialog>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/mvl/js/supabase-config.js?v=stream-guide"></script><script src="/mvl/js/league-data.js?v=court-swap"></script><script src="/mvl/js/admin.js?v=court-swap"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/mvl/js/supabase-config.js?v=stream-guide"></script><script src="/mvl/js/league-data.js?v=courts-original"></script><script src="/mvl/js/admin.js?v=courts-original"></script>
 </body></html>

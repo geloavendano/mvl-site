@@ -30,8 +30,8 @@ const teamId = args.find((a) => !a.startsWith('--')) ?? 'metarice-y';
 
 // Mirrors a real game day: two fixtures on the same evening, two courts.
 const games = flags.has('--no-games') ? [] : [
-  { starts_at: '2026-08-29T08:00:00Z', opponent: 'Gremlins', venue: 'Gameville Ball Park · Court 1' },
-  { starts_at: '2026-08-29T12:40:00Z', opponent: 'Gizmo Spikers', venue: 'Gameville Ball Park · Court 2' },
+  { starts_at: '2026-08-29T08:00:00Z', opponent: 'Gremlins', venue: 'Gameville Ball Park · Court 2' },
+  { starts_at: '2026-08-29T12:40:00Z', opponent: 'Gizmo Spikers', venue: 'Gameville Ball Park · Court 1' },
 ];
 
 const teamNames = {

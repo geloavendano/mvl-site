@@ -206,7 +206,7 @@ const scoreLine = (game, teamId) => {
   }).join('');
 };
 
-// Venue names arrive as "Gameville Ball Park · Court 2". Every game is at
+// Venue names arrive as "Gameville Ball Park · Court 1". Every game is at
 // the same venue, so only the court half earns its place on the card.
 const courtLabel = (venue) => (venue || '').split('·').pop().trim();
 
