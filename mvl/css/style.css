@@ -5461,3 +5461,7 @@ body.checkin-complete { overflow: hidden; }
 }
 .video-filter-clear:hover { color: var(--mint); border-color: var(--mint); }
 .video-filter-clear:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
+
+/* Read-only TV link sits above the OBS and private control links. */
+.admin-scoreboard-court-actions{display:flex;flex-wrap:wrap;gap:8px;padding:12px;border-radius:9px;background:#f8fafc}
+.admin-scoreboard-court-actions .cta{display:inline-flex;align-items:center;justify-content:center}

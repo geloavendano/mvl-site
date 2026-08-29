@@ -135,6 +135,7 @@ const call = async (path, body, token = session?.access_token) => {
 };
 const rpc = (name, body) => call(`/rest/v1/rpc/${name}`, body);
 const scoreboardUrls = (board) => ({
+  court: `${window.location.origin}/mvl/scoreboard-court?board=${encodeURIComponent(board.id)}`,
   obs: `${window.location.origin}/mvl/scoreboard?board=${encodeURIComponent(board.id)}`,
   control: `${window.location.origin}/mvl/scoreboard-control?board=${encodeURIComponent(board.id)}&key=${encodeURIComponent(board.controlToken)}`,
 });
@@ -161,10 +162,14 @@ const renderScoreboards = (boards) => {
         <div><strong>${escapeHtml(board.name)}</strong><span>${board.game ? `Game: ${escapeHtml(board.game.id)} · Set ${board.currentSet} · ` : ''}Updated ${escapeHtml(new Date(board.updatedAt).toLocaleString('en-PH'))}</span></div>
         <div class="admin-scoreboard-score"><span style="--team-color:${escapeHtml(board.leftTeam.colorB)}">${escapeHtml(board.leftTeam.name)} <b>${board.leftScore}</b></span><i>–</i><span style="--team-color:${escapeHtml(board.rightTeam.colorB)}"><b>${board.rightScore}</b> ${escapeHtml(board.rightTeam.name)}</span></div>
       </div>
+      <div class="admin-scoreboard-court-actions">
+        <a class="cta cta--primary" href="${escapeHtml(urls.court)}" target="_blank" rel="noopener">Open court display</a>
+        <button class="cta cta--secondary" type="button" data-copy-url="${escapeHtml(urls.court)}" data-copy-label="Court display">Copy court link</button>
+      </div>
       <div class="admin-scoreboard-actions">
         <a class="cta cta--primary" href="${escapeHtml(urls.control)}" target="_blank" rel="noopener">Manage</a>
-        <button class="cta cta--secondary" type="button" data-copy-url="${escapeHtml(urls.obs)}">Copy OBS link</button>
-        <button class="cta cta--secondary" type="button" data-copy-url="${escapeHtml(urls.control)}">Copy control link</button>
+        <button class="cta cta--secondary" type="button" data-copy-url="${escapeHtml(urls.obs)}" data-copy-label="OBS">Copy OBS link</button>
+        <button class="cta cta--secondary" type="button" data-copy-url="${escapeHtml(urls.control)}" data-copy-label="Control">Copy control link</button>
       </div>
       <p class="form-status"></p>
     </article>`;
@@ -729,9 +734,9 @@ scoreboardList.addEventListener('click', async (event) => {
   const cardStatus = button.closest('.admin-scoreboard-card').querySelector('.form-status');
   try {
     await copyText(button.dataset.copyUrl);
-    status(cardStatus, button.textContent.includes('OBS') ? 'OBS link copied.' : 'Control link copied.', 'success');
+    status(cardStatus, `${button.dataset.copyLabel || 'Link'} copied.`, 'success');
   } catch {
-    status(cardStatus, 'Could not copy the link. Open Manage and copy it there.', 'error');
+    status(cardStatus, 'Could not copy the link. Open it and copy the address from the browser.', 'error');
   }
 });
 livestreamForm.addEventListener('submit', async (e) => {
