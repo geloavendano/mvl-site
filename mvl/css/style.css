@@ -5471,3 +5471,26 @@ body.checkin-complete { overflow: hidden; }
 .video-filter-clear:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
 
 .admin-raffle-drawing.is-animating .admin-raffle-progress span { animation-duration: 2s; }
+
+.admin-toast {
+  position: fixed;
+  z-index: 1200;
+  right: 24px;
+  bottom: 24px;
+  max-width: min(420px, calc(100vw - 32px));
+  padding: 13px 16px;
+  border: 1px solid #abefc6;
+  border-radius: 10px;
+  background: #ecfdf3;
+  color: #067647;
+  box-shadow: 0 14px 40px rgba(16, 24, 40, .18);
+  font: 600 13px/1.45 Arial, Helvetica, sans-serif;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(12px);
+  transition: opacity .18s ease, transform .18s ease;
+}
+.admin-toast.is-visible { opacity: 1; transform: translateY(0); }
+@media (max-width: 600px) {
+  .admin-toast { right: 16px; bottom: 16px; left: 16px; max-width: none; }
+}

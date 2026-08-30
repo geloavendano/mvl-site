@@ -4,7 +4,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><title>MVL Admin</title>
 <link rel="icon" type="image/svg+xml" href="/mvl/assets/metarice-icon.svg">
-<link rel="stylesheet" href="/mvl/css/style.css?v=raffle-draw-2s">
+<link rel="stylesheet" href="/mvl/css/style.css?v=raffle-winner-toast">
 </head>
 <body class="admin-page">
 <header class="admin-topbar"><a href="/mvl/index.html"><img src="/mvl/assets/hero-mvl-2026-logo.png" alt="MVL 2026"></a><button id="signOutBtn" class="admin-link is-hidden" type="button">Sign out</button></header>
@@ -136,6 +136,7 @@
     <a id="emergencyCallLink" class="cta cta--primary admin-contact-call is-hidden" href="#"><span aria-hidden="true">☎</span> Call mobile number</a>
   </div>
 </dialog>
+<div id="adminToast" class="admin-toast" role="status" aria-live="polite" aria-atomic="true"></div>
 <dialog id="raffleDrawDialog" class="admin-raffle-dialog" aria-labelledby="raffleDrawTitle">
   <div class="admin-raffle-dialog-card">
     <div class="admin-raffle-dialog-head"><div><p>MVL raffle draw</p><h2 id="raffleDrawTitle">Drawing a winner</h2></div><form method="dialog"><button class="admin-contact-close" type="submit" aria-label="Close raffle draw">×</button></form></div>
@@ -159,5 +160,5 @@
     </section>
   </div>
 </dialog>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/mvl/js/supabase-config.js?v=stream-guide"></script><script src="/mvl/js/league-data.js?v=courts-original"></script><script src="/mvl/js/admin.js?v=raffle-draw-2s"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/mvl/js/supabase-config.js?v=stream-guide"></script><script src="/mvl/js/league-data.js?v=courts-original"></script><script src="/mvl/js/admin.js?v=raffle-winner-toast"></script>
 </body></html>

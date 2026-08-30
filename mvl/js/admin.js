@@ -44,10 +44,12 @@ const raffleWinnerName = document.getElementById('raffleWinnerName');
 const raffleWinnerMeta = document.getElementById('raffleWinnerMeta');
 const raffleWinnerFurparent = document.getElementById('raffleWinnerFurparent');
 const raffleWinnerForm = document.getElementById('raffleWinnerForm');
+const adminToast = document.getElementById('adminToast');
 let rafflePlayerRequest = 0;
 let raffleDrawToken = 0;
 let raffleSpinFrame = null;
 let currentRaffleWinner = null;
+let adminToastTimer = null;
 const adminTabs = [...document.querySelectorAll('[data-admin-tab]')];
 const adminTabPanels = [...document.querySelectorAll('[data-admin-panel]')];
 const adminTabNames = new Set(adminTabs.map((tab) => tab.dataset.adminTab));
@@ -77,6 +79,14 @@ const gameTeamMarkup = (game, side) => {
   return label ? escapeHtml(name) : teamNameMarkup(id, name);
 };
 const status = (el, text, type = '') => { el.textContent = text; el.className = `form-status ${type ? `is-${type}` : ''}`; };
+const showAdminToast = (message) => {
+  window.clearTimeout(adminToastTimer);
+  adminToast.textContent = message;
+  adminToast.classList.add('is-visible');
+  adminToastTimer = window.setTimeout(() => {
+    adminToast.classList.remove('is-visible');
+  }, 3200);
+};
 const adminTabFromHash = () => {
   const requested = window.location.hash.slice(1);
   return adminTabNames.has(requested) ? requested : 'registrations';
@@ -846,6 +856,7 @@ raffleWinnerForm.addEventListener('submit', async (event) => {
   const form = event.currentTarget;
   const formStatus = form.querySelector('.form-status');
   const submitButton = form.querySelector('button[type="submit"]');
+  const winnerName = currentRaffleWinner.playerName;
   status(formStatus, 'Saving winner…');
   submitButton.disabled = true;
   try {
@@ -854,8 +865,9 @@ raffleWinnerForm.addEventListener('submit', async (event) => {
       p_note: form.elements.note.value,
     });
     await loadRaffleBlacklist();
-    submitButton.textContent = 'Saved in Raffle Winners';
-    status(formStatus, 'Winner saved and excluded from future draws.', 'success');
+    raffleDrawDialog.close();
+    currentRaffleWinner = null;
+    showAdminToast(`${winnerName} added to Raffle Winners and excluded from future draws.`);
   } catch (error) {
     submitButton.disabled = false;
     status(formStatus, error.message, 'error');
