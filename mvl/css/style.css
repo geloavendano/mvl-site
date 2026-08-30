@@ -5494,6 +5494,9 @@ body.checkin-complete { overflow: hidden; }
   transition: opacity .18s ease, transform .18s ease;
 }
 .admin-toast.is-visible { opacity: 1; transform: translateY(0); }
+.admin-video-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; }
 @media (max-width: 600px) {
   .admin-toast { right: 16px; bottom: 16px; left: 16px; max-width: none; }
+  .admin-video-head { align-items: stretch; flex-direction: column; }
+  .admin-video-actions { justify-content: space-between; }
 }

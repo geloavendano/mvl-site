@@ -282,6 +282,21 @@ const videoRow = (video = {}) => `
     </label>
     <button type="button" class="admin-link admin-video-remove" data-remove-video>Remove</button>
   </div>`;
+const collectGameVideos = (form) => {
+  const videos = [...form.querySelectorAll('[data-video-row]')].map((row) => {
+    const label = row.querySelector('[data-video-label]').value.trim();
+    const url = row.querySelector('[data-video-url]').value.trim();
+    if (!url) return null;
+    const id = youtubeId(url);
+    if (!label) throw new Error('Add a label for every YouTube URL.');
+    if (!validYouTubeId(id)) throw new Error(`"${label}" does not have a valid YouTube URL.`);
+    return { label, youtube_id: id };
+  }).filter(Boolean);
+  if (new Set(videos.map((video) => video.youtube_id)).size !== videos.length) {
+    throw new Error('The same YouTube video cannot be added twice to one game.');
+  }
+  return videos;
+};
 const formatAdminDay = (iso) => new Intl.DateTimeFormat('en-PH', {
   timeZone: 'Asia/Manila', month: 'short', day: 'numeric', weekday: 'short',
 }).format(new Date(iso));
@@ -636,7 +651,7 @@ const render = () => {
     </div>
     ${playerPreview(g.playerOfGame)}
     <section class="admin-video-editor">
-      <div class="admin-video-head"><div><strong>Game videos</strong><small>Add a custom label for every recording, such as Full Game, Set 1, or Set 2.</small></div><button type="button" class="admin-link" data-add-video>+ Add video</button></div>
+      <div class="admin-video-head"><div><strong>Game videos</strong><small>Add links before or after the game. Saving here will not change the winner, scores, or game status.</small></div><div class="admin-video-actions"><button type="button" class="admin-link" data-add-video>+ Add video</button><button type="button" class="cta cta--secondary" data-save-videos>Save video links</button></div></div>
       <div class="admin-video-list" data-video-list>${(videos.length ? videos : [{}]).map(videoRow).join('')}</div>
     </section>
     <div class="admin-score-heading"><span>Set</span><strong>${gameTeamMarkup(g, 'A')}</strong><strong>${gameTeamMarkup(g, 'B')}</strong></div>
@@ -926,18 +941,7 @@ adminGameList.addEventListener('submit', async (e) => {
   status(s, 'Saving…');
   try {
     if (!sets.length) throw new Error('Enter at least one set.');
-    const videos = [...form.querySelectorAll('[data-video-row]')].map((row) => {
-      const label = row.querySelector('[data-video-label]').value.trim();
-      const url = row.querySelector('[data-video-url]').value.trim();
-      if (!url) return null;
-      const id = youtubeId(url);
-      if (!label) throw new Error('Add a label for every YouTube URL.');
-      if (!validYouTubeId(id)) throw new Error(`"${label}" does not have a valid YouTube URL.`);
-      return { label, youtube_id: id };
-    }).filter(Boolean);
-    if (new Set(videos.map((video) => video.youtube_id)).size !== videos.length) {
-      throw new Error('The same YouTube video cannot be added twice to one game.');
-    }
+    const videos = collectGameVideos(form);
     const player = form.elements.playerLookup.value.trim() ? await findPlayer(form, g) : null;
     await rpc('mvl_admin_save_game_result', {
       p_game_id: g.id,
@@ -955,6 +959,28 @@ adminGameList.addEventListener('submit', async (e) => {
   }
 });
 adminGameList.addEventListener('click', async (e) => {
+  const saveVideosButton = e.target.closest('[data-save-videos]');
+  if (saveVideosButton) {
+    const form = saveVideosButton.closest('[data-id]');
+    const formStatus = form.querySelector('.form-status');
+    const gameId = form.dataset.id;
+    status(formStatus, 'Saving video links…');
+    saveVideosButton.disabled = true;
+    try {
+      await rpc('mvl_admin_save_game_videos', {
+        p_game_id: gameId,
+        p_videos: collectGameVideos(form),
+      });
+      data = await rpc('mvl_admin_get_dashboard');
+      render();
+      const refreshedStatus = document.querySelector(`[data-id="${gameId}"] .form-status`);
+      status(refreshedStatus, 'Video links updated. The game result was not changed.', 'success');
+    } catch (error) {
+      saveVideosButton.disabled = false;
+      status(formStatus, error.message, 'error');
+    }
+    return;
+  }
   const addVideoButton = e.target.closest('[data-add-video]');
   if (addVideoButton) {
     addVideoButton.closest('[data-id]').querySelector('[data-video-list]').insertAdjacentHTML('beforeend', videoRow({ label: '' }));
