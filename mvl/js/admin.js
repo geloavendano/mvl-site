@@ -374,9 +374,9 @@ const renderRaffleBlacklist = (entries) => {
     <thead><tr><th>Player</th><th>Prize / note</th><th>Added</th><th></th></tr></thead>
     <tbody>${entries.map((entry) => `<tr>
       <td><strong>${escapeHtml(entry.playerName)}</strong><span>${teamNameMarkup(entry.teamId, entry.teamName)}${entry.jerseyNumber ? ` · #${escapeHtml(entry.jerseyNumber)}` : ''}</span></td>
-      <td>${escapeHtml(entry.note)}</td>
+      <td class="admin-raffle-note-cell"><p data-raffle-note-text>${escapeHtml(entry.note)}</p><form class="admin-raffle-note-form is-hidden" data-raffle-note-form data-raffle-id="${escapeHtml(entry.id)}"><input name="note" type="text" maxlength="240" value="${escapeHtml(entry.note)}" aria-label="Prize or note for ${escapeHtml(entry.playerName)}" required><div><button class="cta cta--primary" type="submit">Save</button><button class="admin-link" type="button" data-raffle-edit-cancel>Cancel</button></div><p class="form-status" aria-live="polite"></p></form></td>
       <td>${escapeHtml(formatAdminDate(entry.createdAt))}</td>
-      <td><button class="admin-raffle-remove" type="button" data-raffle-remove="${escapeHtml(entry.id)}" aria-label="Remove ${escapeHtml(entry.playerName)} from Raffle Winners">Remove</button></td>
+      <td><div class="admin-raffle-row-actions"><button class="admin-raffle-edit" type="button" data-raffle-edit aria-label="Edit prize or note for ${escapeHtml(entry.playerName)}">Edit note</button><button class="admin-raffle-remove" type="button" data-raffle-remove="${escapeHtml(entry.id)}" aria-label="Remove ${escapeHtml(entry.playerName)} from Raffle Winners">Remove</button></div></td>
     </tr>`).join('')}</tbody>
   </table>`;
 };
@@ -853,16 +853,53 @@ raffleBlacklistForm.addEventListener('submit', async (event) => {
   }
 });
 raffleBlacklistList.addEventListener('click', async (event) => {
-  const button = event.target.closest('[data-raffle-remove]');
-  if (!button || !window.confirm('Remove this player from Raffle Winners?')) return;
-  button.disabled = true;
+  const editButton = event.target.closest('[data-raffle-edit]');
+  if (editButton) {
+    const row = editButton.closest('tr');
+    row.querySelector('[data-raffle-note-text]').classList.add('is-hidden');
+    const editForm = row.querySelector('[data-raffle-note-form]');
+    editForm.classList.remove('is-hidden');
+    editForm.elements.note.focus();
+    editForm.elements.note.select();
+    return;
+  }
+  const cancelButton = event.target.closest('[data-raffle-edit-cancel]');
+  if (cancelButton) {
+    const row = cancelButton.closest('tr');
+    row.querySelector('[data-raffle-note-form]').classList.add('is-hidden');
+    row.querySelector('[data-raffle-note-text]').classList.remove('is-hidden');
+    return;
+  }
+  const removeButton = event.target.closest('[data-raffle-remove]');
+  if (!removeButton || !window.confirm('Remove this player from Raffle Winners?')) return;
+  removeButton.disabled = true;
   try {
-    await rpc('mvl_admin_remove_raffle_blacklist', { p_blacklist_id: button.dataset.raffleRemove });
+    await rpc('mvl_admin_remove_raffle_blacklist', { p_blacklist_id: removeButton.dataset.raffleRemove });
     await loadRaffleBlacklist();
     status(raffleBlacklistForm.querySelector('.form-status'), 'Player removed from Raffle Winners.', 'success');
   } catch (error) {
-    button.disabled = false;
+    removeButton.disabled = false;
     status(raffleBlacklistForm.querySelector('.form-status'), error.message, 'error');
+  }
+});
+raffleBlacklistList.addEventListener('submit', async (event) => {
+  const form = event.target.closest('[data-raffle-note-form]');
+  if (!form) return;
+  event.preventDefault();
+  const formStatus = form.querySelector('.form-status');
+  const saveButton = form.querySelector('button[type="submit"]');
+  status(formStatus, 'Saving…');
+  saveButton.disabled = true;
+  try {
+    await rpc('mvl_admin_update_raffle_blacklist_note', {
+      p_blacklist_id: form.dataset.raffleId,
+      p_note: form.elements.note.value,
+    });
+    await loadRaffleBlacklist();
+    showAdminToast('Raffle Winner note updated.');
+  } catch (error) {
+    saveButton.disabled = false;
+    status(formStatus, error.message, 'error');
   }
 });
 raffleWinnerForm.addEventListener('submit', async (event) => {

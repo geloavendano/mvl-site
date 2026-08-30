@@ -5495,6 +5495,14 @@ body.checkin-complete { overflow: hidden; }
 }
 .admin-toast.is-visible { opacity: 1; transform: translateY(0); }
 .admin-video-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; }
+.admin-raffle-note-cell { min-width: 240px; }
+.admin-raffle-note-form { display: grid; gap: 7px; }
+.admin-raffle-note-form input { width: 100%; min-height: 38px; padding: 8px 10px; border: 1px solid #d0d5dd; border-radius: 7px; color: #1d2433; font: 400 12px Arial, Helvetica, sans-serif; }
+.admin-raffle-note-form input:focus { border-color: #475467; outline: 0; box-shadow: 0 0 0 3px rgba(71, 84, 103, .1); }
+.admin-raffle-note-form > div, .admin-raffle-row-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; }
+.admin-raffle-note-form .cta { min-height: 34px; padding: 7px 12px; }
+.admin-raffle-edit { border: 0; background: none; color: #344054; cursor: pointer; font: 600 12px Arial, Helvetica, sans-serif; }
+.admin-raffle-edit:hover, .admin-raffle-remove:hover { text-decoration: underline; }
 @media (max-width: 600px) {
   .admin-toast { right: 16px; bottom: 16px; left: 16px; max-width: none; }
   .admin-video-head { align-items: stretch; flex-direction: column; }
