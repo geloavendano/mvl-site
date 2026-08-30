@@ -2134,14 +2134,17 @@ html[data-phase='gameday'] .nav-links a[data-phase='registration'] { display: no
   /* modular grid: livestream left (1.7fr), 2 stacked right, 4 across below */
   .games-grid {
     display: grid;
-    grid-template-columns: 1.7fr 1fr;
+    /* minmax(0, …), not bare fr: an fr track's implicit min-width is auto, so
+       the recent-games column grew to its own content width — 2680px inside a
+       1440px grid — and crushed the livestream track to 119px. */
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
     gap: 24px;
     padding: 0 48px;
     align-items: start;
   }
   .games-live { grid-column: 1; grid-row: 1; }
   .live-frame { border-radius: 16px; box-shadow: 0 0 36px rgba(45, 212, 191, .28); }
-  .games-side { grid-column: 2; grid-row: 1; }
+  .games-side { grid-column: 2; grid-row: 1; min-width: 0; }
   .games-side .past-grid { grid-template-columns: 1fr; gap: 24px; }
   .games-grid.is-offline .games-side { grid-column: 1 / -1; }
   .games-grid.is-offline .games-side .past-grid { grid-template-columns: repeat(2, 1fr); }

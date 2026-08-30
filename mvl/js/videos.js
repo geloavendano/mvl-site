@@ -280,8 +280,24 @@ const applyUrlFilters = () => {
   // a game filter that matched nothing would leave an empty library with no
   // explanation, so fall back to unfiltered rather than a dead end
   if (game && gameFilter.value !== game) gameFilter.value = '';
+
+  return Boolean(teamFilter.value || dayFilter.value || gameFilter.value);
+};
+
+// Arriving from the schedule's "Watch video" landed at the top fold, which
+// features an unrelated latest video — the filtered library the link promised
+// was a screen further down. Jump to it, but only when a filter actually
+// applied, so a plain visit still opens on the feature.
+const revealLibrary = () => {
+  const library = document.getElementById('videoLibraryTitle')?.closest('.video-library');
+  if (!library) return;
+  const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+  // after layout settles — the grid is written synchronously just above, but
+  // the thumbnails it pulls in still change the page height
+  requestAnimationFrame(() => library.scrollIntoView({ behavior, block: 'start' }));
 };
 
 renderLatestGame();
-applyUrlFilters();
+const openedFiltered = applyUrlFilters();
 renderVideos();
+if (openedFiltered) revealLibrary();
