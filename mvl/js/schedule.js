@@ -257,7 +257,15 @@ const renderMatches = () => {
     const videoCount = Array.isArray(game.videos)
       ? game.videos.length
       : (game.youtubeId ? 1 : 0);
-    const videoHref = videoCount ? `/mvl/videos.html?game=${encodeURIComponent(game.id)}` : '';
+    // Once a result is published the video lives in the library, so link there.
+    // Before that the only thing attached is the upcoming stream, which the
+    // library deliberately excludes — point straight at YouTube so people can
+    // still open and save it.
+    const played = game.status === 'final';
+    const firstVideoId = Array.isArray(game.videos) ? game.videos[0]?.youtubeId : game.youtubeId;
+    const videoHref = !videoCount ? ''
+      : played ? `/mvl/videos.html?game=${encodeURIComponent(game.id)}`
+      : (firstVideoId ? `https://www.youtube.com/watch?v=${encodeURIComponent(firstVideoId)}` : '');
     const playoffNote = playoffNotes[game.id];
 
     return `
@@ -304,7 +312,7 @@ const renderMatches = () => {
 
         <div class="match-actions">
           ${winner ? '' : '<span class="winner-pill winner-pill--pending">Awaiting score</span>'}
-          ${videoHref ? `<a class="watch-video" href="${videoHref}">${playIcon}Watch Video</a>` : '<span class="video-pending">Video pending</span>'}
+          ${videoHref ? `<a class="watch-video" href="${videoHref}"${played ? '' : ' target="_blank" rel="noopener"'}>${playIcon}${played ? 'Watch Video' : 'Watch Live'}</a>` : '<span class="video-pending">Video pending</span>'}
         </div>
       </article>
     `;

@@ -71,8 +71,14 @@ const formatTime = (iso) => new Intl.DateTimeFormat('en-PH', {
   minute: '2-digit',
 }).format(new Date(iso));
 
+// Livestream links are attached ahead of a game so people can save them from
+// the schedule. The library is a record of games that have been played, so it
+// only carries games whose result is published — an upcoming fixture's link
+// would otherwise sit here as if it were a recording.
+const hasPublishedResult = (game) => game.status === 'final';
+
 const videoGames = games
-  .filter((game) => gameVideos(game).length)
+  .filter((game) => gameVideos(game).length && hasPublishedResult(game))
   .sort((a, b) => new Date(b.startsAt) - new Date(a.startsAt));
 const videoRecords = videoGames.flatMap((game) =>
   gameVideos(game).map((video, index) => ({ game, video, index }))
