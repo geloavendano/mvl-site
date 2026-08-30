@@ -5469,3 +5469,5 @@ body.checkin-complete { overflow: hidden; }
 }
 .video-filter-clear:hover { color: var(--mint); border-color: var(--mint); }
 .video-filter-clear:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
+
+.admin-raffle-drawing.is-animating .admin-raffle-progress span { animation-duration: 2s; }

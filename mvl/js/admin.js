@@ -448,7 +448,7 @@ const animateRaffleDraw = async (payload) => {
   currentRaffleWinner = null;
   raffleDrawTitle.textContent = 'Drawing a winner';
   raffleDrawCount.textContent = payload.entryCount;
-  raffleDrawCountdown.textContent = 'Winner in 5 seconds';
+  raffleDrawCountdown.textContent = 'Winner in 2 seconds';
   raffleWinnerView.classList.add('is-hidden');
   raffleDrawingView.classList.remove('is-hidden');
   raffleDrawingView.classList.remove('is-animating');
@@ -462,10 +462,10 @@ const animateRaffleDraw = async (payload) => {
   raffleSpinFrame = window.requestAnimationFrame(() => {
     raffleDrawPool.style.transition = window.matchMedia('(prefers-reduced-motion: reduce)').matches
       ? 'none'
-      : 'transform 5s cubic-bezier(.12,.72,.08,1)';
+      : 'transform 2s cubic-bezier(.12,.72,.08,1)';
     raffleDrawPool.style.transform = `translateY(${rouletteOffset}px)`;
   });
-  for (let remaining = 5; remaining > 0; remaining -= 1) {
+  for (let remaining = 2; remaining > 0; remaining -= 1) {
     raffleDrawCountdown.textContent = `Winner in ${remaining} second${remaining === 1 ? '' : 's'}`;
     await new Promise((resolve) => window.setTimeout(resolve, 1000));
     if (token !== raffleDrawToken || !raffleDrawDialog.open) return;
