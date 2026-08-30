@@ -783,10 +783,21 @@ if (location.hash.includes('access_token') || location.search.includes('code='))
   // between the panel being there and staff re-picking the mode themselves.
   const resumeQr = mode === 'qr' || (!mode && hadQrIntent());
   showView(resumeQr ? 'qr' : mode, false);
-  if (resumeQr) {
+  // Look for a staff session on any bare visit, not just when the URL or the
+  // stored intent asks for it. The Google return can arrive with neither: the
+  // flow may finish in a different browsing context (opened from Gmail, an
+  // in-app browser), where sessionStorage is empty and the grant has already
+  // been consumed. Only staff can hold a session, so a player is never caught
+  // by this — and a signed-in staff member landing on the check-in page wants
+  // the scanner, whichever route brought them here.
+  if (resumeQr || !mode) {
     loadAuthClient()
       .then((client) => client.auth.getSession())
-      .then(({ data }) => { if (data?.session) enterScanner(data.session); })
+      .then(({ data }) => {
+        if (!data?.session) return;
+        if (!resumeQr) showView('qr', false);
+        enterScanner(data.session);
+      })
       .catch(() => { /* not signed in: the sign-in button is already showing */ });
   }
 }
