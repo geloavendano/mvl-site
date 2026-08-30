@@ -535,7 +535,17 @@ const enterScanner = (session) => {
   focusScanner();
 };
 
+// The Google round trip can land back on a bare /mvl/checkin with no grant in
+// the URL — an already-valid session, or a provider that returns clean. The URL
+// then says nothing about what staff were doing, so record the intent before
+// leaving and read it on the way back.
+const QR_INTENT = 'mvl.checkin.qrIntent';
+const rememberQrIntent = () => { try { sessionStorage.setItem(QR_INTENT, '1'); } catch { /* private mode */ } };
+const hadQrIntent = () => { try { return sessionStorage.getItem(QR_INTENT) === '1'; } catch { return false; } };
+const clearQrIntent = () => { try { sessionStorage.removeItem(QR_INTENT); } catch { /* private mode */ } };
+
 el('qrSignInBtn').addEventListener('click', async () => {
+  rememberQrIntent();
   setStatus(qrAuthStatus, 'Loading sign-in…');
   try {
     const client = await loadAuthClient();
@@ -551,6 +561,7 @@ el('qrSignInBtn').addEventListener('click', async () => {
 });
 
 el('qrSignOutBtn').addEventListener('click', async () => {
+  clearQrIntent();
   if (authClient) await authClient.auth.signOut();
   qrSignedIn = false;
   hide(el('qrScanner'));
@@ -754,6 +765,7 @@ if (location.hash.includes('access_token') || location.search.includes('code='))
     .then(({ data }) => {
       if (data?.session) {
         setStatus(qrAuthStatus, '');
+        clearQrIntent();
         enterScanner(data.session);
       } else {
         setStatus(qrAuthStatus, 'Sign-in did not complete. Try again.', 'error');
@@ -764,8 +776,14 @@ if (location.hash.includes('access_token') || location.search.includes('code='))
     .catch((error) => setStatus(qrAuthStatus, error.message, 'error'));
 } else if (isOpen) {
   // an already-signed-in staff member reloading ?mode=qr goes back to the scanner
-  showView(urlMode(), false);
-  if (urlMode() === 'qr') {
+  const mode = urlMode();
+  // ?mode=qr, or a Google return that came back on a clean URL — either way
+  // staff were in the scanner flow, so open it. Synchronously: waiting for the
+  // auth client is a dynamic import, and on venue wifi that is the difference
+  // between the panel being there and staff re-picking the mode themselves.
+  const resumeQr = mode === 'qr' || (!mode && hadQrIntent());
+  showView(resumeQr ? 'qr' : mode, false);
+  if (resumeQr) {
     loadAuthClient()
       .then((client) => client.auth.getSession())
       .then(({ data }) => { if (data?.session) enterScanner(data.session); })

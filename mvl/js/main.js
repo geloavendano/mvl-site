@@ -106,19 +106,13 @@ window.addEventListener('resize', () => {
 // ---- render: livestream ----------------------------------------------------
 document.querySelectorAll('[data-livestream-link]').forEach((link) => {
   if (activeLivestreams.length) {
-    link.href = `https://www.youtube.com/watch?v=${activeLivestreams[0].youtubeId}`;
+    // Straight to /mvl/videos, which plays every live court on the page. This
+    // used to send a single court to YouTube and two courts to a picker sheet —
+    // an extra tap to reach a page that already shows both.
+    link.href = '/mvl/videos.html';
     link.innerHTML = '<span class="live-dot" aria-hidden="true"></span> Watch the Livestream';
-    if (activeLivestreams.length === 1) {
-      link.target = '_blank';
-      link.rel = 'noopener';
-    } else {
-      link.removeAttribute('target');
-      link.removeAttribute('rel');
-      link.addEventListener('click', (event) => {
-        event.preventDefault();
-        document.getElementById('livestreamPicker')?.showModal();
-      });
-    }
+    link.removeAttribute('target');
+    link.removeAttribute('rel');
   } else {
     link.href = '/mvl/schedule.html';
     link.removeAttribute('target');
@@ -130,7 +124,6 @@ document.querySelectorAll('[data-livestream-link]').forEach((link) => {
 const liveStreams = document.getElementById('liveStreams');
 const gamesLive = document.querySelector('.games-live');
 const gamesGrid = document.querySelector('.games-grid');
-const livestreamPickerOptions = document.getElementById('livestreamPickerOptions');
 if (!activeLivestreams.length) {
   gamesLive?.classList.add('is-hidden');
   gamesGrid?.classList.add('is-offline');
@@ -148,14 +141,6 @@ if (!activeLivestreams.length) {
           allowfullscreen></iframe>
       </div>
     </article>
-  `).join('');
-}
-if (livestreamPickerOptions) {
-  livestreamPickerOptions.innerHTML = activeLivestreams.map((stream) => `
-    <a href="https://www.youtube.com/watch?v=${stream.youtubeId}" target="_blank" rel="noopener">
-      <span><i class="live-dot" aria-hidden="true"></i>${stream.court}</span>
-      <strong>Watch livestream <b aria-hidden="true">→</b></strong>
-    </a>
   `).join('');
 }
 

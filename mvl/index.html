@@ -179,14 +179,6 @@
     <a class="section-link reveal" href="/mvl/videos.html">All Game Videos</a>
   </div>
 </section>
-
-<dialog class="livestream-picker" id="livestreamPicker" aria-labelledby="livestreamPickerTitle">
-  <div class="livestream-picker-card">
-    <div class="livestream-picker-head"><div><p>Live now</p><h2 id="livestreamPickerTitle">Choose a court</h2></div><form method="dialog"><button type="submit" aria-label="Close livestream choices">×</button></form></div>
-    <div id="livestreamPickerOptions" class="livestream-picker-options"></div>
-  </div>
-</dialog>
-
 <!-- Inside the wrapper on purpose: the strip separates the two folds without
      restarting the ramp, which keeps running behind it. -->
 <div class="marquee" aria-label="Major sponsors">
@@ -297,7 +289,7 @@
      this has to change: a returning visitor holding the old main.js under
      the previous key would load it alongside marquee.js and hit duplicate
      top-level declarations, killing the whole entry script. -->
-<script src="/mvl/js/public-data.js?v=courts-original" data-entry="main" data-version="library-final-only"></script>
+<script src="/mvl/js/public-data.js?v=courts-original" data-entry="main" data-version="qr-intent"></script>
 <script src="/mvl/js/faq.js?v=fg-cluster"></script>
 </body>
 </html>
