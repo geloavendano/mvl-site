@@ -91,33 +91,67 @@ const latestVideos = latestGame ? gameVideos(latestGame) : [];
 const latestVideo =
   latestVideos.find((video) => /local\s*recording/i.test(video.label || '')) || latestVideos[0];
 
+// The feature panel is the page's only player. It opens on the latest game and
+// is retargeted whenever a library card is picked, so the details beside it —
+// matchup, day, result, label — always describe what is on screen.
+const featureLabel = document.querySelector('.videos-feature-label');
+let featureGame = null;
+let featureVideo = null;
+
+const setFeature = (game, video, { isLatest = false } = {}) => {
+  featureGame = game;
+  featureVideo = video;
+
+  const teamA = gameTeamName(game, 'A');
+  const teamB = gameTeamName(game, 'B');
+  const winner = game.winner ? (teamById[game.winner]?.name || game.winner) : '';
+  const label = video.label || 'Live Replay';
+  const maxresPoster = `https://i.ytimg.com/vi/${video.youtubeId}/maxresdefault.jpg`;
+  const fallbackPoster = `https://i.ytimg.com/vi/${video.youtubeId}/hqdefault.jpg`;
+
+  const poster = featureMedia.querySelector('img');
+  if (poster) {
+    poster.src = maxresPoster;
+    poster.onerror = () => {
+      if (poster.src !== fallbackPoster) poster.src = fallbackPoster;
+    };
+  }
+  if (featureLabel) featureLabel.lastChild.textContent = isLatest ? 'Latest Game' : 'Now Playing';
+  featureMatchup.innerHTML =
+    `<span class="video-team">${teamMark(gameTeam(game, 'A'))}${escapeHtml(teamA)}</span>` +
+    ` <span class="video-vs">vs</span> ` +
+    `<span class="video-team">${teamMark(gameTeam(game, 'B'))}${escapeHtml(teamB)}</span>`;
+  featureMeta.textContent = `Day ${game.day} · ${formatDate(game.startsAt)} · ${formatTime(game.startsAt)}`;
+  featureResult.textContent = `${winner ? `Winner: ${winner}` : 'Result pending'} · ${label}${video.duration ? ` · ${video.duration}` : ''}`;
+  featurePlay.disabled = false;
+  featurePlay.dataset.videoId = video.youtubeId;
+  featurePlay.dataset.videoLabel = label;
+  featurePlay.setAttribute('aria-label', `Play ${label}: ${teamA} versus ${teamB}`);
+  featurePlay.lastChild.textContent = isLatest ? ' Play Latest Game' : ` Play ${label}`;
+};
+
+const playFeature = () => {
+  const videoId = featurePlay.dataset.videoId;
+  if (!validYouTubeId(videoId)) return;
+  const label = featurePlay.dataset.videoLabel || 'MVL game video';
+  feature.classList.add('is-playing');
+  featureClose.classList.remove('is-hidden');
+  featureMedia.innerHTML = `
+    <iframe
+      src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1"
+      title="${escapeHtml(label)}"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      referrerpolicy="strict-origin-when-cross-origin"
+      allowfullscreen></iframe>
+  `;
+};
+
 const renderLatestGame = () => {
   if (!latestGame || !latestVideo) {
     feature.classList.add('is-empty');
     return;
   }
-
-  const teamA = gameTeamName(latestGame, 'A');
-  const teamB = gameTeamName(latestGame, 'B');
-  const winner = latestGame.winner ? (teamById[latestGame.winner]?.name || latestGame.winner) : '';
-  const label = latestVideo.label || 'Live Replay';
-  const maxresPoster = `https://i.ytimg.com/vi/${latestVideo.youtubeId}/maxresdefault.jpg`;
-  const fallbackPoster = `https://i.ytimg.com/vi/${latestVideo.youtubeId}/hqdefault.jpg`;
-
-  featurePoster.src = maxresPoster;
-  featurePoster.onerror = () => {
-    if (featurePoster.src !== fallbackPoster) featurePoster.src = fallbackPoster;
-  };
-  featureMatchup.innerHTML =
-    `<span class="video-team">${teamMark(gameTeam(latestGame, 'A'))}${escapeHtml(teamA)}</span>` +
-    ` <span class="video-vs">vs</span> ` +
-    `<span class="video-team">${teamMark(gameTeam(latestGame, 'B'))}${escapeHtml(teamB)}</span>`;
-  featureMeta.textContent = `Day ${latestGame.day} · ${formatDate(latestGame.startsAt)} · ${formatTime(latestGame.startsAt)}`;
-  featureResult.textContent = `${winner ? `Winner: ${winner}` : 'Result pending'} · ${label}${latestVideo.duration ? ` · ${latestVideo.duration}` : ''}`;
-  featurePlay.disabled = false;
-  featurePlay.dataset.videoId = latestVideo.youtubeId;
-  featurePlay.dataset.videoLabel = label;
-  featurePlay.setAttribute('aria-label', `Play ${label}: ${teamA} versus ${teamB}`);
+  setFeature(latestGame, latestVideo, { isLatest: true });
 };
 
 const availableTeamIds = new Set(videoGames.flatMap((game) => [game.teamA, game.teamB]));
@@ -191,7 +225,7 @@ const renderVideos = () => {
     return `
       <article class="library-video-card" id="${escapeHtml(cardId)}">
         <div class="library-video-player">
-          <button type="button" data-play-video="${video.youtubeId}" data-video-label="${escapeHtml(label)}" aria-label="Play ${escapeHtml(label)}: ${escapeHtml(teamA)} versus ${escapeHtml(teamB)}">
+          <button type="button" data-play-video="${video.youtubeId}" data-video-label="${escapeHtml(label)}" aria-label="Play ${escapeHtml(label)}, ${escapeHtml(teamA)} versus ${escapeHtml(teamB)}, in the player at the top of the page">
             <img src="https://i.ytimg.com/vi/${video.youtubeId}/hqdefault.jpg" alt="" loading="lazy">
             <span class="play-btn" aria-hidden="true"></span>
           </button>
@@ -220,51 +254,68 @@ filterClear.addEventListener('click', () => {
   gameFilter.value = '';
   onFilterChange();
 });
+// A card no longer embeds its own player. It retargets the feature and plays
+// there — one player, one size, and the grid stays light instead of carrying
+// an iframe per card.
+//
+// The library sits a screen or more below the feature, so a pick that only
+// swapped the video would load it off-screen above the reader and look like
+// nothing happened. Scroll to the player on the way in, and back to the card
+// they came from on the way out, so the round trip returns them where they
+// were rather than at the top of the page.
+let returnToCardId = '';
+const motion = () => (window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth');
+
 libraryGrid.addEventListener('click', (event) => {
   const button = event.target.closest('[data-play-video]');
   if (!button) return;
   const videoId = button.dataset.playVideo;
   if (!validYouTubeId(videoId)) return;
-  const label = button.dataset.videoLabel || 'MVL game video';
-  button.outerHTML = `
-    <iframe
-      src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1"
-      title="${escapeHtml(label)}"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      referrerpolicy="strict-origin-when-cross-origin"
-      allowfullscreen></iframe>
-  `;
+
+  const card = button.closest('.library-video-card');
+  const record = videoRecords.find(({ video }) => video.youtubeId === videoId);
+  if (!record) return;
+
+  returnToCardId = card?.id || '';
+  libraryGrid.querySelectorAll('.is-playing').forEach((el) => el.classList.remove('is-playing'));
+  card?.classList.add('is-playing');
+
+  setFeature(record.game, record.video);
+  playFeature();
+  featureClose.textContent = 'Back to the library';
+  feature.scrollIntoView({ behavior: motion(), block: 'start' });
+  featureClose.focus({ preventScroll: true });
 });
 
 featurePlay.addEventListener('click', () => {
-  const videoId = featurePlay.dataset.videoId;
-  if (!validYouTubeId(videoId)) return;
-  const label = featurePlay.dataset.videoLabel || 'Latest MVL game';
-  feature.classList.add('is-playing');
-  featureClose.classList.remove('is-hidden');
-  featureMedia.innerHTML = `
-    <iframe
-      src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1"
-      title="${escapeHtml(label)}"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      referrerpolicy="strict-origin-when-cross-origin"
-      allowfullscreen></iframe>
-  `;
-  featureClose.focus();
+  returnToCardId = '';
+  playFeature();
+  featureClose.textContent = 'Back to video details';
+  featureClose.focus({ preventScroll: true });
 });
 
 featureClose.addEventListener('click', () => {
   feature.classList.remove('is-playing');
   featureClose.classList.add('is-hidden');
   featureMedia.innerHTML = '<img id="latestVideoPoster" src="" alt="">';
+  // restore the poster for whatever the feature currently holds, which is not
+  // necessarily the latest game any more
+  const shown = featureVideo || latestVideo;
   const restoredPoster = featureMedia.querySelector('img');
-  restoredPoster.src = `https://i.ytimg.com/vi/${latestVideo.youtubeId}/maxresdefault.jpg`;
+  restoredPoster.src = `https://i.ytimg.com/vi/${shown.youtubeId}/maxresdefault.jpg`;
   restoredPoster.onerror = () => {
     if (restoredPoster.dataset.fallbackApplied) return;
     restoredPoster.dataset.fallbackApplied = 'true';
-    restoredPoster.src = `https://i.ytimg.com/vi/${latestVideo.youtubeId}/hqdefault.jpg`;
+    restoredPoster.src = `https://i.ytimg.com/vi/${shown.youtubeId}/hqdefault.jpg`;
   };
-  featurePlay.focus();
+
+  const card = returnToCardId ? document.getElementById(returnToCardId) : null;
+  if (card) {
+    card.scrollIntoView({ behavior: motion(), block: 'center' });
+    card.querySelector('[data-play-video]')?.focus({ preventScroll: true });
+  } else {
+    featurePlay.focus({ preventScroll: true });
+  }
 });
 
 // ---- open on whatever the URL asked for -------------------------------------

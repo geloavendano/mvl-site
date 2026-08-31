@@ -5521,3 +5521,13 @@ body.checkin-complete { overflow: hidden; }
 }
 .video-library-note li { font-size: 13px; line-height: 1.6; }
 
+/* The card whose video is loaded in the player above. Without it nothing in
+   the grid says which one you picked once you scroll back down to it. */
+.library-video-card.is-playing {
+  outline: 2px solid var(--mint);
+  outline-offset: 2px;
+}
+.library-video-card.is-playing .library-video-player .play-btn {
+  opacity: .35;
+}
+
