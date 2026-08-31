@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/mvl/css/style.css?v=live-grid-fix">
+<link rel="stylesheet" href="/mvl/css/style.css?v=video-kinds">
 <script src="/mvl/js/site-config.js?v=cutover-gameday"></script>
 <script src="/mvl/js/analytics.js?v=fg-cluster"></script>
 <script src="/mvl/js/nav.js?v=fg-cluster"></script>
@@ -87,6 +87,18 @@
         <button class="video-filter-clear is-hidden" id="videoFilterClear" type="button">Clear filters</button>
       </div>
     </div>
+    <!-- Both kinds sit side by side in the grid and the only thing telling
+         them apart is the label on each card, so say what the labels mean. -->
+    <ul class="video-kinds">
+      <li>
+        <strong>Livestream</strong>
+        <span>The original broadcast. May lag or buffer in places.</span>
+      </li>
+      <li>
+        <strong>Recording</strong>
+        <span>Captured on-site. No stream lag or buffering.</span>
+      </li>
+    </ul>
     <div class="video-library-grid" id="videoLibraryGrid"></div>
     <div class="video-library-empty is-hidden" id="videoLibraryEmpty">
       <h3>No videos found</h3>
