@@ -2,6 +2,7 @@ const cfg = window.MVL_SUPABASE;
 const authClient = window.supabase.createClient(cfg.url, cfg.anonKey);
 let session = null;
 let data;
+let adminLoadRequest = 0;
 let activeAdminDay = 1;
 let readinessRequest = 0;
 let emergencyRequest = 0;
@@ -659,9 +660,15 @@ const render = () => {
     <button class="cta cta--primary" ${g.teamALabel || g.teamBLabel ? 'disabled title="The teams will be assigned automatically from tournament results."' : ''}>Save result, player & videos</button><p class="form-status"></p></form>`;
   }).join('');
 };
-const show = async () => {
+const show = async (activeSession = session) => {
+  const accessToken = activeSession?.access_token;
+  if (!accessToken) return;
+  const request = ++adminLoadRequest;
+  status(loginStatus, 'Loading admin…');
   try {
-    data = await rpc('mvl_admin_get_dashboard');
+    const dashboardData = await call('/rest/v1/rpc/mvl_admin_get_dashboard', {}, accessToken);
+    if (request !== adminLoadRequest || session?.access_token !== accessToken) return;
+    data = dashboardData;
     loginPanel.classList.add('is-hidden'); dashboard.classList.remove('is-hidden'); signOutBtn.classList.remove('is-hidden');
     adminIdentity.textContent = data.email;
     const live = data.publicData.livestream, form = livestreamForm.elements;
@@ -673,10 +680,19 @@ const show = async () => {
     render();
     activateAdminTab(adminTabFromHash());
     await Promise.all([loadReadiness(), loadScoreboards(), loadRaffleBlacklist()]);
-  } catch (e) {
-    session = null;
-    authClient.auth.signOut();
-    status(loginStatus, e.message === 'Admin access required' ? 'This Google account is not an MVL administrator.' : e.message, 'error');
+    if (request === adminLoadRequest) status(loginStatus, '');
+  } catch (error) {
+    if (request !== adminLoadRequest || session?.access_token !== accessToken) return;
+    loginPanel.classList.remove('is-hidden');
+    dashboard.classList.add('is-hidden');
+    signOutBtn.classList.add('is-hidden');
+    if (error.message === 'Admin access required') {
+      session = null;
+      await authClient.auth.signOut();
+      status(loginStatus, 'This Google account is not an MVL administrator.', 'error');
+    } else {
+      status(loginStatus, `You are signed in, but the admin dashboard could not load: ${error.message}. Refresh to try again.`, 'error');
+    }
   }
 };
 googleSignInBtn.addEventListener('click', async () => {
@@ -1069,15 +1085,27 @@ adminGameList.addEventListener('click', async (e) => {
   }
 });
 signOutBtn.addEventListener('click', async()=>{await authClient.auth.signOut();location.reload();});
-authClient.auth.onAuthStateChange((_event, nextSession) => {
-  if (nextSession?.access_token && nextSession.access_token !== session?.access_token) {
-    session = nextSession;
-    window.setTimeout(show, 0);
+authClient.auth.onAuthStateChange((event, nextSession) => {
+  if (event === 'SIGNED_OUT') {
+    session = null;
+    data = null;
+    return;
   }
+  if (!nextSession?.access_token) return;
+  if (nextSession.access_token === session?.access_token && data) return;
+  session = nextSession;
+  window.setTimeout(() => show(nextSession), 0);
 });
-authClient.auth.getSession().then(({ data: authData }) => {
-  session = authData.session;
-  if (session?.access_token) show();
+authClient.auth.getSession().then(({ data: authData, error }) => {
+  if (error) {
+    status(loginStatus, error.message, 'error');
+    return;
+  }
+  const restoredSession = authData.session;
+  if (!restoredSession?.access_token) return;
+  if (restoredSession.access_token === session?.access_token) return;
+  session = restoredSession;
+  show(restoredSession);
 });
 activateAdminTab(adminTabFromHash());
 populateScoreboardTeams();
