@@ -5509,44 +5509,15 @@ body.checkin-complete { overflow: hidden; }
   .admin-video-actions { justify-content: space-between; }
 }
 
-/* ==========================================================================
-   Video library — what the two labels mean
-   Livestream and Recording sit side by side in the same grid; only the label
-   on each card separates them, so the note carries the distinction.
-   ========================================================================== */
-.video-kinds {
-  display: grid;
-  gap: 8px 22px;
-  margin: 18px 0 0;
-  padding: 14px 16px;
-  list-style: none;
-  border: 1px solid rgba(255, 255, 255, .1);
-  border-left: 2px solid var(--mint);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, .04);
 }
-.video-kinds li {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 4px 10px;
-  min-width: 0;
+
+/* The library note reuses .mechanics-list from the raffle panel. That list was
+   written to follow a panel head, so it carries a top pad the header does not
+   want, and its 14px body is a size larger than this header needs. */
+.video-library-note {
+  gap: 8px;
+  padding-top: 14px;
+  max-width: 62ch;
 }
-.video-kinds strong {
-  flex: none;
-  color: var(--mint);
-  font: 800 10px var(--mono);
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
-}
-.video-kinds span {
-  min-width: 0;
-  color: var(--ink-muted);
-  font-size: 12.5px;
-  line-height: 1.5;
-}
-@media (min-width: 760px) {
-  /* side by side once there is room; stacked below, where a 12px line that
-     wraps twice reads worse than two rows */
-  .video-kinds { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
+.video-library-note li { font-size: 13px; line-height: 1.6; }
+

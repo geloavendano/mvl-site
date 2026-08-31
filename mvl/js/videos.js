@@ -6,7 +6,6 @@ const gameFilter = document.getElementById('videoGameFilter');
 const filterClear = document.getElementById('videoFilterClear');
 const libraryGrid = document.getElementById('videoLibraryGrid');
 const emptyState = document.getElementById('videoLibraryEmpty');
-const resultCount = document.getElementById('videoResultCount');
 const feature = document.getElementById('latestGame');
 const featureMedia = document.getElementById('latestVideoMedia');
 const featurePoster = document.getElementById('latestVideoPoster');
@@ -181,7 +180,6 @@ const renderVideos = () => {
     (!selectedGame || game.id === selectedGame)
   );
 
-  resultCount.textContent = `${filtered.length} ${filtered.length === 1 ? 'video' : 'videos'}`;
   emptyState.classList.toggle('is-hidden', filtered.length > 0);
   libraryGrid.classList.toggle('is-hidden', filtered.length === 0);
   libraryGrid.innerHTML = filtered.map(({ game, video, index }) => {
