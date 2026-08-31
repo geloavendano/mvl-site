@@ -279,7 +279,7 @@ const validYouTubeId = (value) => typeof value === 'string' && /^[\w-]{11}$/.tes
 const gameVideos = (game) => {
   if (Array.isArray(game.videos)) return game.videos.filter((v) => validYouTubeId(v.youtubeId));
   return validYouTubeId(game.youtubeId)
-    ? [{ youtubeId: game.youtubeId, label: game.videoLabel || 'Full Game', duration: game.duration || '' }]
+    ? [{ youtubeId: game.youtubeId, label: game.videoLabel || 'Live Replay', duration: game.duration || '' }]
     : [];
 };
 

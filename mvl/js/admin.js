@@ -265,7 +265,7 @@ const gameVideos = (game) => {
   if (validYouTubeId(game.youtubeId)) {
     return [{
       youtubeId: game.youtubeId,
-      label: game.videoLabel || 'Full Game',
+      label: game.videoLabel || 'Live Replay',
       duration: game.duration || '',
     }];
   }
@@ -275,7 +275,7 @@ const videoRow = (video = {}) => `
   <div class="admin-video-row" data-video-row>
     <label class="field">
       <span>Label</span>
-      <input data-video-label type="text" maxlength="80" value="${escapeHtml(video.label ?? 'Full Game')}" placeholder="Set 1">
+      <input data-video-label type="text" maxlength="80" value="${escapeHtml(video.label ?? 'Live Replay')}" placeholder="Live Replay / Local Recording">
     </label>
     <label class="field">
       <span>YouTube URL</span>
@@ -1046,7 +1046,7 @@ adminGameList.addEventListener('click', async (e) => {
     if (rows.length > 1) {
       removeVideoButton.closest('[data-video-row]').remove();
     } else {
-      rows[0].querySelector('[data-video-label]').value = 'Full Game';
+      rows[0].querySelector('[data-video-label]').value = 'Live Replay';
       rows[0].querySelector('[data-video-url]').value = '';
     }
     return;

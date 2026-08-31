@@ -30,7 +30,7 @@
       ? game.videos
       : (/^[A-Za-z0-9_-]{11}$/.test(game.youtubeId || '') ? [{
           youtubeId: game.youtubeId,
-          label: game.videoLabel || 'Full Game',
+          label: game.videoLabel || 'Live Replay',
           duration: game.duration || '',
         }] : []);
     return {

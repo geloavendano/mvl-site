@@ -44,7 +44,7 @@ const gameVideos = (game) => {
     return game.videos.filter((video) => validYouTubeId(video.youtubeId));
   }
   return validYouTubeId(game.youtubeId)
-    ? [{ youtubeId: game.youtubeId, label: game.videoLabel || 'Full Game', duration: game.duration || '' }]
+    ? [{ youtubeId: game.youtubeId, label: game.videoLabel || 'Live Replay', duration: game.duration || '' }]
     : [];
 };
 const gameTeamName = (game, side) => {
@@ -85,7 +85,12 @@ const videoRecords = videoGames.flatMap((game) =>
 );
 const latestGame = videoGames[0];
 const latestVideos = latestGame ? gameVideos(latestGame) : [];
-const latestVideo = latestVideos.find((video) => /full\s*game/i.test(video.label || '')) || latestVideos[0];
+// Prefer the on-site capture: it is the same game without the stream's lag.
+// This replaces a rule that looked for a "Full Game" label, which no video
+// carries since the rename — it had quietly become a no-op falling through to
+// whichever video happened to be first.
+const latestVideo =
+  latestVideos.find((video) => /local\s*recording/i.test(video.label || '')) || latestVideos[0];
 
 const renderLatestGame = () => {
   if (!latestGame || !latestVideo) {
@@ -96,7 +101,7 @@ const renderLatestGame = () => {
   const teamA = gameTeamName(latestGame, 'A');
   const teamB = gameTeamName(latestGame, 'B');
   const winner = latestGame.winner ? (teamById[latestGame.winner]?.name || latestGame.winner) : '';
-  const label = latestVideo.label || 'Full Game';
+  const label = latestVideo.label || 'Live Replay';
   const maxresPoster = `https://i.ytimg.com/vi/${latestVideo.youtubeId}/maxresdefault.jpg`;
   const fallbackPoster = `https://i.ytimg.com/vi/${latestVideo.youtubeId}/hqdefault.jpg`;
 
