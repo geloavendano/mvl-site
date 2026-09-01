@@ -78,6 +78,7 @@ body{font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased}
   color:color-mix(in srgb,var(--team-b,#241b57) 78%,#080414);
   text-shadow:none;
 }
+.bigscore-set.is-won b{transform:translateY(.09em)}
 .bigscore-set.is-won::before{
   content:'';
   position:absolute;
