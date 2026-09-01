@@ -5593,7 +5593,7 @@ body.checkin-complete { overflow: hidden; }
   object-position: bottom center;
   filter: drop-shadow(0 6px 12px rgba(4, 2, 20, .5));
 }
-.vote-slot.has-pick .vote-slot-silhouette { display: none; }
+.vote-slot.has-photo .vote-slot-silhouette { display: none; }
 .vote-slot-silhouette { width: 84px; opacity: .5; }
 .vote-slot-caption {
   position: absolute;
@@ -5639,6 +5639,14 @@ body.checkin-complete { overflow: hidden; }
 .vote-actions .cta[hidden] { display: none; }
 .vote-actions { display: flex; gap: 10px; }
 .vote-actions .cta { flex: 1 1 auto; border: 0; cursor: pointer; }
+.vote-actions .cta:disabled { cursor: not-allowed; opacity: .52; }
+.vote-step-status { min-height: 16px; }
+.vote-step-status[hidden] { display: none; }
+.vote-selectors .field.is-error > span { color: #ff9bae; }
+.waiver-page .vote-selectors .field.is-error select {
+  background: rgba(255, 155, 174, .08);
+  box-shadow: 0 0 0 2px #ff9bae;
+}
 
 /* ---- mobile: one viewport per step; the award panel becomes the pick card -- */
 @media (max-width: 859px) {

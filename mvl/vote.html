@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/mvl/css/style.css?v=vote-13">
+<link rel="stylesheet" href="/mvl/css/style.css?v=vote-14">
 <script src="/mvl/js/site-config.js?v=cutover-gameday"></script>
 <script src="/mvl/js/analytics.js?v=fg-cluster"></script>
 <script src="/mvl/js/nav.js?v=fg-cluster"></script>
@@ -42,7 +42,7 @@
 
   <!-- The ballot. Awards come first so people can see what they are voting for;
        who they are is asked at the end, just before it is sent. -->
-  <section class="form-panel vote-ballot" id="voteBallot">
+  <section class="form-panel vote-ballot" id="voteBallot" aria-busy="true">
     <div class="form-panel-head">
       <p class="section-kicker section-kicker--teal" id="voteProgress">Award 1 of 4</p>
       <h2 id="voteAwardName">Fresh New Player of the League</h2>
@@ -77,18 +77,19 @@
          both pickers and Next remain visible with the award panel. -->
     <div class="vote-controls" id="voteControls">
       <div class="form-grid vote-selectors">
-        <label class="field">
+        <label class="field" id="voteNomineeTeamField">
           <span>Team</span>
-          <select id="voteNomineeTeam"><option value="">Select a team</option></select>
+          <select id="voteNomineeTeam" aria-describedby="voteStepStatus" disabled><option value="">Select a team</option></select>
         </label>
-        <label class="field">
+        <label class="field" id="voteNomineePlayerField">
           <span>Player</span>
-          <select id="voteNomineePlayer" disabled><option value="">Select a player</option></select>
+          <select id="voteNomineePlayer" aria-describedby="voteStepStatus" disabled><option value="">Select a team first</option></select>
         </label>
       </div>
+      <p class="form-status vote-step-status" id="voteStepStatus" role="alert" aria-live="assertive" aria-atomic="true">Loading players&hellip;</p>
       <div class="vote-actions">
         <button class="cta cta--secondary" type="button" id="voteBackBtn" hidden>Back</button>
-        <button class="cta cta--primary" type="button" id="voteNextBtn" disabled>Next</button>
+        <button class="cta cta--primary" type="button" id="voteNextBtn" aria-describedby="voteStepStatus" disabled>Next</button>
       </div>
     </div>
   </section>
@@ -132,8 +133,7 @@
     <p class="vote-identity-sub" id="voteDoneSub"></p>
     <ul class="mechanics-list vote-recap" id="voteSummary"></ul>
     <div class="form-actions">
-      <a class="cta cta--primary" href="/mvl/schedule.html">View the Standings</a>
-      <a class="cta cta--secondary" href="/mvl/index.html">Back to Home</a>
+      <a class="cta cta--primary" href="/mvl/index.html">Back to Home</a>
     </div>
   </section>
 </main>
@@ -164,6 +164,6 @@
 <script src="/mvl/js/league-data.js?v=courts-original"></script>
 <script src="/mvl/js/marquee.js?v=fg-cluster"></script>
 <script src="/mvl/js/supabase-config.js?v=fg-cluster"></script>
-<script src="/mvl/js/vote.js?v=vote-12"></script>
+<script src="/mvl/js/vote.js?v=vote-14"></script>
 </body>
 </html>

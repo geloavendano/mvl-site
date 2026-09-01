@@ -30,6 +30,9 @@ const slotBrand = el('voteSlotBrand');
 const nextBtn = el('voteNextBtn');
 const backBtn = el('voteBackBtn');
 const startBtn = el('voteStartBtn');
+const stepStatus = el('voteStepStatus');
+const nomineeTeamField = el('voteNomineeTeamField');
+const nomineePlayerField = el('voteNomineePlayerField');
 
 const setStage = (stage) => {
   document.body.classList.remove('vote-stage-intro', 'vote-stage-active', 'vote-stage-review', 'vote-stage-done');
@@ -45,6 +48,28 @@ const setStatus = (node, message, tone = '') => {
   if (!node) return;
   node.textContent = message || '';
   node.className = `form-status${tone ? ` is-${tone}` : ''}`;
+};
+
+const clearStepError = () => {
+  stepStatus.textContent = '';
+  stepStatus.classList.remove('is-error');
+  stepStatus.hidden = true;
+  [nomineeTeamField, nomineePlayerField].forEach((field) => field.classList.remove('is-error'));
+  [nomineeTeam, nomineePlayer].forEach((control) => control.removeAttribute('aria-invalid'));
+};
+
+const showStepStatus = (message, tone = '') => {
+  stepStatus.textContent = message;
+  stepStatus.classList.toggle('is-error', tone === 'error');
+  stepStatus.hidden = !message;
+};
+
+const showStepError = (field, control, message) => {
+  clearStepError();
+  field.classList.add('is-error');
+  control.setAttribute('aria-invalid', 'true');
+  showStepStatus(message, 'error');
+  control.focus();
 };
 
 // ---- state -------------------------------------------------------------------
@@ -88,6 +113,7 @@ const loadNominees = async () => {
   if (nominees.length) return nominees;
   const rows = await rpc('mvl_get_award_nominees', {});
   nominees = Array.isArray(rows) ? rows : [];
+  if (!nominees.length) throw new Error('No players are available for voting yet.');
   return nominees;
 };
 
@@ -119,16 +145,21 @@ const paintSlot = (award, pick) => {
     slot.style.removeProperty('--team-art');
   }
   slot.classList.toggle('has-pick', Boolean(pick));
+  slot.classList.toggle('has-photo', Boolean(pick?.photo));
   markPick(Boolean(pick));
   slotClear.hidden = !pick;
 
   if (pick?.photo) {
     slotPhoto.src = pick.photo;
     slotPhoto.hidden = false;
-    slotPhoto.onerror = () => { slotPhoto.hidden = true; };
+    slotPhoto.onerror = () => {
+      slotPhoto.hidden = true;
+      slot.classList.remove('has-photo');
+    };
   } else {
     slotPhoto.hidden = true;
     slotPhoto.removeAttribute('src');
+    slot.classList.remove('has-photo');
   }
 
   slotCaption.textContent = pick
@@ -165,6 +196,8 @@ const renderAward = async () => {
   const award = AWARDS[index];
   if (!award) return;
 
+  clearStepError();
+
   el('voteBrand').textContent = award.brand ? `Presented by ${award.brand}` : '';
   el('voteAwardName').textContent = award.name;
   el('voteTagline').textContent = award.tagline || '';
@@ -175,7 +208,7 @@ const renderAward = async () => {
 
   const pick = picks.get(award.id);
   nomineeTeam.value = pick?.teamId || '';
-  nomineePlayer.innerHTML = '<option value="">Select a player</option>';
+  nomineePlayer.innerHTML = `<option value="">${pick?.teamId ? 'Select a player' : 'Select a team first'}</option>`;
   nomineePlayer.disabled = !pick?.teamId;
   if (pick?.teamId) {
     fillPlayers(pick.teamId);
@@ -184,26 +217,33 @@ const renderAward = async () => {
 
   paintSlot(award, pick);
   backBtn.hidden = index === 0;
-  nextBtn.disabled = !pick;
   nextBtn.textContent = index === AWARDS.length - 1 ? 'Review ballot' : 'Next';
   renderRail();
 };
 
 const fillPlayers = (teamId) => {
-  nomineePlayer.innerHTML = '<option value="">Select a player</option>' + teamPlayers(teamId)
+  const players = teamPlayers(teamId);
+  if (!players.length) {
+    nomineePlayer.innerHTML = '<option value="">No players available</option>';
+    nomineePlayer.disabled = true;
+    showStepError(nomineeTeamField, nomineeTeam, 'No eligible players are available for this team. Select another team.');
+    return false;
+  }
+  nomineePlayer.innerHTML = '<option value="">Select a player</option>' + players
     .map((p) => `<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)}${p.jerseyNumber ? ` · #${escapeHtml(p.jerseyNumber)}` : ''}</option>`)
     .join('');
   nomineePlayer.disabled = false;
+  return true;
 };
 
 nomineeTeam.addEventListener('change', async () => {
+  clearStepError();
   const teamId = nomineeTeam.value;
   picks.delete(AWARDS[index].id);
-  nextBtn.disabled = true;
   paintSlot(AWARDS[index], null);
   renderRail();
   if (!teamId) {
-    nomineePlayer.innerHTML = '<option value="">Select a player</option>';
+    nomineePlayer.innerHTML = '<option value="">Select a team first</option>';
     nomineePlayer.disabled = true;
     return;
   }
@@ -211,12 +251,12 @@ nomineeTeam.addEventListener('change', async () => {
 });
 
 nomineePlayer.addEventListener('change', () => {
+  clearStepError();
   const award = AWARDS[index];
   const playerId = nomineePlayer.value;
   if (!playerId) {
     picks.delete(award.id);
     paintSlot(award, null);
-    nextBtn.disabled = true;
     renderRail();
     return;
   }
@@ -231,18 +271,17 @@ nomineePlayer.addEventListener('change', () => {
   };
   picks.set(award.id, pick);
   paintSlot(award, pick);
-  nextBtn.disabled = false;
   renderRail();
 });
 
 slotClear.addEventListener('click', () => {
+  clearStepError();
   const award = AWARDS[index];
   picks.delete(award.id);
   nomineeTeam.value = '';
-  nomineePlayer.innerHTML = '<option value="">Select a player</option>';
+  nomineePlayer.innerHTML = '<option value="">Select a team first</option>';
   nomineePlayer.disabled = true;
   paintSlot(award, null);
-  nextBtn.disabled = true;
   renderRail();
 });
 
@@ -272,6 +311,18 @@ const showIdentity = () => {
 };
 
 nextBtn.addEventListener('click', () => {
+  if (!nomineeTeam.value) {
+    showStepError(nomineeTeamField, nomineeTeam, 'Select a team to continue.');
+    return;
+  }
+  if (nomineePlayer.disabled) {
+    showStepError(nomineeTeamField, nomineeTeam, 'No eligible players are available for this team. Select another team.');
+    return;
+  }
+  if (!nomineePlayer.value || !picks.has(AWARDS[index].id)) {
+    showStepError(nomineePlayerField, nomineePlayer, 'Select a player to continue.');
+    return;
+  }
   if (index < AWARDS.length - 1) {
     index += 1;
     renderAward();
@@ -336,5 +387,17 @@ identityForm.addEventListener('submit', async (event) => {
 
 // ---- first paint ---------------------------------------------------------------
 loadNominees()
-  .then(() => renderAward())
-  .catch((error) => setStatus(el('voteIdentityStatus'), explain(error), 'error'));
+  .then(() => {
+    nomineeTeam.disabled = false;
+    nextBtn.disabled = false;
+    ballot.removeAttribute('aria-busy');
+    clearStepError();
+    renderAward();
+  })
+  .catch((error) => {
+    nomineeTeam.disabled = true;
+    nomineePlayer.disabled = true;
+    nextBtn.disabled = true;
+    ballot.removeAttribute('aria-busy');
+    showStepStatus(explain(error), 'error');
+  });
