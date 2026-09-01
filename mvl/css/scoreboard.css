@@ -15,3 +15,67 @@ body{font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased}
 .scoreboard-logo{position:absolute;z-index:3;left:50%;top:50%;width:260px;height:260px;max-width:none;object-fit:contain;transform:translate(-50%,-50%);filter:drop-shadow(0 7px 4px rgba(0,0,0,.28));pointer-events:none}
 .overlay-status{position:absolute;left:50%;bottom:18px;padding:8px 12px;border-radius:7px;background:rgba(11,7,48,.88);color:#fff;font:600 13px/1.3 Arial,Helvetica,sans-serif;transform:translateX(-50%);white-space:nowrap}.overlay-status.is-hidden{display:none}.overlay-status.is-error{background:rgba(147,16,31,.94)}
 @media(max-width:900px){.scoreboard-stage{padding-inline:24px;padding-bottom:clamp(68px,11.3vh,92px)}.scoreboard-bar{height:92px}.score-box--left{border-radius:46px 0 0 46px}.score-box--right{border-radius:0 46px 46px 0}.team-box{--service-size:18px;--logo-text-clearance:64px;gap:8px}.service-dot{width:18px;height:18px;flex-basis:18px;box-shadow:0 0 0 7px rgba(255,255,255,.16)}.scoreboard-logo{width:180px;height:180px}}
+
+/* ==========================================================================
+   Big score overlay — every set, both teams. scoreboard-big.html
+   Same design language as the OBS band above: pill ends, full-bleed team
+   gradients, Morganite caps, and the MVL badge overlapping the bar rather
+   than boxed beside it. Two rows instead of one, so the set columns can line
+   up under each other. Page stays transparent for the stream composite.
+   ========================================================================== */
+.bigscore-page{min-width:520px;min-height:220px}
+.bigscore-stage{position:relative;display:flex;width:100%;height:100%;align-items:center;justify-content:center;padding:clamp(24px,4vh,56px) clamp(28px,4vw,72px)}
+.bigscore{position:relative;width:auto;max-width:min(1180px,100%);opacity:1;transition:opacity .25s ease,transform .25s ease}
+.bigscore.is-loading{opacity:0;transform:translateY(-8px)}
+.bigscore-bar{
+  --row-h:clamp(62px,6.6vw,88px);
+  --set-w:clamp(84px,6.6vw,124px);
+  --logo-clearance:clamp(132px,12vw,214px);
+  display:grid;
+  grid-auto-rows:var(--row-h);
+  color:#fff;
+  border:3px solid #7C3BFF;
+  border-radius:56px;
+  overflow:hidden;
+  filter:drop-shadow(0 10px 20px rgba(0,0,0,.28));
+}
+.bigscore-row{
+  display:grid;
+  grid-template-columns:minmax(clamp(250px,23vw,400px),1fr) auto;
+  align-items:center;
+  text-transform:uppercase;
+  text-shadow:0 3px 3px rgba(0,0,0,.34);
+  background:linear-gradient(110deg,var(--team-a,#2b2350),var(--team-b,#141033));
+}
+.bigscore-row--right{border-top:1px solid rgba(255,255,255,.32)}
+.bigscore-team{
+  display:block;min-width:0;max-width:100%;overflow:hidden;
+  /* clears the badge, which overlaps the left end the way it overlaps the
+     centre of the OBS band */
+  padding-left:var(--logo-clearance);
+  padding-right:clamp(14px,2vw,36px);
+  font-family:Morganite,'Arial Narrow',sans-serif;
+  font-size:clamp(38px,3.8vw,66px);
+  font-weight:700;line-height:1.08;letter-spacing:.015em;white-space:nowrap;
+}
+.bigscore-sets{display:grid;grid-template-columns:repeat(var(--set-count,3),var(--set-w));align-items:stretch;height:100%}
+.bigscore-set{
+  display:grid;place-items:center;
+  border-left:1px solid rgba(255,255,255,.32);
+  font-family:Morganite,'Arial Narrow',sans-serif;
+  font-size:clamp(40px,4vw,70px);
+  font-weight:700;line-height:.9;
+  font-variant-numeric:tabular-nums;
+  background:rgba(4,2,20,.26);
+}
+/* the closed set's winner — the boxed score in the layout, in league mint */
+.bigscore-set.is-won{color:#06120c;background:#7CF5B4;text-shadow:none}
+/* the set in play: marked, but never as a result */
+.bigscore-set.is-live{background:rgba(4,2,20,.46);box-shadow:inset 0 0 0 3px rgba(124,245,180,.55)}
+.bigscore-logo{
+  position:absolute;z-index:3;left:0;top:50%;
+  width:clamp(172px,17vw,260px);height:auto;max-width:none;
+  transform:translate(-21%,-50%);
+  filter:drop-shadow(0 7px 4px rgba(0,0,0,.28));
+  pointer-events:none;
+}

@@ -168,6 +168,7 @@ const courtDisplayOrigin = window.location.hostname === 'www.metaricevolley.ph' 
 const scoreboardUrls = (board) => ({
   court: `${courtDisplayOrigin}/mvl/scoreboard-court?board=${encodeURIComponent(board.publicCode || board.id)}`,
   obs: `${window.location.origin}/mvl/scoreboard?board=${encodeURIComponent(board.id)}`,
+  bigscore: `${window.location.origin}/mvl/scoreboard-big?board=${encodeURIComponent(board.id)}`,
   control: `${window.location.origin}/mvl/scoreboard-control?board=${encodeURIComponent(board.id)}&key=${encodeURIComponent(board.controlToken)}`,
 });
 const copyText = async (value) => {
@@ -196,6 +197,7 @@ const renderScoreboards = (boards) => {
       <div class="admin-scoreboard-actions">
         <a class="cta cta--primary" href="${escapeHtml(urls.control)}" target="_blank" rel="noopener">Manage</a>
         <button class="cta cta--secondary" type="button" data-copy-url="${escapeHtml(urls.obs)}" data-copy-label="OBS">Copy OBS link</button>
+        <button class="cta cta--secondary" type="button" data-copy-url="${escapeHtml(urls.bigscore)}" data-copy-label="Bigscore">Copy bigscore link</button>
         <button class="cta cta--secondary" type="button" data-copy-url="${escapeHtml(urls.control)}" data-copy-label="Control">Copy control link</button>
         <button class="cta cta--secondary" type="button" data-copy-url="${escapeHtml(urls.court)}" data-copy-label="Court display">Copy court link</button>
       </div>

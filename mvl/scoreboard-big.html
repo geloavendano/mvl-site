@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>MVL Big Score</title>
+  <link rel="stylesheet" href="/mvl/css/scoreboard.css?v=bigscore-3">
+</head>
+<body class="scoreboard-overlay-page bigscore-page">
+  <main class="bigscore-stage" aria-live="polite">
+    <section id="bigscore" class="bigscore is-loading" aria-label="Match score by set">
+      <div class="bigscore-bar">
+        <div class="bigscore-row bigscore-row--left">
+          <strong class="bigscore-team" id="bigLeftName">Team A</strong>
+          <div class="bigscore-sets" id="bigLeftSets"></div>
+        </div>
+        <div class="bigscore-row bigscore-row--right">
+          <strong class="bigscore-team" id="bigRightName">Team B</strong>
+          <div class="bigscore-sets" id="bigRightSets"></div>
+        </div>
+      </div>
+      <img class="bigscore-logo" src="/mvl/assets/hero-mvl-2026-logo.png" alt="Metarice Volleyball League 2026">
+    </section>
+    <p id="bigscoreStatus" class="overlay-status">Connecting to scoreboard…</p>
+  </main>
+  <script src="/mvl/js/supabase-config.js?v=fg-cluster"></script>
+  <script src="/mvl/js/scoreboard-big.js?v=bigscore-2"></script>
+</body>
+</html>
