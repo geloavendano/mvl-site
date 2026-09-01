@@ -5503,6 +5503,15 @@ body.checkin-complete { overflow: hidden; }
 .admin-raffle-note-form .cta { min-height: 34px; padding: 7px 12px; }
 .admin-raffle-edit { border: 0; background: none; color: #344054; cursor: pointer; font: 600 12px Arial, Helvetica, sans-serif; }
 .admin-raffle-edit:hover, .admin-raffle-remove:hover { text-decoration: underline; }
+.admin-raffle-team-exclusions { grid-column: 1 / -1; min-width: 0; margin: -2px 0 0; padding: 14px; border: 1px solid #eaecf0; border-radius: 8px; background: #fff; }
+.admin-raffle-team-exclusions[hidden] { display: none; }
+.admin-raffle-team-exclusions legend { padding: 0 5px; color: #475467; font: 600 11px Arial, Helvetica, sans-serif; }
+.admin-raffle-team-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.admin-raffle-team-option { display: flex; min-width: 0; align-items: center; gap: 8px; padding: 9px 10px; border-radius: 7px; background: #f9fafb; color: #344054; cursor: pointer; font: 600 11px Arial, Helvetica, sans-serif; }
+.admin-raffle-team-option input { width: 16px; height: 16px; flex: 0 0 16px; margin: 0; accent-color: var(--team-color, #25324a); }
+.admin-raffle-team-option span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.admin-raffle-team-option span::before { display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: var(--team-color, #475467); content: ''; vertical-align: 1px; }
+@media (min-width: 760px) { .admin-raffle-team-list { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 @media (max-width: 600px) {
   .admin-toast { right: 16px; bottom: 16px; left: 16px; max-width: none; }
   .admin-video-head { align-items: stretch; flex-direction: column; }
@@ -5530,4 +5539,3 @@ body.checkin-complete { overflow: hidden; }
 .library-video-card.is-playing .library-video-player .play-btn {
   opacity: .35;
 }
-

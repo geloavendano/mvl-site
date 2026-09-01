@@ -4,7 +4,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><title>MVL Admin</title>
 <link rel="icon" type="image/svg+xml" href="/mvl/assets/metarice-icon.svg">
-<link rel="stylesheet" href="/mvl/css/style.css?v=single-player">
+<link rel="stylesheet" href="/mvl/css/style.css?v=raffle-team-exclusions">
 </head>
 <body class="admin-page">
 <header class="admin-topbar"><a href="/mvl/index.html"><img src="/mvl/assets/hero-mvl-2026-logo.png" alt="MVL 2026"></a><button id="signOutBtn" class="admin-link is-hidden" type="button">Sign out</button></header>
@@ -42,6 +42,11 @@
             <label class="field"><span>End date</span><input id="raffleEndDate" name="endDate" type="date" required></label>
             <label class="admin-checkbox"><input name="furparentOnly" type="checkbox"><span><strong>Furparents only</strong><small>Include only players who declared that they have a pet.</small></span></label>
             <label class="admin-checkbox"><input name="includePreviousWinners" type="checkbox"><span><strong>Include previous raffle winners</strong><small>Allow players already awarded a prize back into the draw pool. Applies only to Draw Winner.</small></span></label>
+            <label class="admin-checkbox"><input id="raffleExcludeTeamsToggle" name="excludeTeams" type="checkbox" aria-controls="raffleExcludedTeams" aria-expanded="false"><span><strong>Exclude teams</strong><small>Remove selected teams from the Draw Winner pool.</small></span></label>
+            <fieldset id="raffleExcludedTeams" class="admin-raffle-team-exclusions" hidden>
+              <legend>Teams to exclude</legend>
+              <div id="raffleExcludedTeamList" class="admin-raffle-team-list"></div>
+            </fieldset>
           </div>
           <div class="admin-form-actions"><div class="admin-raffle-export-actions"><button class="cta cta--secondary" type="submit">Download CSV</button><button id="raffleDrawBtn" class="cta cta--primary" type="button">Draw Winner</button></div><p class="form-status" aria-live="polite"></p></div>
         </form>
@@ -161,5 +166,5 @@
     </section>
   </div>
 </dialog>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/mvl/js/supabase-config.js?v=stream-guide"></script><script src="/mvl/js/league-data.js?v=courts-original"></script><script src="/mvl/js/admin.js?v=raffle-repeat-winners"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/mvl/js/supabase-config.js?v=stream-guide"></script><script src="/mvl/js/league-data.js?v=courts-original"></script><script src="/mvl/js/admin.js?v=raffle-team-exclusions"></script>
 </body></html>

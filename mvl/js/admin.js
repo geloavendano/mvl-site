@@ -31,6 +31,9 @@ const raffleBlacklistTeam = document.getElementById('raffleBlacklistTeam');
 const raffleBlacklistPlayer = document.getElementById('raffleBlacklistPlayer');
 const raffleBlacklistList = document.getElementById('raffleBlacklistList');
 const raffleDrawBtn = document.getElementById('raffleDrawBtn');
+const raffleExcludeTeamsToggle = document.getElementById('raffleExcludeTeamsToggle');
+const raffleExcludedTeams = document.getElementById('raffleExcludedTeams');
+const raffleExcludedTeamList = document.getElementById('raffleExcludedTeamList');
 const raffleDrawDialog = document.getElementById('raffleDrawDialog');
 const raffleDrawTitle = document.getElementById('raffleDrawTitle');
 const raffleDrawingView = document.getElementById('raffleDrawingView');
@@ -68,6 +71,22 @@ const adminTeamColor = (teamId) => {
   return `#${rgb.map((value, index) => Math.round(value * .68 + base[index] * .32).toString(16).padStart(2, '0')).join('')}`;
 };
 const teamNameMarkup = (teamId, name, className = '') => `<span class="admin-team-name ${className}" style="--team-color:${adminTeamColor(teamId)}">${escapeHtml(name)}</span>`;
+const renderRaffleTeamExclusions = () => {
+  raffleExcludedTeamList.innerHTML = window.MVL_DATA.teams.map((team) => (
+    `<label class="admin-raffle-team-option" style="--team-color:${adminTeamColor(team.id)}"><input name="excludedTeamIds" type="checkbox" value="${escapeHtml(team.id)}" disabled><span>${escapeHtml(team.name)}</span></label>`
+  )).join('');
+};
+const syncRaffleTeamExclusions = () => {
+  const isActive = raffleExcludeTeamsToggle.checked;
+  raffleExcludeTeamsToggle.setAttribute('aria-expanded', String(isActive));
+  raffleExcludedTeams.hidden = !isActive;
+  raffleExcludedTeamList.querySelectorAll('input').forEach((input) => { input.disabled = !isActive; });
+};
+const selectedRaffleTeamExclusions = () => raffleExcludeTeamsToggle.checked
+  ? [...raffleExcludedTeamList.querySelectorAll('input:checked')].map((input) => input.value)
+  : [];
+renderRaffleTeamExclusions();
+syncRaffleTeamExclusions();
 const gameTeamName = (game, side) => {
   const id = side === 'A' ? game.teamA : game.teamB;
   const label = side === 'A' ? game.teamALabel : game.teamBLabel;
@@ -822,17 +841,19 @@ raffleExportForm.addEventListener('submit', async (event) => {
     submitButton.disabled = false;
   }
 });
+raffleExcludeTeamsToggle.addEventListener('change', syncRaffleTeamExclusions);
 raffleDrawBtn.addEventListener('click', async () => {
   if (!raffleExportForm.reportValidity()) return;
   const formStatus = raffleExportForm.querySelector('.form-status');
   status(formStatus, 'Preparing the raffle pool…');
   raffleDrawBtn.disabled = true;
   try {
-    const payload = await rpc('mvl_admin_draw_raffle_winner_with_options', {
+    const payload = await rpc('mvl_admin_draw_raffle_winner_with_filters', {
       p_start_date: raffleExportForm.elements.startDate.value,
       p_end_date: raffleExportForm.elements.endDate.value,
       p_furparent_only: raffleExportForm.elements.furparentOnly.checked,
       p_include_previous_winners: raffleExportForm.elements.includePreviousWinners.checked,
+      p_excluded_team_ids: selectedRaffleTeamExclusions(),
     });
     if (!payload.winner || !payload.pool?.length) {
       status(formStatus, 'No eligible check-ins found for this selection.', 'error');
