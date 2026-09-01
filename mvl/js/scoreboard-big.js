@@ -57,7 +57,7 @@ const renderSets = (columns) => {
     // a live set has no winner yet — highlighting one mid-rally would read as
     // a decided result on the broadcast
     const won = !column.live && mine > theirs;
-    return `<span class="bigscore-set${won ? ' is-won' : ''}${column.live ? ' is-live' : ''}">${mine}</span>`;
+    return `<span class="bigscore-set${won ? ' is-won' : ''}${column.live ? ' is-live' : ''}"><b>${mine}</b></span>`;
   };
   leftSets.innerHTML = columns.map((column) => cell(column, 'left')).join('');
   rightSets.innerHTML = columns.map((column) => cell(column, 'right')).join('');
