@@ -30,7 +30,7 @@ body{font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased}
 .bigscore-bar{
   --row-h:clamp(62px,6.6vw,88px);
   --set-w:clamp(84px,6.6vw,124px);
-  --logo-clearance:clamp(132px,12vw,214px);
+  --logo-clearance:clamp(150px,14vw,242px);
   display:grid;
   grid-auto-rows:var(--row-h);
   color:#fff;
@@ -43,6 +43,8 @@ body{font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased}
   display:grid;
   grid-template-columns:minmax(clamp(250px,23vw,400px),1fr) auto;
   align-items:center;
+  /* clears the 56px corner radius so the last set is not cut by the curve */
+  padding-right:clamp(22px,2.8vw,48px);
   text-transform:uppercase;
   text-shadow:0 3px 3px rgba(0,0,0,.34);
   background:linear-gradient(110deg,var(--team-a,#2b2350),var(--team-b,#141033));
@@ -60,22 +62,41 @@ body{font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased}
 }
 .bigscore-sets{display:grid;grid-template-columns:repeat(var(--set-count,3),var(--set-w));align-items:stretch;height:100%}
 .bigscore-set{
+  position:relative;
   display:grid;place-items:center;
   border-left:1px solid rgba(255,255,255,.32);
   font-family:Morganite,'Arial Narrow',sans-serif;
   font-size:clamp(40px,4vw,70px);
   font-weight:700;line-height:.9;
   font-variant-numeric:tabular-nums;
-  background:rgba(4,2,20,.26);
 }
-/* the closed set's winner — the boxed score in the layout, in league mint */
-.bigscore-set.is-won{color:#06120c;background:#7CF5B4;text-shadow:none}
-/* the set in play: marked, but never as a result */
-.bigscore-set.is-live{background:rgba(4,2,20,.46);box-shadow:inset 0 0 0 3px rgba(124,245,180,.55)}
-.bigscore-logo{
+/* The won set carries the same ring and outer glow as a winning team card on
+   /mvl/schedule (.match-team.is-winner), so the two pages mark a win the same
+   way. Inset, so it never changes the cell's footprint. */
+.bigscore-set.is-won{color:#7CF5B4;text-shadow:0 3px 3px rgba(0,0,0,.34)}
+/* Drawn on a pseudo-element rather than the cell so it can sit inside the
+   cell's bounds — a ring on the cell itself butts against the dividers and
+   reads as a table border rather than a mark around the score. */
+.bigscore-set.is-won::before{
+  content:'';
+  position:absolute;
+  inset:clamp(7px,13%,15px) clamp(9px,15%,20px);
+  border:2px solid #7CF5B4;
+  /* echoes the frame's roundness without going fully circular */
+  border-radius:clamp(12px,26%,22px);
+  box-shadow:0 0 18px rgba(124,245,180,.16);
+  pointer-events:none;
+}
+/* The set in play gets no marker: a win is the only thing worth calling out,
+   and the layout leaves an in-progress set plain. */
+/* Star behind the mark, as on the court display — the star runs about 1.66x
+   the logo there, and the same ratio holds here. */
+.bigscore-brand{
   position:absolute;z-index:3;left:0;top:50%;
-  width:clamp(172px,17vw,260px);height:auto;max-width:none;
-  transform:translate(-21%,-50%);
+  display:grid;place-items:center;
+  transform:translate(-34%,-50%);
   filter:drop-shadow(0 7px 4px rgba(0,0,0,.28));
   pointer-events:none;
 }
+.bigscore-star{position:absolute;width:clamp(230px,22vw,340px);height:auto;max-width:none;object-fit:contain}
+.bigscore-logo{position:relative;z-index:1;width:clamp(138px,13.2vw,205px);height:auto;max-width:none;object-fit:contain}
