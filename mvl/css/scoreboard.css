@@ -82,10 +82,13 @@ body{font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased}
   content:'';
   position:absolute;
   z-index:0;
-  inset:clamp(7px,13%,15px) clamp(9px,15%,20px);
+  top:50%;
+  right:clamp(9px,15%,20px);
+  left:clamp(9px,15%,20px);
+  height:74%;
   border-radius:clamp(12px,26%,22px);
-  background:rgba(255,255,255,.9);
-  background:linear-gradient(135deg,color-mix(in srgb,var(--team-a,#777) 28%,#fff),color-mix(in srgb,var(--team-b,#333) 24%,#fff));
+  background:linear-gradient(135deg,rgba(255,255,255,.58),rgba(255,255,255,.34)),linear-gradient(135deg,var(--team-a,#777),var(--team-b,#333));
+  transform:translateY(-50%);
   pointer-events:none;
 }
 /* The set in play gets no marker: a win is the only thing worth calling out,
