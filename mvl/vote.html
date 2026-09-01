@@ -9,12 +9,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/mvl/css/style.css?v=vote-3">
+<link rel="stylesheet" href="/mvl/css/style.css?v=vote-10">
 <script src="/mvl/js/site-config.js?v=cutover-gameday"></script>
 <script src="/mvl/js/analytics.js?v=fg-cluster"></script>
 <script src="/mvl/js/nav.js?v=fg-cluster"></script>
 </head>
-<body class="vote-page" id="top">
+<body class="waiver-page vote-page" id="top">
 
 <header class="nav nav--stuck page-nav" id="nav">
   <a class="nav-logo" href="/mvl/index.html" aria-label="MVL 2026 home">
@@ -25,13 +25,12 @@
     <a href="/mvl/videos.html">Videos</a>
     <a href="/mvl/rules.html">Rules</a>
     <a href="/mvl/index.html#teams">Teams</a>
-    <a href="/mvl/vote.html">Vote</a>
     <a href="/mvl/checkin.html">Check-In</a>
   </nav>
 </header>
 
-<main class="vote-main">
-  <section class="vote-intro page-hero">
+<main class="waiver-main">
+  <section class="waiver-intro page-hero">
     <p class="section-kicker section-kicker--teal">MVL 2026</p>
     <h1 class="page-title">Vote for the <em>Special Awards</em></h1>
     <p class="page-lede">
@@ -40,74 +39,29 @@
     </p>
   </section>
 
-  <!-- Identity first, deliberately: it is what tells someone they have already
-       voted, and finding that out after picking four players would be worse. -->
-  <form class="vote-form" id="voteIdentity" novalidate>
-    <section class="form-panel">
-      <div class="form-panel-head">
-        <p class="section-kicker section-kicker--teal">Step 1</p>
-        <h2>Tell us who you are</h2>
-        <p class="form-panel-sub">We match this against your league registration so each player votes once.</p>
-      </div>
-      <div class="form-grid">
-        <label class="field">
-          <span>Team</span>
-          <select name="team_id" id="voteTeam" required>
-            <option value="">Select your team</option>
-          </select>
-        </label>
-        <label class="field">
-          <span>Jersey number</span>
-          <input name="jersey_number" id="voteJersey" type="text" inputmode="numeric" autocomplete="off" placeholder="00" required>
-        </label>
-        <label class="field field--wide">
-          <span>Registered email</span>
-          <input name="email" id="voteEmail" type="email" autocomplete="email" placeholder="you@example.com" required>
-        </label>
-      </div>
-      <div class="form-actions">
-        <button class="cta cta--primary" type="submit" id="voteStartBtn">Start voting</button>
-        <p class="form-status" id="voteIdentityStatus"></p>
-      </div>
-    </section>
-  </form>
-
-  <!-- The ballot. One award on screen at a time; the rail lets you jump back. -->
-  <section class="vote-ballot is-hidden" id="voteBallot" aria-live="polite">
-    <div class="vote-ballot-head">
-      <p class="section-kicker section-kicker--teal">Step 2</p>
-      <h2 id="voteBallotVoter">Your ballot</h2>
-      <p class="vote-progress" id="voteProgress"></p>
+  <!-- The ballot. Awards come first so people can see what they are voting for;
+       who they are is asked at the end, just before it is sent. -->
+  <section class="form-panel vote-ballot" id="voteBallot">
+    <div class="form-panel-head">
+      <p class="section-kicker section-kicker--teal" id="voteProgress">Award 1 of 4</p>
+      <h2 id="voteAwardName">Fresh New Player of the League</h2>
     </div>
 
     <div class="vote-layout">
+      <!-- Desktop only: jump between awards. On mobile the progress line above
+           carries the same information without four items of scrolling. -->
       <ol class="vote-rail" id="voteRail" aria-label="Awards"></ol>
 
-      <div class="vote-card">
-        <div class="vote-card-copy">
+      <div class="vote-card" id="voteCard">
+        <div class="vote-copy" id="voteCopy">
           <p class="vote-brand" id="voteBrand"></p>
-          <h3 class="vote-award-name" id="voteAwardName"></h3>
           <p class="vote-tagline" id="voteTagline"></p>
           <div class="vote-body" id="voteBody"></div>
           <p class="vote-question" id="voteQuestion"></p>
-
-          <div class="form-grid vote-selectors">
-            <label class="field">
-              <span>Team</span>
-              <select id="voteNomineeTeam">
-                <option value="">Select a team</option>
-              </select>
-            </label>
-            <label class="field">
-              <span>Player</span>
-              <select id="voteNomineePlayer" disabled>
-                <option value="">Select a player</option>
-              </select>
-            </label>
-          </div>
         </div>
 
         <figure class="vote-slot" id="voteSlot">
+          <button class="vote-slot-clear" type="button" id="voteSlotClear" hidden aria-label="Clear this pick">&times;</button>
           <img id="voteSlotPhoto" alt="" hidden>
           <svg class="vote-slot-silhouette" viewBox="0 0 120 140" aria-hidden="true">
             <path fill="currentColor" d="M60 18a24 24 0 1 1 0 48 24 24 0 0 1 0-48Zm0 58c26 0 47 17 47 38v6H13v-6c0-21 21-38 47-38Z"/>
@@ -118,20 +72,65 @@
       </div>
     </div>
 
-    <div class="vote-actions">
-      <button class="cta cta--secondary" type="button" id="voteBackBtn" hidden>Back</button>
-      <button class="cta cta--primary" type="button" id="voteNextBtn" disabled>Next</button>
-      <p class="form-status" id="voteStatus"></p>
+    <!-- Fixed to the bottom of the viewport on mobile so the pickers and Next
+         stay in reach without scrolling past the award copy. -->
+    <div class="vote-controls" id="voteControls">
+      <div class="form-grid vote-selectors">
+        <label class="field">
+          <span>Team</span>
+          <select id="voteNomineeTeam"><option value="">Select a team</option></select>
+        </label>
+        <label class="field">
+          <span>Player</span>
+          <select id="voteNomineePlayer" disabled><option value="">Select a player</option></select>
+        </label>
+      </div>
+      <div class="vote-actions">
+        <button class="cta cta--secondary" type="button" id="voteBackBtn" hidden>Back</button>
+        <button class="cta cta--primary" type="button" id="voteNextBtn" disabled>Next</button>
+      </div>
     </div>
   </section>
 
-  <!-- Takeover once the ballot is in. -->
-  <section class="vote-done is-hidden" id="voteDone" role="status" aria-live="polite">
-    <p class="section-kicker section-kicker--teal">Ballot received</p>
-    <h2 class="vote-done-title" id="voteDoneTitle">Thanks for voting</h2>
-    <p class="vote-done-sub" id="voteDoneSub"></p>
-    <ul class="vote-summary" id="voteSummary"></ul>
-    <div class="vote-done-actions">
+  <!-- Asked last: they have seen what they are voting for by now. -->
+  <form class="vote-form is-hidden" id="voteIdentity" novalidate>
+    <section class="form-panel">
+      <div class="form-panel-head">
+        <p class="section-kicker section-kicker--teal">Last step</p>
+        <h2>Confirm it is you</h2>
+      </div>
+      <p class="vote-identity-sub">We match this against your league registration so each player votes once.</p>
+      <ul class="mechanics-list vote-recap" id="voteRecap"></ul>
+      <div class="form-grid">
+        <label class="field">
+          <span>Team</span>
+          <select name="team_id" id="voteTeam" required><option value="">Select your team</option></select>
+        </label>
+        <label class="field">
+          <span>Jersey number</span>
+          <input name="jersey_number" id="voteJersey" type="text" inputmode="numeric" autocomplete="off" placeholder="00" required>
+        </label>
+        <label class="field">
+          <span>Registered email</span>
+          <input name="email" id="voteEmail" type="email" autocomplete="email" placeholder="you@example.com" required>
+        </label>
+      </div>
+      <div class="form-actions">
+        <button class="cta cta--secondary" type="button" id="voteEditBtn">Back to my picks</button>
+        <button class="cta cta--primary" type="submit" id="voteSubmitBtn">Submit ballot</button>
+        <p class="form-status" id="voteIdentityStatus"></p>
+      </div>
+    </section>
+  </form>
+
+  <section class="form-panel vote-done is-hidden" id="voteDone" role="status" aria-live="polite">
+    <div class="form-panel-head">
+      <p class="section-kicker section-kicker--teal">Ballot received</p>
+      <h2 id="voteDoneTitle">Thanks for voting</h2>
+    </div>
+    <p class="vote-identity-sub" id="voteDoneSub"></p>
+    <ul class="mechanics-list vote-recap" id="voteSummary"></ul>
+    <div class="form-actions">
       <a class="cta cta--primary" href="/mvl/schedule.html">View the Standings</a>
       <a class="cta cta--secondary" href="/mvl/index.html">Back to Home</a>
     </div>
@@ -164,6 +163,6 @@
 <script src="/mvl/js/league-data.js?v=courts-original"></script>
 <script src="/mvl/js/marquee.js?v=fg-cluster"></script>
 <script src="/mvl/js/supabase-config.js?v=fg-cluster"></script>
-<script src="/mvl/js/vote.js?v=vote-1"></script>
+<script src="/mvl/js/vote.js?v=vote-11"></script>
 </body>
 </html>

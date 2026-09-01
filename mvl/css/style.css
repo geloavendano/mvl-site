@@ -5542,105 +5542,36 @@ body.checkin-complete { overflow: hidden; }
 
 /* ==========================================================================
    Special-award voting — /mvl/vote
-   Reuses .form-panel, .field and .cta from the waiver flow; what is new here
-   is the ballot layout and the nominee slot.
+   The page is a .waiver-page, so .waiver-main, .form-panel, .form-panel-head,
+   .form-grid, .field, .cta and .mechanics-list all come from the waiver flow.
+   Only the ballot's two-column split and the nominee slot are new.
    ========================================================================== */
-.vote-main {
-  position: relative;
-  z-index: 2;
-  width: min(calc(100% - 32px), 1180px);
-  margin: 0 auto;
-  padding: calc(var(--nav-h) + 40px) 0 60px;
-  display: grid;
-  gap: 28px;
-}
-.vote-intro { max-width: 720px; }
-.vote-form { display: grid; gap: 18px; }
+.vote-layout { padding-top: 18px; }
+.vote-rail { display: none; }          /* desktop only — see the query below */
 
-.vote-ballot-head { margin-bottom: 20px; }
-.vote-ballot-head h2 {
-  font: italic clamp(30px, 6vw, 46px)/.95 var(--stretch);
-  text-transform: uppercase;
-}
-.vote-progress {
-  margin-top: 8px;
-  color: var(--ink-muted);
-  font: 700 10px var(--mono);
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
-}
-
-/* Rail above the card on narrow screens, beside it once there is room — the
-   wireframe's two-column split. */
-.vote-layout {
-  display: grid;
-  gap: 20px;
-  padding: 18px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, .05);
-}
-/* On narrow screens the rail would push the award itself four items down the
-   page, so the card leads and the rail follows as a jump list. "Award n of 4"
-   above already says where you are. From 860px they sit side by side. */
-.vote-rail {
-  order: 2;
-  list-style: none;
-  display: grid;
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-}
-.vote-card { order: 1; }
-.vote-rail-item {
-  width: 100%;
-  display: grid;
-  gap: 3px;
-  padding: 12px 14px;
-  border: 1px solid rgba(255, 255, 255, .12);
-  border-radius: 12px;
-  background: none;
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-.vote-rail-item:disabled { opacity: .45; cursor: default; }
-.vote-rail-item.is-current { border-color: var(--mint); background: rgba(124, 245, 180, .1); }
-.vote-rail-item:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
-.vote-rail-name {
-  font: 800 12px var(--ui);
-  letter-spacing: .4px;
-  text-transform: uppercase;
-}
-.vote-rail-pick { color: var(--ink-muted); font-size: 12px; }
-.vote-rail-item.is-done .vote-rail-pick { color: var(--mint); }
-
-.vote-card { display: grid; gap: 20px; }
+.vote-card { display: grid; gap: 16px; }
 .vote-brand {
   color: var(--teal);
   font: 800 10px var(--mono);
   letter-spacing: 1.4px;
   text-transform: uppercase;
 }
-.vote-award-name {
-  margin-top: 6px;
-  font: italic clamp(24px, 5vw, 34px)/.98 var(--stretch);
-  text-transform: uppercase;
-}
-.vote-tagline { margin-top: 8px; color: #fff; font-size: 15px; font-weight: 700; }
+.vote-tagline { margin-top: 6px; color: #fff; font-size: 15px; font-weight: 700; }
 .vote-body { display: grid; gap: 8px; margin-top: 10px; }
 .vote-body p { color: var(--ink-soft); font-size: 13.5px; line-height: 1.6; }
 .vote-question { margin-top: 12px; color: var(--mint); font-size: 14px; font-weight: 700; }
-.vote-selectors { margin-top: 16px; }
+.vote-identity-sub { padding-top: 16px; color: var(--ink-soft); font-size: 13.5px; line-height: 1.6; }
+.vote-recap { padding-top: 14px; }
+.vote-recap li { font-size: 13.5px; }
 
-/* The nominee slot: the team's artwork with the cut-out standing on it, the
-   same treatment as the check-in confirmation card, with the presenting
-   brand's logo sitting in the corner the way it would on a poster. */
+/* The nominee slot: the check-in card's treatment — the cut-out standing on the
+   team's artwork — with the presenting brand where it would sit on a poster. */
 .vote-slot {
   position: relative;
   margin: 0;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 16 / 11;
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: 14px;
   display: grid;
   place-items: center;
   color: color-mix(in srgb, var(--team-a, var(--mint)) 55%, #ffffff);
@@ -5663,16 +5594,15 @@ body.checkin-complete { overflow: hidden; }
   filter: drop-shadow(0 6px 12px rgba(4, 2, 20, .5));
 }
 .vote-slot.has-pick .vote-slot-silhouette { display: none; }
-.vote-slot-silhouette { width: 92px; opacity: .5; }
+.vote-slot-silhouette { width: 84px; opacity: .5; }
 .vote-slot-caption {
   position: absolute;
   left: 14px;
-  right: 96px;
+  right: 92px;
   bottom: 12px;
   z-index: 2;
   color: #fff;
   font: 800 12px var(--ui);
-  letter-spacing: .3px;
   text-shadow: 0 2px 8px rgba(4, 2, 20, .8);
 }
 .vote-slot-brand {
@@ -5681,44 +5611,108 @@ body.checkin-complete { overflow: hidden; }
   bottom: 12px;
   z-index: 2;
   width: auto;
-  max-width: 84px;
-  max-height: 26px;
+  max-width: 78px;
+  max-height: 24px;
   object-fit: contain;
 }
-
-/* .cta sets display, which beats the UA [hidden] rule whatever the
-   specificity — without this the Back button shows on the first award. */
-.vote-actions .cta[hidden] { display: none; }
-.vote-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-  margin-top: 18px;
-}
-.vote-actions .form-status { flex: 1 1 100%; }
-
-.vote-done { display: grid; gap: 12px; justify-items: start; }
-.vote-done-title { font: italic clamp(34px, 8vw, 60px)/.92 var(--stretch); text-transform: uppercase; }
-.vote-done-sub { color: var(--ink-soft); }
-.vote-summary { list-style: none; display: grid; gap: 8px; margin: 8px 0 0; padding: 0; }
-.vote-summary li {
+.vote-slot-clear {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 3;
   display: grid;
-  gap: 2px;
-  padding: 12px 14px;
-  border-left: 2px solid var(--mint);
-  border-radius: 0 10px 10px 0;
-  background: rgba(255, 255, 255, .05);
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(4, 2, 20, .6);
+  color: #fff;
+  font-size: 19px;
+  line-height: 1;
+  cursor: pointer;
 }
-.vote-summary strong { font: 800 11px var(--mono); letter-spacing: 1.1px; text-transform: uppercase; color: var(--teal); }
-.vote-summary span { font-size: 15px; font-weight: 700; }
-.vote-done-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
+.vote-slot-clear[hidden] { display: none; }
+.vote-slot-clear:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
+
+/* .cta sets display, which beats the UA [hidden] rule whatever the specificity */
+.vote-actions .cta[hidden] { display: none; }
+.vote-actions { display: flex; gap: 10px; }
+.vote-actions .cta { flex: 1 1 auto; border: 0; cursor: pointer; }
+
+/* ---- mobile: one award, controls pinned, picked player takes the card ----- */
+@media (max-width: 859px) {
+  /* The pickers and Next stay in reach instead of sitting below the copy.
+     .form-panel carries a backdrop-filter, which makes it a containing block
+     for fixed descendants — the bar would anchor to the panel rather than the
+     viewport — so the blur comes off this one panel. Sticky is not the way out
+     either: html and body are overflow-x:hidden, which breaks it. */
+  .waiver-page .vote-ballot {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .vote-controls {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    display: grid;
+    gap: 10px;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    border-top: 1px solid rgba(124, 245, 180, .22);
+    background: rgba(4, 9, 15, .96);
+  }
+  /* clear the bar so the end of the copy stays reachable */
+  .vote-ballot { padding-bottom: 168px; }
+  .vote-controls .form-grid { grid-template-columns: 1fr 1fr; gap: 10px; padding-top: 0; }
+  .vote-controls .field span { font-size: 9px; }
+  /* Once a player is picked they take the card; the × brings the copy back. */
+  .vote-card.has-pick .vote-copy { display: none; }
+  /* Square, not portrait: a 3/4 slot pushed its own caption and the presenting
+     brand's logo down behind the fixed bar. The cut-out is bottom-anchored at
+     full height either way, so it loses nothing. */
+  .vote-slot { aspect-ratio: 6 / 5; }
+}
 
 @media (min-width: 860px) {
-  .vote-layout { grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 28px; padding: 24px; }
-  .vote-rail { order: 0; }
-  .vote-card { order: 0; }
-  .vote-card { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); align-items: start; gap: 26px; }
-  .vote-slot { aspect-ratio: 4 / 3; }
+  .vote-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 240px) minmax(0, 1fr);
+    gap: 26px;
+    align-items: start;
+  }
+  .vote-rail {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .vote-rail-item {
+    width: 100%;
+    display: grid;
+    gap: 3px;
+    padding: 11px 13px;
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 12px;
+    background: none;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .vote-rail-item:disabled { opacity: .45; cursor: default; }
+  .vote-rail-item.is-current { border-color: var(--mint); background: rgba(124, 245, 180, .1); }
+  .vote-rail-item:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
+  .vote-rail-name { font: 800 11px var(--ui); letter-spacing: .4px; text-transform: uppercase; }
+  .vote-rail-pick { color: var(--ink-muted); font-size: 12px; }
+  .vote-rail-item.is-done .vote-rail-pick { color: var(--mint); }
+
+  .vote-card { grid-template-columns: minmax(0, 1fr) minmax(0, .92fr); gap: 22px; align-items: start; }
+  .vote-slot { aspect-ratio: 4 / 5; }
+  .vote-controls { margin-top: 20px; }
+  .vote-controls .form-grid { grid-template-columns: 1fr 1fr; }
+  .vote-actions { justify-content: flex-end; margin-top: 16px; }
+  .vote-actions .cta { flex: 0 0 auto; min-width: 140px; }
 }
 

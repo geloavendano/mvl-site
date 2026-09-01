@@ -18,6 +18,8 @@ const cssUrl = (path) => `url('${String(path).replace(/'/g, "\\'")}')`;
 
 const identityForm = el('voteIdentity');
 const ballot = el('voteBallot');
+const card = el('voteCard');
+const slotClear = el('voteSlotClear');
 const done = el('voteDone');
 const railList = el('voteRail');
 const nomineeTeam = el('voteNomineeTeam');
@@ -36,7 +38,6 @@ const setStatus = (node, message, tone = '') => {
 };
 
 // ---- state -------------------------------------------------------------------
-let voter = null;              // { team_id, jersey_number, email, name }
 let index = 0;                 // which award is on screen
 const picks = new Map();       // award id -> { playerId, name, teamId, photo }
 let nominees = [];              // every player, fetched once
@@ -87,6 +88,11 @@ const teamOptions = TEAMS.map((team) => `<option value="${escapeHtml(team.id)}">
 el('voteTeam').insertAdjacentHTML('beforeend', teamOptions);
 nomineeTeam.insertAdjacentHTML('beforeend', teamOptions);
 
+// On mobile the picked player takes the card, so the award copy steps aside;
+// clearing brings it back. Driven by a class rather than inline display so the
+// desktop layout, which shows both at once, is unaffected.
+const markPick = (has) => card.classList.toggle('has-pick', has);
+
 // ---- the slot ----------------------------------------------------------------
 // Mirrors the check-in confirmation card: the nominee's cut-out stands on the
 // team's artwork, so the pick reads as a person rather than a row in a select.
@@ -103,6 +109,8 @@ const paintSlot = (award, pick) => {
     slot.style.removeProperty('--team-art');
   }
   slot.classList.toggle('has-pick', Boolean(pick));
+  markPick(Boolean(pick));
+  slotClear.hidden = !pick;
 
   if (pick?.photo) {
     slotPhoto.src = pick.photo;
@@ -150,6 +158,7 @@ const renderAward = async () => {
   el('voteBrand').textContent = award.brand ? `Presented by ${award.brand}` : '';
   el('voteAwardName').textContent = award.name;
   el('voteTagline').textContent = award.tagline || '';
+  document.title = `${award.name} — Vote — MVL 2026`;
   el('voteBody').innerHTML = (award.body || []).map((line) => `<p>${escapeHtml(line)}</p>`).join('');
   el('voteQuestion').textContent = award.question || '';
   el('voteProgress').textContent = `Award ${index + 1} of ${AWARDS.length}`;
@@ -216,6 +225,17 @@ nomineePlayer.addEventListener('change', () => {
   renderRail();
 });
 
+slotClear.addEventListener('click', () => {
+  const award = AWARDS[index];
+  picks.delete(award.id);
+  nomineeTeam.value = '';
+  nomineePlayer.innerHTML = '<option value="">Select a player</option>';
+  nomineePlayer.disabled = true;
+  paintSlot(award, null);
+  nextBtn.disabled = true;
+  renderRail();
+});
+
 railList.addEventListener('click', (event) => {
   const button = event.target.closest('[data-award-index]');
   if (!button || button.disabled) return;
@@ -230,32 +250,14 @@ backBtn.addEventListener('click', () => {
   ballot.scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
 
-// ---- submit ------------------------------------------------------------------
-const submitBallot = async () => {
-  nextBtn.disabled = true;
-  setStatus(el('voteStatus'), 'Sending your ballot…');
-  try {
-    const payload = await rpc('mvl_submit_award_votes', {
-      p_team_id: voter.team_id,
-      p_jersey_number: voter.jersey_number,
-      p_email: voter.email,
-      p_votes: AWARDS.filter((a) => picks.has(a.id)).map((a) => ({
-        award_id: a.id,
-        nominee_player_id: picks.get(a.id).playerId,
-      })),
-    });
-    ballot.classList.add('is-hidden');
-    done.classList.remove('is-hidden');
-    el('voteDoneTitle').textContent = `Thanks, ${voter.name.split(' ')[0]}`;
-    el('voteDoneSub').textContent = `${payload.votes} ${payload.votes === 1 ? 'vote' : 'votes'} recorded. Winners are announced on the final day.`;
-    el('voteSummary').innerHTML = AWARDS.filter((a) => picks.has(a.id)).map((a) => `
-      <li><strong>${escapeHtml(a.name)}</strong><span>${escapeHtml(picks.get(a.id).name)}</span></li>
-    `).join('');
-    done.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  } catch (error) {
-    setStatus(el('voteStatus'), explain(error), 'error');
-    nextBtn.disabled = false;
-  }
+// ---- advancing ---------------------------------------------------------------
+const showIdentity = () => {
+  ballot.classList.add('is-hidden');
+  identityForm.classList.remove('is-hidden');
+  el('voteRecap').innerHTML = AWARDS.filter((a) => picks.has(a.id)).map((a) => `
+    <li><strong>${escapeHtml(a.name)}.</strong> ${escapeHtml(picks.get(a.id).name)}</li>
+  `).join('');
+  identityForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
 
 nextBtn.addEventListener('click', () => {
@@ -265,45 +267,61 @@ nextBtn.addEventListener('click', () => {
     ballot.scrollIntoView({ behavior: 'smooth', block: 'start' });
     return;
   }
-  submitBallot();
+  showIdentity();
 });
 
-// ---- identity ----------------------------------------------------------------
+el('voteEditBtn').addEventListener('click', () => {
+  identityForm.classList.add('is-hidden');
+  ballot.classList.remove('is-hidden');
+  ballot.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+// ---- submit ------------------------------------------------------------------
+// Identity is checked here rather than up front, so someone who has already
+// voted only finds out now — the trade for letting them see the awards first.
 identityForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   const status = el('voteIdentityStatus');
+  const submitBtn = el('voteSubmitBtn');
   const team_id = el('voteTeam').value;
   const jersey_number = el('voteJersey').value.trim();
   const email = el('voteEmail').value.trim();
+
   if (!team_id || !jersey_number || !email) {
     setStatus(status, 'Fill in all three so we can find your registration.', 'error');
     return;
   }
+  const cast = AWARDS.filter((a) => picks.has(a.id));
+  if (!cast.length) {
+    setStatus(status, MESSAGES.NO_VOTES, 'error');
+    return;
+  }
 
-  el('voteStartBtn').disabled = true;
-  setStatus(status, 'Checking your registration…');
+  submitBtn.disabled = true;
+  setStatus(status, 'Sending your ballot…');
   try {
-    const payload = await rpc('mvl_award_voter_status', {
+    const payload = await rpc('mvl_submit_award_votes', {
       p_team_id: team_id,
       p_jersey_number: jersey_number,
       p_email: email,
+      p_votes: cast.map((a) => ({ award_id: a.id, nominee_player_id: picks.get(a.id).playerId })),
     });
-    if (payload.already_voted) {
-      setStatus(status, MESSAGES.ALREADY_VOTED, 'error');
-      el('voteStartBtn').disabled = false;
-      return;
-    }
-    const p = payload.player;
-    voter = { team_id, jersey_number, email, name: [p.display_name, p.surname].filter(Boolean).join(' ') };
-    await loadNominees();
-    setStatus(status, '');
+    const name = [payload.player.display_name, payload.player.surname].filter(Boolean).join(' ');
     identityForm.classList.add('is-hidden');
-    ballot.classList.remove('is-hidden');
-    el('voteBallotVoter').textContent = `${voter.name}, here is your ballot`;
-    await renderAward();
-    ballot.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    done.classList.remove('is-hidden');
+    el('voteDoneTitle').textContent = `Thanks, ${name.split(' ')[0]}`;
+    el('voteDoneSub').textContent = `${payload.votes} ${payload.votes === 1 ? 'vote' : 'votes'} recorded. Winners are announced on the final day.`;
+    el('voteSummary').innerHTML = cast.map((a) => `
+      <li><strong>${escapeHtml(a.name)}.</strong> ${escapeHtml(picks.get(a.id).name)}</li>
+    `).join('');
+    done.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } catch (error) {
     setStatus(status, explain(error), 'error');
-    el('voteStartBtn').disabled = false;
+    submitBtn.disabled = false;
   }
 });
+
+// ---- first paint ---------------------------------------------------------------
+loadNominees()
+  .then(() => renderAward())
+  .catch((error) => setStatus(el('voteIdentityStatus'), explain(error), 'error'));
