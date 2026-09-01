@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vote — MVL 2026 Special Awards</title>
+<meta name="description" content="Vote for the MVL 2026 special awards. One ballot per player.">
+<link rel="icon" type="image/svg+xml" href="/mvl/assets/metarice-icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/mvl/css/style.css?v=vote-3">
+<script src="/mvl/js/site-config.js?v=cutover-gameday"></script>
+<script src="/mvl/js/analytics.js?v=fg-cluster"></script>
+<script src="/mvl/js/nav.js?v=fg-cluster"></script>
+</head>
+<body class="vote-page" id="top">
+
+<header class="nav nav--stuck page-nav" id="nav">
+  <a class="nav-logo" href="/mvl/index.html" aria-label="MVL 2026 home">
+    <img class="nav-logo-img" src="/mvl/assets/hero-mvl-2026-logo.png" alt="Metarice Volleyball League 2026">
+  </a>
+  <nav class="nav-links" aria-label="Primary">
+    <a href="/mvl/schedule.html">Standings</a>
+    <a href="/mvl/videos.html">Videos</a>
+    <a href="/mvl/rules.html">Rules</a>
+    <a href="/mvl/index.html#teams">Teams</a>
+    <a href="/mvl/vote.html">Vote</a>
+    <a href="/mvl/checkin.html">Check-In</a>
+  </nav>
+</header>
+
+<main class="vote-main">
+  <section class="vote-intro page-hero">
+    <p class="section-kicker section-kicker--teal">MVL 2026</p>
+    <h1 class="page-title">Vote for the <em>Special Awards</em></h1>
+    <p class="page-lede">
+      Four awards, chosen by the people who played the tournament. Pick one player for each &mdash;
+      any team, any position. One ballot per player, so make it count.
+    </p>
+  </section>
+
+  <!-- Identity first, deliberately: it is what tells someone they have already
+       voted, and finding that out after picking four players would be worse. -->
+  <form class="vote-form" id="voteIdentity" novalidate>
+    <section class="form-panel">
+      <div class="form-panel-head">
+        <p class="section-kicker section-kicker--teal">Step 1</p>
+        <h2>Tell us who you are</h2>
+        <p class="form-panel-sub">We match this against your league registration so each player votes once.</p>
+      </div>
+      <div class="form-grid">
+        <label class="field">
+          <span>Team</span>
+          <select name="team_id" id="voteTeam" required>
+            <option value="">Select your team</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>Jersey number</span>
+          <input name="jersey_number" id="voteJersey" type="text" inputmode="numeric" autocomplete="off" placeholder="00" required>
+        </label>
+        <label class="field field--wide">
+          <span>Registered email</span>
+          <input name="email" id="voteEmail" type="email" autocomplete="email" placeholder="you@example.com" required>
+        </label>
+      </div>
+      <div class="form-actions">
+        <button class="cta cta--primary" type="submit" id="voteStartBtn">Start voting</button>
+        <p class="form-status" id="voteIdentityStatus"></p>
+      </div>
+    </section>
+  </form>
+
+  <!-- The ballot. One award on screen at a time; the rail lets you jump back. -->
+  <section class="vote-ballot is-hidden" id="voteBallot" aria-live="polite">
+    <div class="vote-ballot-head">
+      <p class="section-kicker section-kicker--teal">Step 2</p>
+      <h2 id="voteBallotVoter">Your ballot</h2>
+      <p class="vote-progress" id="voteProgress"></p>
+    </div>
+
+    <div class="vote-layout">
+      <ol class="vote-rail" id="voteRail" aria-label="Awards"></ol>
+
+      <div class="vote-card">
+        <div class="vote-card-copy">
+          <p class="vote-brand" id="voteBrand"></p>
+          <h3 class="vote-award-name" id="voteAwardName"></h3>
+          <p class="vote-tagline" id="voteTagline"></p>
+          <div class="vote-body" id="voteBody"></div>
+          <p class="vote-question" id="voteQuestion"></p>
+
+          <div class="form-grid vote-selectors">
+            <label class="field">
+              <span>Team</span>
+              <select id="voteNomineeTeam">
+                <option value="">Select a team</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Player</span>
+              <select id="voteNomineePlayer" disabled>
+                <option value="">Select a player</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <figure class="vote-slot" id="voteSlot">
+          <img id="voteSlotPhoto" alt="" hidden>
+          <svg class="vote-slot-silhouette" viewBox="0 0 120 140" aria-hidden="true">
+            <path fill="currentColor" d="M60 18a24 24 0 1 1 0 48 24 24 0 0 1 0-48Zm0 58c26 0 47 17 47 38v6H13v-6c0-21 21-38 47-38Z"/>
+          </svg>
+          <figcaption class="vote-slot-caption" id="voteSlotCaption">Pick a player to see them here</figcaption>
+          <img class="vote-slot-brand" id="voteSlotBrand" alt="" hidden>
+        </figure>
+      </div>
+    </div>
+
+    <div class="vote-actions">
+      <button class="cta cta--secondary" type="button" id="voteBackBtn" hidden>Back</button>
+      <button class="cta cta--primary" type="button" id="voteNextBtn" disabled>Next</button>
+      <p class="form-status" id="voteStatus"></p>
+    </div>
+  </section>
+
+  <!-- Takeover once the ballot is in. -->
+  <section class="vote-done is-hidden" id="voteDone" role="status" aria-live="polite">
+    <p class="section-kicker section-kicker--teal">Ballot received</p>
+    <h2 class="vote-done-title" id="voteDoneTitle">Thanks for voting</h2>
+    <p class="vote-done-sub" id="voteDoneSub"></p>
+    <ul class="vote-summary" id="voteSummary"></ul>
+    <div class="vote-done-actions">
+      <a class="cta cta--primary" href="/mvl/schedule.html">View the Standings</a>
+      <a class="cta cta--secondary" href="/mvl/index.html">Back to Home</a>
+    </div>
+  </section>
+</main>
+
+<div class="marquee marquee--footer" aria-label="Sponsors">
+  <div class="marquee-track" data-marquee="all"></div>
+</div>
+
+<footer class="footer">
+  <div class="footer-bar">
+    <a class="footer-logo" href="/mvl/index.html" aria-label="MVL 2026 home">
+      <img class="footer-logo-img footer-logo-img--metarice" src="/mvl/assets/metarice-club-wordmark.svg" alt="Metarice Club">
+    </a>
+    <p class="footer-social">
+      <a href="https://instagram.com/metaricevolley" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.2c3.2 0 3.58.01 4.85.07 3.25.15 4.77 1.69 4.92 4.92.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.15 3.23-1.66 4.77-4.92 4.92-1.27.06-1.64.07-4.85.07s-3.58-.01-4.85-.07c-3.26-.15-4.77-1.7-4.92-4.92-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85C2.42 3.92 3.94 2.38 7.15 2.27 8.42 2.21 8.8 2.2 12 2.2Zm0 1.8c-3.15 0-3.5.01-4.74.07-2.42.11-3.56 1.26-3.67 3.67-.06 1.24-.07 1.6-.07 4.74s.01 3.51.07 4.74c.11 2.41 1.25 3.56 3.67 3.67 1.24.06 1.6.07 4.74.07 3.15 0 3.51-.01 4.74-.07 2.42-.11 3.56-1.26 3.67-3.67.06-1.24.07-1.6.07-4.74s-.01-3.5-.07-4.74c-.11-2.41-1.25-3.56-3.67-3.67-1.24-.06-1.6-.07-4.74-.07Zm0 3.06a4.94 4.94 0 1 1 0 9.88 4.94 4.94 0 0 1 0-9.88Zm0 1.8a3.14 3.14 0 1 0 0 6.28 3.14 3.14 0 0 0 0-6.28Zm5.15-3.2a1.15 1.15 0 1 1 0 2.3 1.15 1.15 0 0 1 0-2.3Z"/></svg>
+      </a>
+      <a href="https://www.tiktok.com/@metaricevolley" target="_blank" rel="noopener" aria-label="TikTok">
+        <svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.6 0-1.72 1.66-3.01 3.37-2.48V9.66c-3.45-.46-6.47 2.22-6.47 5.64 0 3.33 2.76 5.7 5.69 5.7 3.14 0 5.69-2.55 5.69-5.7V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3c-1.32 0-2.5-.56-3.24-1.48Z"/></svg>
+      </a>
+      <a href="https://www.youtube.com/@metaricevolley" target="_blank" rel="noopener" aria-label="YouTube">
+        <svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.51 3.55 12 3.55 12 3.55s-7.51 0-9.38.5A3.02 3.02 0 0 0 .5 6.19C0 8.07 0 12 0 12s0 3.93.5 5.81a3.02 3.02 0 0 0 2.12 2.14c1.87.5 9.38.5 9.38.5s7.51 0 9.38-.5a3.02 3.02 0 0 0 2.12-2.14C24 15.93 24 12 24 12s0-3.93-.5-5.81ZM9.55 15.57V8.43L15.82 12l-6.27 3.57Z"/></svg>
+      </a>
+    </p>
+  </div>
+</footer>
+
+<script src="/mvl/js/league-data.js?v=courts-original"></script>
+<script src="/mvl/js/marquee.js?v=fg-cluster"></script>
+<script src="/mvl/js/supabase-config.js?v=fg-cluster"></script>
+<script src="/mvl/js/vote.js?v=vote-1"></script>
+</body>
+</html>

@@ -117,7 +117,7 @@ document.querySelectorAll('[data-livestream-link]').forEach((link) => {
     link.href = '/mvl/schedule.html';
     link.removeAttribute('target');
     link.removeAttribute('rel');
-    link.textContent = 'View the Schedule';
+    link.textContent = 'View the Standings';
   }
 });
 

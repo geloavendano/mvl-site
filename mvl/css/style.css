@@ -5539,3 +5539,186 @@ body.checkin-complete { overflow: hidden; }
 .library-video-card.is-playing .library-video-player .play-btn {
   opacity: .35;
 }
+
+/* ==========================================================================
+   Special-award voting — /mvl/vote
+   Reuses .form-panel, .field and .cta from the waiver flow; what is new here
+   is the ballot layout and the nominee slot.
+   ========================================================================== */
+.vote-main {
+  position: relative;
+  z-index: 2;
+  width: min(calc(100% - 32px), 1180px);
+  margin: 0 auto;
+  padding: calc(var(--nav-h) + 40px) 0 60px;
+  display: grid;
+  gap: 28px;
+}
+.vote-intro { max-width: 720px; }
+.vote-form { display: grid; gap: 18px; }
+
+.vote-ballot-head { margin-bottom: 20px; }
+.vote-ballot-head h2 {
+  font: italic clamp(30px, 6vw, 46px)/.95 var(--stretch);
+  text-transform: uppercase;
+}
+.vote-progress {
+  margin-top: 8px;
+  color: var(--ink-muted);
+  font: 700 10px var(--mono);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+/* Rail above the card on narrow screens, beside it once there is room — the
+   wireframe's two-column split. */
+.vote-layout {
+  display: grid;
+  gap: 20px;
+  padding: 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, .05);
+}
+/* On narrow screens the rail would push the award itself four items down the
+   page, so the card leads and the rail follows as a jump list. "Award n of 4"
+   above already says where you are. From 860px they sit side by side. */
+.vote-rail {
+  order: 2;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+}
+.vote-card { order: 1; }
+.vote-rail-item {
+  width: 100%;
+  display: grid;
+  gap: 3px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 12px;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.vote-rail-item:disabled { opacity: .45; cursor: default; }
+.vote-rail-item.is-current { border-color: var(--mint); background: rgba(124, 245, 180, .1); }
+.vote-rail-item:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
+.vote-rail-name {
+  font: 800 12px var(--ui);
+  letter-spacing: .4px;
+  text-transform: uppercase;
+}
+.vote-rail-pick { color: var(--ink-muted); font-size: 12px; }
+.vote-rail-item.is-done .vote-rail-pick { color: var(--mint); }
+
+.vote-card { display: grid; gap: 20px; }
+.vote-brand {
+  color: var(--teal);
+  font: 800 10px var(--mono);
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+}
+.vote-award-name {
+  margin-top: 6px;
+  font: italic clamp(24px, 5vw, 34px)/.98 var(--stretch);
+  text-transform: uppercase;
+}
+.vote-tagline { margin-top: 8px; color: #fff; font-size: 15px; font-weight: 700; }
+.vote-body { display: grid; gap: 8px; margin-top: 10px; }
+.vote-body p { color: var(--ink-soft); font-size: 13.5px; line-height: 1.6; }
+.vote-question { margin-top: 12px; color: var(--mint); font-size: 14px; font-weight: 700; }
+.vote-selectors { margin-top: 16px; }
+
+/* The nominee slot: the team's artwork with the cut-out standing on it, the
+   same treatment as the check-in confirmation card, with the presenting
+   brand's logo sitting in the corner the way it would on a poster. */
+.vote-slot {
+  position: relative;
+  margin: 0;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  color: color-mix(in srgb, var(--team-a, var(--mint)) 55%, #ffffff);
+  background:
+    linear-gradient(180deg, rgba(4, 2, 20, 0) 44%, rgba(4, 2, 20, .72) 100%),
+    var(--team-art, linear-gradient(135deg, var(--team-b, #1b2340), var(--team-a, #2c3557)));
+  background-size: cover, cover;
+  background-position: center, center;
+}
+.vote-slot img#voteSlotPhoto {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  height: 100%;
+  width: auto;
+  max-width: none;
+  object-fit: contain;
+  object-position: bottom center;
+  filter: drop-shadow(0 6px 12px rgba(4, 2, 20, .5));
+}
+.vote-slot.has-pick .vote-slot-silhouette { display: none; }
+.vote-slot-silhouette { width: 92px; opacity: .5; }
+.vote-slot-caption {
+  position: absolute;
+  left: 14px;
+  right: 96px;
+  bottom: 12px;
+  z-index: 2;
+  color: #fff;
+  font: 800 12px var(--ui);
+  letter-spacing: .3px;
+  text-shadow: 0 2px 8px rgba(4, 2, 20, .8);
+}
+.vote-slot-brand {
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+  z-index: 2;
+  width: auto;
+  max-width: 84px;
+  max-height: 26px;
+  object-fit: contain;
+}
+
+/* .cta sets display, which beats the UA [hidden] rule whatever the
+   specificity — without this the Back button shows on the first award. */
+.vote-actions .cta[hidden] { display: none; }
+.vote-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+}
+.vote-actions .form-status { flex: 1 1 100%; }
+
+.vote-done { display: grid; gap: 12px; justify-items: start; }
+.vote-done-title { font: italic clamp(34px, 8vw, 60px)/.92 var(--stretch); text-transform: uppercase; }
+.vote-done-sub { color: var(--ink-soft); }
+.vote-summary { list-style: none; display: grid; gap: 8px; margin: 8px 0 0; padding: 0; }
+.vote-summary li {
+  display: grid;
+  gap: 2px;
+  padding: 12px 14px;
+  border-left: 2px solid var(--mint);
+  border-radius: 0 10px 10px 0;
+  background: rgba(255, 255, 255, .05);
+}
+.vote-summary strong { font: 800 11px var(--mono); letter-spacing: 1.1px; text-transform: uppercase; color: var(--teal); }
+.vote-summary span { font-size: 15px; font-weight: 700; }
+.vote-done-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
+
+@media (min-width: 860px) {
+  .vote-layout { grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 28px; padding: 24px; }
+  .vote-rail { order: 0; }
+  .vote-card { order: 0; }
+  .vote-card { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); align-items: start; gap: 26px; }
+  .vote-slot { aspect-ratio: 4 / 3; }
+}
+

@@ -114,6 +114,60 @@ window.MVL_DATA = {
     ],
   },
 
+  // Special awards voted on at /mvl/vote. Copy is the client's, verbatim; the
+  // brand on each award is the partner presenting it, and its logo sits in the
+  // nominee slot the way it would on a poster.
+  awards: [
+    {
+      id: 'fresh-new-player',
+      name: 'Fresh New Player of the League',
+      brand: 'Future Glow',
+      logo: '/mvl/assets/Sponsor Logos/Official Partners/future glow.png',
+      tagline: 'New to the league. Already making a mark.',
+      body: [
+        'This one\u2019s for the fresh faces who came into MVL ready to play.',
+        'The rookies who brought new energy to the court, showed us what they can do and made sure we\u2019ll remember their names next season.',
+      ],
+      question: 'Who\u2019s the fresh new player you can\u2019t wait to see more of?',
+    },
+    {
+      id: 'extra-strong-sigaw',
+      name: 'Extra Strong Sigaw',
+      brand: 'Strepsils',
+      logo: '/mvl/assets/Sponsor Logos/Co-Presenters/Strepsils.png',
+      tagline: 'You heard them before you even saw them.',
+      body: [
+        'Every team has that one player. Cheering every point. Calling out from the sidelines. Picking everyone back up. Somehow still yelling in the third set like the day just started.',
+        'This award goes to the player whose extra strong sigaw kept the energy high and their teammates fired up all tournament long.',
+      ],
+      question: 'Whose voice practically became part of the MVL soundtrack?',
+    },
+    {
+      id: 'outstanding-sportsmanship',
+      name: 'Outstanding Sportsmanship Award',
+      brand: 'Decathlon',
+      logo: '/mvl/assets/Sponsor Logos/Major Sponsors/Decathlon Logo Horizontal.png',
+      tagline: 'Play hard. Compete harder. Respect always.',
+      body: [
+        'Winning matters. How you play the game matters too.',
+        'This award recognizes the player who showed us what great competition looks like \u2014 respecting opponents, supporting teammates and bringing the right attitude whether the point went their way or not. The kind of player you want on your team and never mind playing against.',
+      ],
+      question: 'Who represented the best of the game?',
+    },
+    {
+      id: 'face-of-the-league',
+      name: 'Face of the League',
+      brand: 'Garnier',
+      logo: '/mvl/assets/Sponsor Logos/Co-Presenters/garnier.PNG',
+      tagline: 'Some players just have that main-character energy.',
+      body: [
+        'You\u2019ve seen them on the court. You\u2019ve probably seen them on your camera roll too.',
+        'This is for the player who brought the presence, personality and unmistakable MVL energy \u2014 on the court and in front of the camera. The face you\u2019d put on the poster for MVL 2026.',
+      ],
+      question: 'Who gets your vote for Face of the League?',
+    },
+  ],
+
   games: [
     {
       id: 'g1',
