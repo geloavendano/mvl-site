@@ -33,9 +33,10 @@ body{font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased}
   --logo-clearance:clamp(150px,14vw,242px);
   display:grid;
   grid-auto-rows:var(--row-h);
+  padding:3px;
   color:#fff;
-  border:3px solid #7C3BFF;
-  border-radius:56px;
+  border-radius:28px;
+  background:linear-gradient(115deg,#5b43f5 0%,#8f82e9 52%,#77a0f2 100%);
   overflow:hidden;
   filter:drop-shadow(0 10px 20px rgba(0,0,0,.28));
 }
@@ -43,8 +44,8 @@ body{font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased}
   display:grid;
   grid-template-columns:minmax(clamp(250px,23vw,400px),1fr) auto;
   align-items:center;
-  /* clears the 56px corner radius so the last set is not cut by the curve */
-  padding-right:clamp(22px,2.8vw,48px);
+  /* A small inset protects the last score without leaving an empty tail. */
+  padding-right:clamp(8px,.9vw,16px);
   text-transform:uppercase;
   text-shadow:0 3px 3px rgba(0,0,0,.34);
   background:linear-gradient(110deg,var(--team-a,#2b2350),var(--team-b,#141033));
@@ -70,22 +71,15 @@ body{font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased}
   font-weight:700;line-height:.9;
   font-variant-numeric:tabular-nums;
 }
-/* The won set carries the same ring and outer glow as a winning team card on
-   /mvl/schedule (.match-team.is-winner), so the two pages mark a win the same
-   way. Inset, so it never changes the cell's footprint. */
-.bigscore-set.is-won{color:#7CF5B4;text-shadow:0 3px 3px rgba(0,0,0,.34)}
-/* Drawn on a pseudo-element rather than the cell so it can sit inside the
-   cell's bounds — a ring on the cell itself butts against the dividers and
-   reads as a table border rather than a mark around the score. */
-.bigscore-set.is-won::before{
-  content:'';
-  position:absolute;
-  inset:clamp(7px,13%,15px) clamp(9px,15%,20px);
-  border:2px solid #7CF5B4;
-  /* echoes the frame's roundness without going fully circular */
-  border-radius:clamp(12px,26%,22px);
-  box-shadow:0 0 18px rgba(124,245,180,.16);
-  pointer-events:none;
+/* Reverse the winning cell: a light version of the team's own gradient with
+   the deeper team colour for the score. The solid values are fallbacks for
+   older browser sources without color-mix support. */
+.bigscore-set.is-won{
+  color:var(--team-b,#241b57);
+  color:color-mix(in srgb,var(--team-b,#241b57) 78%,#080414);
+  background:rgba(255,255,255,.9);
+  background:linear-gradient(135deg,color-mix(in srgb,var(--team-a,#777) 28%,#fff),color-mix(in srgb,var(--team-b,#333) 24%,#fff));
+  text-shadow:none;
 }
 /* The set in play gets no marker: a win is the only thing worth calling out,
    and the layout leaves an in-progress set plain. */
