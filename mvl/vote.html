@@ -9,12 +9,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/mvl/css/style.css?v=vote-10">
+<link rel="stylesheet" href="/mvl/css/style.css?v=vote-12">
 <script src="/mvl/js/site-config.js?v=cutover-gameday"></script>
 <script src="/mvl/js/analytics.js?v=fg-cluster"></script>
 <script src="/mvl/js/nav.js?v=fg-cluster"></script>
 </head>
-<body class="waiver-page vote-page" id="top">
+<body class="waiver-page vote-page vote-stage-intro" id="top">
 
 <header class="nav nav--stuck page-nav" id="nav">
   <a class="nav-logo" href="/mvl/index.html" aria-label="MVL 2026 home">
@@ -30,13 +30,14 @@
 </header>
 
 <main class="waiver-main">
-  <section class="waiver-intro page-hero">
+  <section class="waiver-intro page-hero vote-intro" id="voteIntro">
     <p class="section-kicker section-kicker--teal">MVL 2026</p>
     <h1 class="page-title">Vote for the <em>Special Awards</em></h1>
     <p class="page-lede">
       Four awards, chosen by the people who played the tournament. Pick one player for each &mdash;
       any team, any position. One ballot per player, so make it count.
     </p>
+    <button class="cta cta--primary vote-intro-action" type="button" id="voteStartBtn" aria-controls="voteBallot">Next</button>
   </section>
 
   <!-- The ballot. Awards come first so people can see what they are voting for;
@@ -72,8 +73,8 @@
       </div>
     </div>
 
-    <!-- Fixed to the bottom of the viewport on mobile so the pickers and Next
-         stay in reach without scrolling past the award copy. -->
+    <!-- On mobile this is the final row of the viewport-sized award step, so
+         both pickers and Next remain visible with the award panel. -->
     <div class="vote-controls" id="voteControls">
       <div class="form-grid vote-selectors">
         <label class="field">
@@ -163,6 +164,6 @@
 <script src="/mvl/js/league-data.js?v=courts-original"></script>
 <script src="/mvl/js/marquee.js?v=fg-cluster"></script>
 <script src="/mvl/js/supabase-config.js?v=fg-cluster"></script>
-<script src="/mvl/js/vote.js?v=vote-11"></script>
+<script src="/mvl/js/vote.js?v=vote-12"></script>
 </body>
 </html>

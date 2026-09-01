@@ -1,9 +1,8 @@
 /* ==========================================================================
    Special-award voting — /mvl/vote
 
-   Identity first, then one award per screen, then the whole ballot goes up in
-   a single call. Identity leads because it is what tells someone they have
-   already voted; discovering that after picking four players would be worse.
+   A dedicated intro leads into one award per screen. Identity comes after the
+   picks, then the whole ballot goes up in a single call.
    ========================================================================== */
 const { teams: TEAMS, awards: AWARDS = [] } = window.MVL_DATA;
 const cfg = window.MVL_SUPABASE || {};
@@ -30,6 +29,17 @@ const slotCaption = el('voteSlotCaption');
 const slotBrand = el('voteSlotBrand');
 const nextBtn = el('voteNextBtn');
 const backBtn = el('voteBackBtn');
+const startBtn = el('voteStartBtn');
+
+const setStage = (stage) => {
+  document.body.classList.remove('vote-stage-intro', 'vote-stage-active', 'vote-stage-review', 'vote-stage-done');
+  document.body.classList.add(`vote-stage-${stage}`);
+};
+
+startBtn?.addEventListener('click', () => {
+  setStage('active');
+  window.scrollTo(0, 0);
+});
 
 const setStatus = (node, message, tone = '') => {
   if (!node) return;
@@ -175,7 +185,7 @@ const renderAward = async () => {
   paintSlot(award, pick);
   backBtn.hidden = index === 0;
   nextBtn.disabled = !pick;
-  nextBtn.textContent = index === AWARDS.length - 1 ? 'Submit ballot' : 'Next';
+  nextBtn.textContent = index === AWARDS.length - 1 ? 'Review ballot' : 'Next';
   renderRail();
 };
 
@@ -252,6 +262,7 @@ backBtn.addEventListener('click', () => {
 
 // ---- advancing ---------------------------------------------------------------
 const showIdentity = () => {
+  setStage('review');
   ballot.classList.add('is-hidden');
   identityForm.classList.remove('is-hidden');
   el('voteRecap').innerHTML = AWARDS.filter((a) => picks.has(a.id)).map((a) => `
@@ -271,6 +282,7 @@ nextBtn.addEventListener('click', () => {
 });
 
 el('voteEditBtn').addEventListener('click', () => {
+  setStage('active');
   identityForm.classList.add('is-hidden');
   ballot.classList.remove('is-hidden');
   ballot.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -307,6 +319,7 @@ identityForm.addEventListener('submit', async (event) => {
       p_votes: cast.map((a) => ({ award_id: a.id, nominee_player_id: picks.get(a.id).playerId })),
     });
     const name = [payload.player.display_name, payload.player.surname].filter(Boolean).join(' ');
+    setStage('done');
     identityForm.classList.add('is-hidden');
     done.classList.remove('is-hidden');
     el('voteDoneTitle').textContent = `Thanks, ${name.split(' ')[0]}`;

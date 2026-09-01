@@ -5640,39 +5640,124 @@ body.checkin-complete { overflow: hidden; }
 .vote-actions { display: flex; gap: 10px; }
 .vote-actions .cta { flex: 1 1 auto; border: 0; cursor: pointer; }
 
-/* ---- mobile: one award, controls pinned, picked player takes the card ----- */
+/* ---- mobile: one viewport per step; the award panel becomes the pick card -- */
 @media (max-width: 859px) {
-  /* The pickers and Next stay in reach instead of sitting below the copy.
-     .form-panel carries a backdrop-filter, which makes it a containing block
-     for fixed descendants — the bar would anchor to the panel rather than the
-     viewport — so the blur comes off this one panel. Sticky is not the way out
-     either: html and body are overflow-x:hidden, which breaks it. */
+  .vote-page { min-height: 100svh; }
+  .vote-page .page-nav,
+  .vote-page .marquee--footer,
+  .vote-page .footer { display: none; }
+  .vote-page .waiver-main {
+    min-height: 100svh;
+    max-width: none;
+    padding: 0;
+  }
+
+  /* Landing is deliberately its own screen. It introduces the task without
+     making the first award begin below the fold. */
+  .vote-stage-intro { overflow: hidden; }
+  .vote-stage-intro .waiver-main { display: flex; padding: 20px 16px; }
+  .vote-stage-intro .vote-intro {
+    width: 100%;
+    min-height: calc(100svh - 40px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(32px, 10vh, 88px) 2px;
+  }
+  .vote-intro .page-title {
+    max-width: 12ch;
+    margin-top: 10px;
+    font-size: clamp(36px, 11vw, 52px);
+    line-height: .95;
+  }
+  .vote-intro .page-lede {
+    max-width: 31ch;
+    margin-top: 18px;
+    color: var(--ink-soft);
+    font-size: 15px;
+    line-height: 1.45;
+  }
+  .vote-intro-action {
+    width: min(44vw, 168px);
+    min-height: 52px;
+    align-self: flex-end;
+    margin-top: clamp(48px, 14vh, 116px);
+    border: 0;
+    cursor: pointer;
+  }
+  .vote-stage-intro .vote-ballot,
+  .vote-stage-intro .vote-form,
+  .vote-stage-intro .vote-done,
+  .vote-stage-active .vote-intro,
+  .vote-stage-review .vote-intro,
+  .vote-stage-done .vote-intro { display: none !important; }
+
+  /* The ballot owns the viewport. Header and controls take only what they
+     need; the award/player panel absorbs the remaining height. */
+  .vote-stage-active { overflow: hidden; }
+  .vote-stage-active .waiver-main { height: 100svh; }
   .waiver-page .vote-ballot {
+    height: 100svh;
+    min-height: 0;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    margin: 0;
+    padding: 18px 16px calc(14px + env(safe-area-inset-bottom));
+    border-radius: 0;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
-  .vote-controls {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 40;
-    display: grid;
-    gap: 10px;
-    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
-    border-top: 1px solid rgba(124, 245, 180, .22);
-    background: rgba(4, 9, 15, .96);
+  .vote-ballot .form-panel-head { padding: 0 2px; }
+  .vote-ballot .form-panel-head h2 {
+    margin-top: 4px;
+    font-size: clamp(27px, 8vw, 36px);
   }
-  /* clear the bar so the end of the copy stays reachable */
-  .vote-ballot { padding-bottom: 168px; }
-  .vote-controls .form-grid { grid-template-columns: 1fr 1fr; gap: 10px; padding-top: 0; }
-  .vote-controls .field span { font-size: 9px; }
-  /* Once a player is picked they take the card; the × brings the copy back. */
+  .vote-layout {
+    min-height: 0;
+    padding-top: 12px;
+  }
+  .vote-card {
+    height: 100%;
+    min-height: 0;
+    display: block;
+    overflow: hidden;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, .06);
+  }
+  .vote-copy {
+    height: 100%;
+    overflow-y: auto;
+    padding: clamp(18px, 5vw, 24px);
+    overscroll-behavior: contain;
+  }
+  .vote-brand { font-size: 9px; }
+  .vote-tagline { font-size: 14px; }
+  .vote-body { gap: 6px; margin-top: 8px; }
+  .vote-body p { font-size: 13px; line-height: 1.45; }
+  .vote-question { margin-top: 9px; font-size: 13px; }
+  .vote-card:not(.has-pick) .vote-slot { display: none; }
   .vote-card.has-pick .vote-copy { display: none; }
-  /* Square, not portrait: a 3/4 slot pushed its own caption and the presenting
-     brand's logo down behind the fixed bar. The cut-out is bottom-anchored at
-     full height either way, so it loses nothing. */
-  .vote-slot { aspect-ratio: 6 / 5; }
+  .vote-controls {
+    display: grid;
+    gap: 9px;
+    padding-top: 12px;
+  }
+  .vote-controls .form-grid { grid-template-columns: 1fr; gap: 7px; padding-top: 0; }
+  .vote-controls .field span { font-size: 9px; }
+  .vote-controls .field { grid-template-columns: 48px minmax(0, 1fr); align-items: center; gap: 8px; }
+  .vote-controls .field select { min-height: 42px; padding: 9px 12px; font-size: 14px; }
+  .vote-actions { justify-content: flex-end; }
+  .vote-actions .cta { flex: 0 1 142px; min-height: 44px; padding: 10px 16px; }
+  .vote-slot { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 18px; }
+
+  /* Review and completion may need to scroll on short phones, but begin at the
+     top of the viewport now that the navigation is out of the flow. */
+  .vote-stage-review .waiver-main,
+  .vote-stage-done .waiver-main { padding: 16px 16px 36px; }
+}
+
+@media (min-width: 860px) {
+  .vote-intro-action { display: none; }
 }
 
 @media (min-width: 860px) {
@@ -5715,4 +5800,3 @@ body.checkin-complete { overflow: hidden; }
   .vote-actions { justify-content: flex-end; margin-top: 16px; }
   .vote-actions .cta { flex: 0 0 auto; min-width: 140px; }
 }
-
