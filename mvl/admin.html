@@ -36,11 +36,12 @@
     <section id="rafflePanel" class="admin-tab-panel" role="tabpanel" aria-labelledby="raffleTab" data-admin-panel="raffle" hidden>
       <div class="admin-raffle-grid">
         <form id="raffleExportForm" class="admin-panel admin-form">
-          <div class="admin-panel-head"><div><h2>Raffle entries</h2><p>Download entries or draw from eligible, inside-venue roster check-ins. Past raffle winners are excluded automatically.</p></div></div>
+          <div class="admin-panel-head"><div><h2>Raffle entries</h2><p>Download entries or draw from eligible, inside-venue roster check-ins. Previous winners are excluded unless included below.</p></div></div>
           <div class="admin-raffle-filters">
             <label class="field"><span>Start date</span><input id="raffleStartDate" name="startDate" type="date" required></label>
             <label class="field"><span>End date</span><input id="raffleEndDate" name="endDate" type="date" required></label>
             <label class="admin-checkbox"><input name="furparentOnly" type="checkbox"><span><strong>Furparents only</strong><small>Include only players who declared that they have a pet.</small></span></label>
+            <label class="admin-checkbox"><input name="includePreviousWinners" type="checkbox"><span><strong>Include previous raffle winners</strong><small>Allow players already awarded a prize back into the draw pool. Applies only to Draw Winner.</small></span></label>
           </div>
           <div class="admin-form-actions"><div class="admin-raffle-export-actions"><button class="cta cta--secondary" type="submit">Download CSV</button><button id="raffleDrawBtn" class="cta cta--primary" type="button">Draw Winner</button></div><p class="form-status" aria-live="polite"></p></div>
         </form>
@@ -160,5 +161,5 @@
     </section>
   </div>
 </dialog>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/mvl/js/supabase-config.js?v=stream-guide"></script><script src="/mvl/js/league-data.js?v=courts-original"></script><script src="/mvl/js/admin.js?v=video-labels"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/mvl/js/supabase-config.js?v=stream-guide"></script><script src="/mvl/js/league-data.js?v=courts-original"></script><script src="/mvl/js/admin.js?v=raffle-repeat-winners"></script>
 </body></html>
