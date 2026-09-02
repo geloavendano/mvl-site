@@ -324,12 +324,9 @@ backBtn.addEventListener('click', () => {
   ballot.scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
 
-// ---- advancing ---------------------------------------------------------------
-const showIdentity = () => {
-  setStage('review');
-  ballot.classList.add('is-hidden');
-  identityForm.classList.remove('is-hidden');
-  el('voteRecap').innerHTML = AWARDS.filter((a) => picks.has(a.id)).map((a) => {
+// ---- review cards ------------------------------------------------------------
+const renderPickCards = (container, awards) => {
+  container.innerHTML = awards.map((a) => {
     const pick = picks.get(a.id);
     const team = teamById[pick.teamId];
     const awardLabel = [a.brand, a.name].filter(Boolean).join(' ');
@@ -352,12 +349,20 @@ const showIdentity = () => {
       </li>
     `;
   }).join('');
-  el('voteRecap').querySelectorAll('.vote-review-photo').forEach((photo) => {
+  container.querySelectorAll('.vote-review-photo').forEach((photo) => {
     photo.addEventListener('error', () => {
       photo.hidden = true;
       photo.closest('.vote-review-card')?.classList.remove('has-photo');
     }, { once: true });
   });
+};
+
+// ---- advancing ---------------------------------------------------------------
+const showIdentity = () => {
+  setStage('review');
+  ballot.classList.add('is-hidden');
+  identityForm.classList.remove('is-hidden');
+  renderPickCards(el('voteRecap'), AWARDS.filter((a) => picks.has(a.id)));
   identityForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
 
@@ -445,9 +450,7 @@ identityForm.addEventListener('submit', async (event) => {
     done.classList.remove('is-hidden');
     el('voteDoneTitle').textContent = `Thanks, ${name.split(' ')[0]}`;
     el('voteDoneSub').textContent = `${payload.votes} ${payload.votes === 1 ? 'vote' : 'votes'} recorded. Winners are announced on the final day.`;
-    el('voteSummary').innerHTML = cast.map((a) => `
-      <li><strong>${escapeHtml(a.name)}.</strong> ${escapeHtml(picks.get(a.id).name)}</li>
-    `).join('');
+    renderPickCards(el('voteSummary'), cast);
     done.scrollIntoView({ behavior: 'smooth', block: 'start' });
     // votes are one-per-voter, so this fires exactly once per ballot
     if (payload.player?.id) sendVoteConfirmation(payload.player.id);
