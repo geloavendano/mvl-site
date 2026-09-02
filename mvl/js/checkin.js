@@ -120,12 +120,17 @@ const setStatus = (node, message, kind) => {
 const show = (node) => node.classList.remove('is-hidden');
 const hide = (node) => node.classList.add('is-hidden');
 
+// Bumped whenever the player photos are re-uploaded. The filenames are stable
+// and the objects are served with max-age=86400, so without a changing URL a
+// browser that already has yesterday's photo keeps showing it for a day.
+const PHOTO_VERSION = '260902';
+const withPhotoVersion = (url) => (url ? `${url}${url.includes('?') ? '&' : '?'}v=${PHOTO_VERSION}` : '');
 const playerPhotoUrl = (payload) => {
   const { photo_url: url, photo_path: path } = payload.player;
-  if (url) return url;
+  if (url) return withPhotoVersion(url);
   if (!path) return '';
   const clean = path.split('/').filter(Boolean).map(encodeURIComponent).join('/');
-  return `${cfg.url}/storage/v1/object/public/mvl-player-photos/${clean}`;
+  return withPhotoVersion(`${cfg.url}/storage/v1/object/public/mvl-player-photos/${clean}`);
 };
 
 const cssUrl = (value) => `url(${JSON.stringify(value)})`;

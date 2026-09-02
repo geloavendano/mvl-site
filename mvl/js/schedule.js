@@ -14,11 +14,16 @@ const playoffNotes = {
 const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
 }[char]));
+// Bumped whenever the player photos are re-uploaded. The filenames are stable
+// and the objects are served with max-age=86400, so without a changing URL a
+// browser that already has yesterday's photo keeps showing it for a day.
+const PHOTO_VERSION = '260902';
+const withPhotoVersion = (url) => (url ? `${url}${url.includes('?') ? '&' : '?'}v=${PHOTO_VERSION}` : '');
 const playerPhotoUrl = (value) => {
   if (!value) return '';
-  if (/^https?:\/\//i.test(value)) return value;
+  if (/^https?:\/\//i.test(value)) return withPhotoVersion(value);
   const path = value.split('/').filter(Boolean).map(encodeURIComponent).join('/');
-  return `${window.MVL_SUPABASE.url}/storage/v1/object/public/mvl-player-photos/${path}`;
+  return withPhotoVersion(`${window.MVL_SUPABASE.url}/storage/v1/object/public/mvl-player-photos/${path}`);
 };
 const gameTeam = (game, side) => {
   const id = side === 'A' ? game.teamA : game.teamB;
