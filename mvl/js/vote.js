@@ -13,6 +13,9 @@ const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => (
 }[char]));
 
 const teamById = Object.fromEntries(TEAMS.map((team) => [team.id, team]));
+const VOTER_TEAMS = TEAMS.some((team) => team.id === 'organizer')
+  ? TEAMS
+  : [...TEAMS, { id: 'organizer', name: 'Organizer' }];
 const cssUrl = (path) => `url('${String(path).replace(/'/g, "\\'")}')`;
 
 const identityForm = el('voteIdentity');
@@ -125,7 +128,9 @@ const teamPlayers = (teamId, award = AWARDS[index]) =>
   eligible(award).filter((p) => p.teamId === teamId);
 
 // ---- team pickers ------------------------------------------------------------
-const teamOptions = TEAMS.map((team) => `<option value="${escapeHtml(team.id)}">${escapeHtml(team.name)}</option>`).join('');
+// Organizers are valid test voters, but remain excluded from the public nominee
+// selectors, team pages, standings and schedule.
+const teamOptions = VOTER_TEAMS.map((team) => `<option value="${escapeHtml(team.id)}">${escapeHtml(team.name)}</option>`).join('');
 el('voteTeam').insertAdjacentHTML('beforeend', teamOptions);
 
 // On mobile the picked player takes the card, so the award copy steps aside;
