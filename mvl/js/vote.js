@@ -118,12 +118,15 @@ const loadNominees = async () => {
   return nominees;
 };
 
-const teamPlayers = (teamId) => nominees.filter((p) => p.teamId === teamId);
+// An award may restrict who can be nominated. Today only Fresh New Player
+// does: mvl.players.is_repeat marks anyone who appeared in 2024 or 2025.
+const eligible = (award) => (award?.newPlayersOnly ? nominees.filter((p) => !p.isRepeat) : nominees);
+const teamPlayers = (teamId, award = AWARDS[index]) =>
+  eligible(award).filter((p) => p.teamId === teamId);
 
 // ---- team pickers ------------------------------------------------------------
 const teamOptions = TEAMS.map((team) => `<option value="${escapeHtml(team.id)}">${escapeHtml(team.name)}</option>`).join('');
 el('voteTeam').insertAdjacentHTML('beforeend', teamOptions);
-nomineeTeam.insertAdjacentHTML('beforeend', teamOptions);
 
 // On mobile the picked player takes the card, so the award copy steps aside;
 // clearing brings it back. Driven by a class rather than inline display so the
@@ -214,6 +217,16 @@ const renderAward = async () => {
   el('voteBody').innerHTML = (award.body || []).map((line) => `<p>${escapeHtml(line)}</p>`).join('');
   el('voteQuestion').textContent = award.question || '';
   el('voteProgress').textContent = `Award ${index + 1} of ${AWARDS.length}`;
+  el('voteEligibility').textContent = award.eligibilityNote || '';
+  el('voteEligibility').hidden = !award.eligibilityNote;
+
+  // Rebuilt per award: a team with nobody eligible would be a dead end, so it
+  // is not offered at all.
+  const withNominees = new Set(eligible(award).map((p) => p.teamId));
+  nomineeTeam.innerHTML = '<option value="">Select a team</option>' + TEAMS
+    .filter((team) => withNominees.has(team.id))
+    .map((team) => `<option value="${escapeHtml(team.id)}">${escapeHtml(team.name)}</option>`)
+    .join('');
 
   const pick = picks.get(award.id);
   nomineeTeam.value = pick?.teamId || '';
@@ -269,7 +282,7 @@ nomineePlayer.addEventListener('change', () => {
     renderRail();
     return;
   }
-  const player = nominees.find((p) => p.id === playerId);
+  const player = eligible(AWARDS[index]).find((p) => p.id === playerId);
   if (!player) return;
   const pick = {
     playerId,

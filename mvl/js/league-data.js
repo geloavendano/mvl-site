@@ -121,6 +121,10 @@ window.MVL_DATA = {
     {
       id: 'fresh-new-player',
       name: 'Fresh New Player of the League',
+      // Only players who did not appear in 2024 or 2025 — mvl.players.is_repeat
+      // marks the returning ones, matched from the client's roster export.
+      newPlayersOnly: true,
+      eligibilityNote: 'Only players new to MVL this year are eligible.',
       brand: 'Future Glow',
       logo: '/mvl/assets/Sponsor Logos/Official Partners/future glow.png',
       tagline: 'New to the league. Already making a mark.',

@@ -5828,3 +5828,13 @@ body.checkin-complete { overflow: hidden; }
   .vote-actions { justify-content: flex-end; margin-top: 16px; }
   .vote-actions .cta { flex: 0 0 auto; min-width: 140px; }
 }
+
+/* Eligibility caveat under an award's question — only Fresh New Player has one. */
+.vote-eligibility {
+  margin-top: 8px;
+  color: var(--ink-muted);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+.vote-eligibility[hidden] { display: none; }
+
