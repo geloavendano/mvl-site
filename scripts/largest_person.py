@@ -55,10 +55,35 @@ def keep_largest_person(im: Image.Image, work_w: int = 480) -> Image.Image:
     return im
 
 
+def fill_enclosed_holes(im: Image.Image) -> Image.Image:
+    """Re-opaque any transparent region the silhouette fully encloses.
+
+    Vision segments *people*, so a dark shirt panel it reads as background —
+    and the part of a held ball that the arms enclose — comes back transparent
+    even though it sits inside the body outline. Anything the outline surrounds
+    belongs to the figure, so flood the background inward from the border and
+    keep whatever the flood cannot reach.
+    """
+    from PIL import ImageChops, ImageDraw, ImageOps
+
+    alpha = im.getchannel("A")
+    w, h = alpha.size
+    background = ImageOps.invert(alpha.point(lambda v: 255 if v > 128 else 0))
+
+    # pad so a hole touching the image edge is still reachable from outside
+    work = Image.new("L", (w + 2, h + 2), 255)
+    work.paste(background, (1, 1))
+    ImageDraw.floodfill(work, (0, 0), 128)
+
+    holes = work.crop((1, 1, w + 1, h + 1)).point(lambda v: 255 if v == 255 else 0)
+    im.putalpha(ImageChops.lighter(alpha, holes))
+    return im
+
+
 if __name__ == "__main__":
     import sys
     src, dst = sys.argv[1], sys.argv[2]
-    out = keep_largest_person(Image.open(src))
+    out = fill_enclosed_holes(keep_largest_person(Image.open(src)))
     b = out.getchannel("A").getbbox()
     if b:
         out = out.crop(b)

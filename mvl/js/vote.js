@@ -81,7 +81,7 @@ let index = 0;                 // which award is on screen
 // Bumped whenever the player photos are re-uploaded. The filenames are stable
 // and the objects are served with max-age=86400, so without a changing URL a
 // browser that already has an older photo keeps showing it for a day.
-const PHOTO_VERSION = '260903b';
+const PHOTO_VERSION = '260903c';
 const withPhotoVersion = (url) => (url ? `${url}${url.includes('?') ? '&' : '?'}v=${PHOTO_VERSION}` : '');
 
 const picks = new Map();       // award id -> { playerId, name, teamId, photo }

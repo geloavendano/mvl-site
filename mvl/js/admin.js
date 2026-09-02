@@ -149,7 +149,7 @@ const activateStreamCamera = (camera, { focus = false } = {}) => {
 };
 // Bumped whenever the player photos are re-uploaded; the filenames are stable
 // under max-age=86400, so an unchanged URL is never refetched.
-const PHOTO_VERSION = '260903b';
+const PHOTO_VERSION = '260903c';
 const withPhotoVersion = (url) => (url ? `${url}${url.includes('?') ? '&' : '?'}v=${PHOTO_VERSION}` : '');
 const playerPhotoUrl = (value) => {
   if (!value) return '';
