@@ -40,6 +40,9 @@ def roster():
     return {r["code"].upper(): r for r in rows}
 
 
+# Sources shorter than HEIGHT, collected during a build and reported at the end.
+UNDERSIZED = []
+
 def to_card_webp(src: Path, dst: Path):
     """Trim to the cut-out's own bounds, scale to HEIGHT, keep the alpha."""
     from PIL import Image, ImageOps
@@ -65,8 +68,15 @@ def to_card_webp(src: Path, dst: Path):
             im = im.crop(box)
 
     w, h = im.size
-    if h != HEIGHT:
+    # Downscale only. Enlarging a small cut-out to HEIGHT invents no detail —
+    # it just interpolates, then the browser resamples again, and the result is
+    # visibly soft while the file gets *smaller* because blur compresses well.
+    # A source under HEIGHT is a source problem; report it rather than paper
+    # over it (see UNDERSIZED below).
+    if h > HEIGHT:
         im = im.resize((max(1, round(w * HEIGHT / h)), HEIGHT), Image.LANCZOS)
+    elif h < HEIGHT * 0.95:
+        UNDERSIZED.append((src.name, w, h))
 
     dst.parent.mkdir(parents=True, exist_ok=True)
     if im.mode == "RGBA":
@@ -111,6 +121,14 @@ def main():
         if args.build:
             if not to_card_webp(f, out / f"{code}.webp"):
                 noface.append(code)
+
+    if UNDERSIZED:
+        print(f"\n!! {len(UNDERSIZED)} source(s) shorter than the {HEIGHT}px target — these were NOT")
+        print("   enlarged, so they will render soft on a retina card. Re-export them")
+        print("   taller from the originals in mvl/assets/player-photos/extracted/.")
+        for name, w, h in sorted(UNDERSIZED, key=lambda r: r[2]):
+            print(f"     {name:28} {w}x{h}  ({HEIGHT/h:.1f}x short)")
+        print()
 
     print(f"source        {len(files)} readable file(s) in {src}")
     print(f"matched       {len(matched)}")

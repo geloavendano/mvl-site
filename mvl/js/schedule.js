@@ -17,7 +17,7 @@ const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => (
 // Bumped whenever the player photos are re-uploaded. The filenames are stable
 // and the objects are served with max-age=86400, so without a changing URL a
 // browser that already has yesterday's photo keeps showing it for a day.
-const PHOTO_VERSION = '260902';
+const PHOTO_VERSION = '260903';
 const withPhotoVersion = (url) => (url ? `${url}${url.includes('?') ? '&' : '?'}v=${PHOTO_VERSION}` : '');
 const playerPhotoUrl = (value) => {
   if (!value) return '';
