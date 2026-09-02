@@ -78,6 +78,12 @@ const showStepError = (field, control, message) => {
 
 // ---- state -------------------------------------------------------------------
 let index = 0;                 // which award is on screen
+// Bumped whenever the player photos are re-uploaded. The filenames are stable
+// and the objects are served with max-age=86400, so without a changing URL a
+// browser that already has an older photo keeps showing it for a day.
+const PHOTO_VERSION = '260903b';
+const withPhotoVersion = (url) => (url ? `${url}${url.includes('?') ? '&' : '?'}v=${PHOTO_VERSION}` : '');
+
 const picks = new Map();       // award id -> { playerId, name, teamId, photo }
 let nominees = [];              // every player, fetched once
 
@@ -292,7 +298,7 @@ nomineePlayer.addEventListener('change', () => {
     teamId: player.teamId,
     name: player.name,
     jersey: player.jerseyNumber || '',
-    photo: player.photoUrl || '',
+    photo: withPhotoVersion(player.photoUrl || ''),
   };
   picks.set(award.id, pick);
   paintSlot(award, pick);

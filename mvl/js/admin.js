@@ -147,11 +147,15 @@ const activateStreamCamera = (camera, { focus = false } = {}) => {
     content.hidden = content.dataset.streamCameraContent !== camera;
   });
 };
+// Bumped whenever the player photos are re-uploaded; the filenames are stable
+// under max-age=86400, so an unchanged URL is never refetched.
+const PHOTO_VERSION = '260903b';
+const withPhotoVersion = (url) => (url ? `${url}${url.includes('?') ? '&' : '?'}v=${PHOTO_VERSION}` : '');
 const playerPhotoUrl = (value) => {
   if (!value) return '';
-  if (/^https?:\/\//i.test(value)) return value;
+  if (/^https?:\/\//i.test(value)) return withPhotoVersion(value);
   const path = value.split('/').filter(Boolean).map(encodeURIComponent).join('/');
-  return `${cfg.url}/storage/v1/object/public/mvl-player-photos/${path}`;
+  return withPhotoVersion(`${cfg.url}/storage/v1/object/public/mvl-player-photos/${path}`);
 };
 const playerPreview = (player) => {
   if (!player) return '<div class="admin-player-preview is-empty" data-player-preview>No player selected</div>';
@@ -524,7 +528,7 @@ const revealRaffleWinner = (winner) => {
   addButton.disabled = false;
   addButton.textContent = 'Add to Raffle Winners';
   if (winner.photoUrl) {
-    raffleWinnerPhoto.src = winner.photoUrl;
+    raffleWinnerPhoto.src = withPhotoVersion(winner.photoUrl);
     raffleWinnerPhoto.alt = `${winner.playerName}, raffle winner`;
     raffleWinnerPhoto.classList.remove('is-hidden');
     raffleWinnerPhotoFallback.classList.add('is-hidden');
