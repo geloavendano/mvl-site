@@ -60,20 +60,6 @@ const teamColors: Record<string, [string, string]> = {
   secret: ['#FF9A05', '#FF5A00'],
 };
 
-// Same artwork the site puts behind a team card. JPEG rather than the site's
-// WebP: Outlook's Word engine cannot decode WebP, and a background it cannot
-// decode is a background it silently drops.
-const teamArt: Record<string, string> = {
-  'metarice-x': 'mint-green',
-  'metarice-y': 'violet',
-  thurstrap: 'blue',
-  gizmo: 'pink',
-  gremlins: 'forest-green',
-  ssvc: 'yellow',
-  s24: 'red',
-  secret: 'orange',
-};
-
 // Award names and their presenting brand live in js/league-data.js, which an
 // edge function cannot read. Duplicated here on purpose; keep the two in step
 // when an award is renamed or changes sponsor.
@@ -133,44 +119,33 @@ const jsonResponse = (body: unknown, status = 200) =>
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
 
-// One card per award, two to a row. The cut-outs are exported at a single
-// height but wildly different widths (455-830px), so sizing them on width gives
-// every card a different photo height. Rather than crop, the photo cells and
-// the label cells sit in their own table rows: a row equalises its cells, so
-// the shorter figure simply gets more of its team gradient above it and the
-// two label blocks still line up. Bottom-aligned, so the figure stands on the
-// label bar the way it does on the site's team cards.
-const photoCell = (pick: Pick | undefined) => {
+// One card per award, two to a row.
+//
+// Text only. The nominee cut-outs are transparent WebP, and mail clients that
+// will not composite that alpha paint the transparent pixels black — which put
+// a black box around half the players instead of their team artwork. The team
+// colour survives as a bar across the top of each card, so a ballot still
+// reads at a glance without depending on an image rendering correctly.
+const textCard = (pick: Pick | undefined) => {
   if (!pick) return '<td width="48%" style="width:48%;">&nbsp;</td>';
-  const [a, b] = teamColors[pick.team_id ?? ''] ?? ['#3FE39A', '#101A36'];
-  const art = teamArt[pick.team_id ?? ''];
-  // Three layers, most capable first. Clients that honour background-size get
-  // the artwork filling a cell whose height they cannot know in advance; the
-  // `background` attribute covers the older ones that ignore the CSS; and
-  // bgcolor is what Outlook lands on, since the Word engine drops both. Every
-  // layer is a team colour, so the cut-out never sits on bare white.
-  const artCss = art
-    ? `background-image:url('${mvlUrl}/assets/teams/background-email/${art}.jpg');background-size:cover;background-position:center;`
-    : `background-image:linear-gradient(160deg,${a} 0%,${b} 100%);`;
-  const artAttr = art ? ` background="${mvlUrl}/assets/teams/background-email/${art}.jpg"` : '';
-  return `
-    <td width="48%" valign="bottom" align="center" bgcolor="${b}"${artAttr} style="width:48%;background-color:${b};${artCss}font-size:0;line-height:0;">
-      ${pick.photo_url
-        ? `<img src="${escapeHtml(pick.photo_url)}" width="150" alt="${escapeHtml(pick.player_name)}" style="display:block;width:100%;max-width:150px;height:auto;border:0;">`
-        : `<div style="height:150px;line-height:150px;color:${g.ink};font:800 40px/150px ${uiFont};">&#9679;</div>`}
-    </td>`;
-};
-
-const labelCell = (pick: Pick | undefined) => {
-  if (!pick) return '<td width="48%" style="width:48%;">&nbsp;</td>';
-  const award = awardNames[pick.award_id] ?? pick.award_id;
-  const brand = awardBrands[pick.award_id];
+  const [a] = teamColors[pick.team_id ?? ''] ?? ['#3FE39A'];
+  const award = [awardBrands[pick.award_id], awardNames[pick.award_id] ?? pick.award_id]
+    .filter(Boolean).join(' ');
   const jersey = pick.jersey_number ? ` &middot; #${escapeHtml(pick.jersey_number)}` : '';
   return `
-    <td width="48%" valign="top" bgcolor="${g.panelSolid}" style="width:48%;background-color:${g.panelFill};padding:12px 14px;">
-      <p class="x-ink" style="margin:0 0 6px;color:${g.ink};font:700 9px/1.35 ${monoFont};letter-spacing:1.4px;text-transform:uppercase;">${escapeHtml([brand, award].filter(Boolean).join(' '))}</p>
-      <p class="x-ink" style="margin:0;color:${g.ink};font:800 15px/1.3 ${uiFont};letter-spacing:-.1px;">${escapeHtml(pick.player_name)}</p>
-      <p class="x-ink" style="margin:2px 0 0;color:${g.ink};font:400 11.5px/1.4 ${uiFont};opacity:.78;">${escapeHtml(pick.team_name ?? '')}${jersey}</p>
+    <td width="48%" valign="top" style="width:48%;">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+        <tr>
+          <td height="5" bgcolor="${a}" style="height:5px;line-height:5px;font-size:0;background-color:${a};">&nbsp;</td>
+        </tr>
+        <tr>
+          <td bgcolor="${g.panelSolid}" style="background-color:${g.panelFill};border:1px solid ${g.edge};border-top:0;padding:14px 16px 16px;">
+            <p class="x-ink" style="margin:0 0 8px;color:${g.ink};font:700 9px/1.4 ${monoFont};letter-spacing:1.4px;text-transform:uppercase;">${escapeHtml(award)}</p>
+            <p class="x-ink" style="margin:0;color:${g.ink};font:800 17px/1.28 ${uiFont};letter-spacing:-.2px;">${escapeHtml(pick.player_name)}</p>
+            <p class="x-ink" style="margin:4px 0 0;color:${g.ink};font:400 12px/1.4 ${uiFont};opacity:.78;">${escapeHtml(pick.team_name ?? '')}${jersey}</p>
+          </td>
+        </tr>
+      </table>
     </td>`;
 };
 
@@ -178,10 +153,8 @@ const pickGrid = (picks: Pick[]) => {
   const spacer = '<td width="4%" style="width:4%;font-size:0;line-height:0;">&nbsp;</td>';
   let rows = '';
   for (let i = 0; i < picks.length; i += 2) {
-    const pair = [picks[i], picks[i + 1]];
     rows += `
-      <tr>${photoCell(pair[0])}${spacer}${photoCell(pair[1])}</tr>
-      <tr>${labelCell(pair[0])}${spacer}${labelCell(pair[1])}</tr>
+      <tr>${textCard(picks[i])}${spacer}${textCard(picks[i + 1])}</tr>
       <tr><td colspan="3" height="14" style="height:14px;line-height:14px;font-size:0;">&nbsp;</td></tr>`;
   }
   return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">${rows}</table>`;
