@@ -324,9 +324,12 @@ const showIdentity = () => {
   setStage('review');
   ballot.classList.add('is-hidden');
   identityForm.classList.remove('is-hidden');
-  el('voteRecap').innerHTML = AWARDS.filter((a) => picks.has(a.id)).map((a) => `
-    <li><strong>${escapeHtml(a.name)}.</strong> ${escapeHtml(picks.get(a.id).name)}</li>
-  `).join('');
+  el('voteRecap').innerHTML = AWARDS.filter((a) => picks.has(a.id)).map((a) => {
+    const pick = picks.get(a.id);
+    return `
+      <li><strong>${escapeHtml(a.name)}:</strong> ${escapeHtml(pick.name)}, ${escapeHtml(teamById[pick.teamId]?.name || '')}</li>
+    `;
+  }).join('');
   identityForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
 
