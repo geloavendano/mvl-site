@@ -390,6 +390,25 @@ el('voteEditBtn').addEventListener('click', () => {
   ballot.scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
 
+// The done screen is the real receipt; the email is a copy for later. So this
+// never blocks the confirmation and never surfaces an error — the ballot is
+// already recorded either way, and a Resend hiccup is not the voter's problem.
+const sendVoteConfirmation = (voterPlayerId) => {
+  fetch(`${cfg.url}/functions/v1/send-vote-confirmation`, {
+    method: 'POST',
+    headers: {
+      apikey: cfg.anonKey,
+      Authorization: `Bearer ${cfg.anonKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ voterPlayerId }),
+  })
+    .then((response) => {
+      if (!response.ok) console.warn('Vote confirmation email failed:', response.status);
+    })
+    .catch((error) => console.warn('Vote confirmation email failed:', error));
+};
+
 // ---- submit ------------------------------------------------------------------
 // Identity is checked here rather than up front, so someone who has already
 // voted only finds out now — the trade for letting them see the awards first.
@@ -430,6 +449,8 @@ identityForm.addEventListener('submit', async (event) => {
       <li><strong>${escapeHtml(a.name)}.</strong> ${escapeHtml(picks.get(a.id).name)}</li>
     `).join('');
     done.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // votes are one-per-voter, so this fires exactly once per ballot
+    if (payload.player?.id) sendVoteConfirmation(payload.player.id);
   } catch (error) {
     setStatus(status, explain(error), 'error');
     submitBtn.disabled = false;
