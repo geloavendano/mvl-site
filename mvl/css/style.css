@@ -5601,6 +5601,7 @@ body.checkin-complete { overflow: hidden; }
   padding: 0;
   list-style: none;
 }
+.vote-review-grid + .form-panel-head { margin-top: 16px; }
 .vote-review-card {
   position: relative;
   min-width: 0;
