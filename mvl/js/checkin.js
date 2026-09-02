@@ -123,7 +123,7 @@ const hide = (node) => node.classList.add('is-hidden');
 // Bumped whenever the player photos are re-uploaded. The filenames are stable
 // and the objects are served with max-age=86400, so without a changing URL a
 // browser that already has yesterday's photo keeps showing it for a day.
-const PHOTO_VERSION = '260903c';
+const PHOTO_VERSION = '260903d';
 const withPhotoVersion = (url) => (url ? `${url}${url.includes('?') ? '&' : '?'}v=${PHOTO_VERSION}` : '');
 const playerPhotoUrl = (payload) => {
   const { photo_url: url, photo_path: path } = payload.player;
