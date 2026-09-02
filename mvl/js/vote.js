@@ -326,11 +326,33 @@ const showIdentity = () => {
   identityForm.classList.remove('is-hidden');
   el('voteRecap').innerHTML = AWARDS.filter((a) => picks.has(a.id)).map((a) => {
     const pick = picks.get(a.id);
+    const team = teamById[pick.teamId];
     const awardLabel = [a.brand, a.name].filter(Boolean).join(' ');
+    const cardStyle = [
+      `--team-a:${team?.grad?.[0] || '#3fe39a'}`,
+      `--team-b:${team?.grad?.[1] || '#101a36'}`,
+      team?.bg ? `--team-art:${cssUrl(team.bg)}` : '',
+    ].filter(Boolean).join(';');
     return `
-      <li><strong>${escapeHtml(awardLabel)}:</strong> ${escapeHtml(pick.name)}, ${escapeHtml(teamById[pick.teamId]?.name || '')}</li>
+      <li class="vote-review-card${pick.photo ? ' has-photo' : ''}" style="${escapeHtml(cardStyle)}">
+        ${pick.photo ? `<img class="vote-review-photo" src="${escapeHtml(pick.photo)}" alt="">` : ''}
+        <svg class="vote-review-silhouette" viewBox="0 0 120 140" aria-hidden="true">
+          <path fill="currentColor" d="M60 18a24 24 0 1 1 0 48 24 24 0 0 1 0-48Zm0 58c26 0 47 17 47 38v6H13v-6c0-21 21-38 47-38Z"/>
+        </svg>
+        <span class="vote-review-award">${escapeHtml(awardLabel)}</span>
+        <span class="vote-review-pick">
+          <strong>${escapeHtml(pick.name)}</strong>
+          <span>${escapeHtml(team?.name || '')}</span>
+        </span>
+      </li>
     `;
   }).join('');
+  el('voteRecap').querySelectorAll('.vote-review-photo').forEach((photo) => {
+    photo.addEventListener('error', () => {
+      photo.hidden = true;
+      photo.closest('.vote-review-card')?.classList.remove('has-photo');
+    }, { once: true });
+  });
   identityForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
 

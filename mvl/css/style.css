@@ -5593,6 +5593,73 @@ body.checkin-complete { overflow: hidden; }
 .vote-recap { padding-top: 14px; }
 .vote-recap li { font-size: 13.5px; }
 
+.vote-review-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.vote-review-card {
+  position: relative;
+  min-width: 0;
+  aspect-ratio: 1 / 1.08;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--team-a, var(--mint)) 58%, transparent);
+  border-radius: 13px;
+  color: color-mix(in srgb, var(--team-a, var(--mint)) 58%, #fff);
+  background:
+    linear-gradient(180deg, rgba(4, 2, 20, .58) 0%, rgba(4, 2, 20, 0) 35%, rgba(4, 2, 20, .86) 100%),
+    var(--team-art, linear-gradient(135deg, var(--team-b, #1b2340), var(--team-a, #2c3557)));
+  background-size: cover, cover;
+  background-position: center, center;
+}
+.vote-review-photo {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: auto;
+  height: 96%;
+  max-width: none;
+  transform: translateX(-50%);
+  object-fit: contain;
+  object-position: bottom center;
+  filter: drop-shadow(0 5px 10px rgba(4, 2, 20, .55));
+}
+.vote-review-silhouette {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 54px;
+  transform: translate(-50%, -48%);
+  opacity: .55;
+}
+.vote-review-card.has-photo .vote-review-silhouette { display: none; }
+.vote-review-award,
+.vote-review-pick {
+  position: absolute;
+  z-index: 1;
+  left: 10px;
+  right: 10px;
+  text-shadow: 0 2px 7px rgba(4, 2, 20, .9);
+}
+.vote-review-award {
+  top: 9px;
+  color: var(--mint);
+  font: 800 8px/1.25 var(--mono);
+  letter-spacing: .55px;
+  text-transform: uppercase;
+}
+.vote-review-pick {
+  bottom: 9px;
+  display: grid;
+  gap: 1px;
+  color: #fff;
+}
+.vote-review-pick strong { font: 800 12px/1.15 var(--ui); }
+.vote-review-pick span { color: rgba(255, 255, 255, .76); font-size: 10px; line-height: 1.2; }
+
 /* The nominee slot: the check-in card's treatment — the cut-out standing on the
    team's artwork — with the presenting brand where it would sit on a poster. */
 .vote-slot {
@@ -5878,6 +5945,10 @@ body.checkin-complete { overflow: hidden; }
   .vote-controls .form-grid { grid-template-columns: 1fr 1fr; }
   .vote-actions { justify-content: flex-end; margin-top: 16px; }
   .vote-actions .cta { flex: 0 0 auto; min-width: 140px; }
+  .vote-review-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .vote-review-card { aspect-ratio: 1 / 1; }
+  .vote-review-award { font-size: 8.5px; }
+  .vote-review-pick strong { font-size: 13px; }
 }
 
 /* Eligibility caveat under an award's question — only Fresh New Player has one. */
