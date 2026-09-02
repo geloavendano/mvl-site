@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/mvl/css/style.css?v=vote-eligibility">
+<link rel="stylesheet" href="/mvl/css/style.css?v=vote-stars">
 <script src="/mvl/js/site-config.js?v=cutover-gameday"></script>
 <script src="/mvl/js/analytics.js?v=fg-cluster"></script>
 <script src="/mvl/js/nav.js?v=fg-cluster"></script>
@@ -28,6 +28,17 @@
     <a href="/mvl/checkin.html">Check-In</a>
   </nav>
 </header>
+
+<div class="vote-stars" aria-hidden="true">
+  <img class="vote-star vote-star--splash-a" src="/mvl/assets/vote-splash.png" alt="">
+  <img class="vote-star vote-star--splash-b" src="/mvl/assets/vote-splash.png" alt="">
+  <img class="vote-star vote-star--blue-a" src="/mvl/assets/vote-star-blue.png" alt="">
+  <img class="vote-star vote-star--blue-b" src="/mvl/assets/vote-star-blue.png" alt="">
+  <img class="vote-star vote-star--violet-a" src="/mvl/assets/vote-star-violet.png" alt="">
+  <img class="vote-star vote-star--violet-b" src="/mvl/assets/vote-star-violet.png" alt="">
+  <img class="vote-star vote-star--mint-a" src="/mvl/assets/vote-star-mint.png" alt="">
+  <img class="vote-star vote-star--mint-b" src="/mvl/assets/vote-star-mint.png" alt="">
+</div>
 
 <main class="waiver-main">
   <section class="waiver-intro page-hero vote-intro" id="voteIntro">
@@ -62,7 +73,7 @@
             <p class="vote-question" id="voteQuestion"></p>
           <p class="vote-eligibility" id="voteEligibility" hidden></p>
           </div>
-          <img class="vote-copy-brand" id="voteCopyBrand" alt="" hidden>
+          <div class="vote-brand-lockup vote-copy-brand" id="voteCopyBrand" hidden></div>
         </div>
 
         <figure class="vote-slot" id="voteSlot">
@@ -72,7 +83,7 @@
             <path fill="currentColor" d="M60 18a24 24 0 1 1 0 48 24 24 0 0 1 0-48Zm0 58c26 0 47 17 47 38v6H13v-6c0-21 21-38 47-38Z"/>
           </svg>
           <figcaption class="vote-slot-caption" id="voteSlotCaption">Pick a player to see them here</figcaption>
-          <img class="vote-slot-brand" id="voteSlotBrand" alt="" hidden>
+          <div class="vote-brand-lockup vote-slot-brand" id="voteSlotBrand" hidden></div>
         </figure>
       </div>
     </div>
@@ -165,9 +176,9 @@
   </div>
 </footer>
 
-<script src="/mvl/js/league-data.js?v=vote-eligibility"></script>
+<script src="/mvl/js/league-data.js?v=vote-stars"></script>
 <script src="/mvl/js/marquee.js?v=fg-cluster"></script>
 <script src="/mvl/js/supabase-config.js?v=fg-cluster"></script>
-<script src="/mvl/js/vote.js?v=vote-eligibility"></script>
+<script src="/mvl/js/vote.js?v=vote-stars"></script>
 </body>
 </html>

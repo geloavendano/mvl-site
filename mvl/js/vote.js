@@ -170,21 +170,19 @@ const paintSlot = (award, pick) => {
     ? `${pick.name}${pick.jersey ? ` · #${pick.jersey}` : ''} · ${team?.name || ''}`
     : 'Pick a player to see them here';
 
-  if (award.logo) {
-    slotBrand.src = award.logo;
-    slotBrand.alt = award.brand ? `${award.brand}` : '';
-    slotBrand.classList.toggle('has-logo-bg', Boolean(award.logoBg));
-    slotBrand.hidden = false;
-    copyBrand.src = award.logo;
-    copyBrand.classList.toggle('has-logo-bg', Boolean(award.logoBg));
-    copyBrand.hidden = false;
-  } else {
-    slotBrand.hidden = true;
-    slotBrand.classList.remove('has-logo-bg');
-    copyBrand.hidden = true;
-    copyBrand.classList.remove('has-logo-bg');
-    copyBrand.removeAttribute('src');
-  }
+  const awardLogos = Array.isArray(award.logos) && award.logos.length
+    ? award.logos
+    : (award.logo ? [{ name: award.brand, logo: award.logo, logoBg: award.logoBg }] : []);
+  const logoMarkup = awardLogos.map((item) => `
+    <img class="vote-brand-logo${item.logoBg ? ' has-logo-bg' : ''}"
+         src="${escapeHtml(item.logo)}" alt="${escapeHtml(item.name || '')}">
+  `).join('');
+  [slotBrand, copyBrand].forEach((lockup) => {
+    lockup.innerHTML = logoMarkup;
+    lockup.hidden = !awardLogos.length;
+    lockup.classList.toggle('is-group', awardLogos.length > 1);
+  });
+  slot.classList.toggle('has-brand-group', awardLogos.length > 1);
 };
 
 // ---- rail --------------------------------------------------------------------

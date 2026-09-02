@@ -127,6 +127,14 @@ window.MVL_DATA = {
       eligibilityNote: 'Only players new to MVL this year are eligible.',
       brand: 'Future Glow',
       logo: '/mvl/assets/Sponsor Logos/Official Partners/future glow.png',
+      logos: [
+        { name: 'Future Glow', logo: '/mvl/assets/Sponsor Logos/Official Partners/future glow.png' },
+        { name: 'Vitanature', logo: '/mvl/assets/Sponsor Logos/Official Partners/future glow - VITANATURE White Logo.png' },
+        { name: 'Tropicana', logo: '/mvl/assets/Sponsor Logos/Official Partners/future glow - tropicana.png' },
+        { name: 'Oxecure', logo: '/mvl/assets/Sponsor Logos/Official Partners/future glow - Oxecure.png' },
+        { name: 'Dr. O Skin Lab', logo: '/mvl/assets/Sponsor Logos/Official Partners/future glow - Dr O White Logo.png' },
+        { name: 'Snake Brand', logo: '/mvl/assets/Sponsor Logos/Official Partners/future glow - snake brand.png' },
+      ],
       tagline: 'New to the league. Already making a mark.',
       body: [
         'This one\u2019s for the fresh faces who came into MVL ready to play.',
