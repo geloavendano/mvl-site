@@ -4,7 +4,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><title>MVL Admin</title>
 <link rel="icon" type="image/svg+xml" href="/mvl/assets/metarice-icon.svg">
-<link rel="stylesheet" href="/mvl/css/style.css?v=vote-10">
+<link rel="stylesheet" href="/mvl/css/style.css?v=admin-award-counts">
 </head>
 <body class="admin-page">
 <header class="admin-topbar"><a href="/mvl/index.html"><img src="/mvl/assets/hero-mvl-2026-logo.png" alt="MVL 2026"></a><button id="signOutBtn" class="admin-link is-hidden" type="button">Sign out</button></header>
@@ -19,6 +19,7 @@
       <button id="raffleTab" class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="rafflePanel" tabindex="-1" data-admin-tab="raffle">Raffle draw</button>
       <button id="livestreamTab" class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="livestreamPanel" tabindex="-1" data-admin-tab="livestream">Livestream</button>
       <button id="scoreboardTab" class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="scoreboardPanel" tabindex="-1" data-admin-tab="scoreboard">Scoreboard</button>
+      <button id="specialAwardsTab" class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="specialAwardsPanel" tabindex="-1" data-admin-tab="special-awards">Special awards</button>
       <button id="gameResultsTab" class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="gameResultsPanel" tabindex="-1" data-admin-tab="game-results">Game results</button>
     </nav>
     <section id="registrationsPanel" class="admin-tab-panel is-active" role="tabpanel" aria-labelledby="registrationsTab" data-admin-panel="registrations">
@@ -122,6 +123,16 @@
         <div id="scoreboardList" class="admin-scoreboard-list" aria-live="polite"><p class="admin-scoreboard-empty">Loading scoreboards…</p></div>
       </section>
     </section>
+    <section id="specialAwardsPanel" class="admin-tab-panel" role="tabpanel" aria-labelledby="specialAwardsTab" data-admin-panel="special-awards" hidden>
+      <section class="admin-panel admin-awards" aria-labelledby="specialAwardsTitle">
+        <div class="admin-panel-head admin-awards-head">
+          <div><h2 id="specialAwardsTitle">Special awards vote count</h2><p>Select an award to view every nominated player and their current vote total.</p></div>
+          <label class="field admin-award-filter"><span>Award</span><select id="specialAwardFilter"></select></label>
+        </div>
+        <p id="specialAwardSummary" class="admin-readiness-summary" aria-live="polite">Loading vote counts…</p>
+        <div id="specialAwardResults" class="admin-readiness-table-wrap" aria-live="polite"></div>
+      </section>
+    </section>
     <section id="gameResultsPanel" class="admin-tab-panel" role="tabpanel" aria-labelledby="gameResultsTab" data-admin-panel="game-results" hidden>
       <div class="admin-games-toolbar"><div><h2>Games</h2><p id="adminDaySummary"></p></div><label class="admin-day-filter"><span>Match day</span><select id="adminDayFilter"></select></label></div>
       <div id="adminGameList"></div>
@@ -166,5 +177,5 @@
     </section>
   </div>
 </dialog>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/mvl/js/supabase-config.js?v=stream-guide"></script><script src="/mvl/js/league-data.js?v=courts-original"></script><script src="/mvl/js/admin.js?v=bigscore"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/mvl/js/supabase-config.js?v=stream-guide"></script><script src="/mvl/js/league-data.js?v=courts-original"></script><script src="/mvl/js/admin.js?v=admin-award-counts"></script>
 </body></html>

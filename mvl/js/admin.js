@@ -25,6 +25,9 @@ const emergencyCallLink = document.getElementById('emergencyCallLink');
 const scoreboardCreateForm = document.getElementById('scoreboardCreateForm');
 const scoreboardList = document.getElementById('scoreboardList');
 const newScoreboardBtn = document.getElementById('newScoreboardBtn');
+const specialAwardFilter = document.getElementById('specialAwardFilter');
+const specialAwardSummary = document.getElementById('specialAwardSummary');
+const specialAwardResults = document.getElementById('specialAwardResults');
 const raffleExportForm = document.getElementById('raffleExportForm');
 const raffleBlacklistForm = document.getElementById('raffleBlacklistForm');
 const raffleBlacklistTeam = document.getElementById('raffleBlacklistTeam');
@@ -51,6 +54,7 @@ const raffleWinnerForm = document.getElementById('raffleWinnerForm');
 const adminToast = document.getElementById('adminToast');
 let rafflePlayerRequest = 0;
 let raffleDrawToken = 0;
+let specialAwardRequest = 0;
 let raffleSpinFrame = null;
 let currentRaffleWinner = null;
 let adminToastTimer = null;
@@ -63,6 +67,7 @@ const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => (
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
 }[char]));
 const teams = Object.fromEntries(window.MVL_DATA.teams.map((t) => [t.id, t]));
+const awards = Array.isArray(window.MVL_DATA.awards) ? window.MVL_DATA.awards : [];
 const adminTeamColor = (teamId) => {
   const source = teams[teamId]?.grad?.[1];
   if (!/^#[0-9a-f]{6}$/i.test(source || '')) return '#475467';
@@ -164,6 +169,48 @@ const call = async (path, body, token = session?.access_token) => {
   return json;
 };
 const rpc = (name, body) => call(`/rest/v1/rpc/${name}`, body);
+const initSpecialAwards = () => {
+  specialAwardFilter.innerHTML = awards.map((award) => (
+    `<option value="${escapeHtml(award.id)}">${escapeHtml(award.name)}</option>`
+  )).join('');
+  specialAwardFilter.disabled = awards.length === 0;
+};
+const renderSpecialAwardCounts = (result) => {
+  const nominees = Array.isArray(result?.nominees) ? result.nominees : [];
+  const totalVotes = Number(result?.totalVotes) || 0;
+  specialAwardSummary.textContent = totalVotes === 0
+    ? 'No votes have been recorded for this award yet.'
+    : `${totalVotes} ${totalVotes === 1 ? 'vote' : 'votes'} across ${nominees.length} nominated ${nominees.length === 1 ? 'player' : 'players'}.`;
+  if (!nominees.length) {
+    specialAwardResults.innerHTML = '<p class="admin-readiness-empty">No nominated players to show yet.</p>';
+    return;
+  }
+  specialAwardResults.innerHTML = `<table class="admin-readiness-table admin-award-table">
+    <thead><tr><th scope="col">Rank</th><th scope="col">Player</th><th scope="col">Team</th><th scope="col">Votes</th></tr></thead>
+    <tbody>${nominees.map((nominee, index) => `<tr>
+      <td class="admin-award-rank">${index + 1}</td>
+      <td class="admin-player-name"><strong>${escapeHtml(nominee.playerName || 'Unnamed player')}</strong><span>Jersey #${escapeHtml(nominee.jerseyNumber || '—')}</span></td>
+      <td>${teamNameMarkup(nominee.teamId, nominee.teamName || teams[nominee.teamId]?.name || 'Unknown team')}</td>
+      <td><strong class="admin-award-vote-count">${Number(nominee.voteCount) || 0}</strong></td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+};
+const loadSpecialAwardCounts = async (awardId = specialAwardFilter.value) => {
+  if (!session?.access_token || !awardId) return;
+  const request = ++specialAwardRequest;
+  const award = awards.find((item) => item.id === awardId);
+  specialAwardSummary.textContent = `Loading ${award?.name || 'award'} vote counts…`;
+  specialAwardResults.innerHTML = '<p class="admin-readiness-empty">Loading nominated players…</p>';
+  try {
+    const result = await rpc('mvl_admin_get_award_vote_counts', { p_award_id: awardId });
+    if (request !== specialAwardRequest) return;
+    renderSpecialAwardCounts(result);
+  } catch (error) {
+    if (request !== specialAwardRequest) return;
+    specialAwardSummary.textContent = 'Vote counts could not be loaded.';
+    specialAwardResults.innerHTML = `<p class="form-status is-error">${escapeHtml(error.message)}</p>`;
+  }
+};
 const courtDisplayOrigin = window.location.hostname === 'www.metaricevolley.ph' ? 'https://metaricevolley.ph' : window.location.origin;
 const scoreboardUrls = (board) => ({
   court: `${courtDisplayOrigin}/mvl/scoreboard-court?board=${encodeURIComponent(board.publicCode || board.id)}`,
@@ -700,7 +747,7 @@ const show = async (activeSession = session) => {
     form.court2Url.value = streams[1]?.youtube_url || '';
     render();
     activateAdminTab(adminTabFromHash());
-    await Promise.all([loadReadiness(), loadScoreboards(), loadRaffleBlacklist()]);
+    await Promise.all([loadReadiness(), loadScoreboards(), loadRaffleBlacklist(), loadSpecialAwardCounts()]);
     if (request === adminLoadRequest) status(loginStatus, '');
   } catch (error) {
     if (request !== adminLoadRequest || session?.access_token !== accessToken) return;
@@ -980,6 +1027,9 @@ readinessTeamFilter.addEventListener('change', () => {
 readinessDayFilter.addEventListener('change', () => {
   loadReadiness(readinessTeamFilter.value, readinessDayFilter.value);
 });
+specialAwardFilter.addEventListener('change', () => {
+  loadSpecialAwardCounts(specialAwardFilter.value);
+});
 readinessTeamSummary.addEventListener('click', (event) => {
   const button = event.target.closest('[data-readiness-team]');
   if (!button) return;
@@ -1132,6 +1182,7 @@ authClient.auth.getSession().then(({ data: authData, error }) => {
   show(restoredSession);
 });
 activateAdminTab(adminTabFromHash());
+initSpecialAwards();
 populateScoreboardTeams();
 populateRaffleTeams();
 raffleExportForm.elements.startDate.value = manilaDateInput();
