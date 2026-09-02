@@ -326,8 +326,9 @@ const showIdentity = () => {
   identityForm.classList.remove('is-hidden');
   el('voteRecap').innerHTML = AWARDS.filter((a) => picks.has(a.id)).map((a) => {
     const pick = picks.get(a.id);
+    const awardLabel = [a.brand, a.name].filter(Boolean).join(' ');
     return `
-      <li><strong>${escapeHtml(a.name)}:</strong> ${escapeHtml(pick.name)}, ${escapeHtml(teamById[pick.teamId]?.name || '')}</li>
+      <li><strong>${escapeHtml(awardLabel)}:</strong> ${escapeHtml(pick.name)}, ${escapeHtml(teamById[pick.teamId]?.name || '')}</li>
     `;
   }).join('');
   identityForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
