@@ -5974,16 +5974,3 @@ body.checkin-complete { overflow: hidden; }
   .vote-brand-lockup.is-group .vote-brand-logo { max-height: 11px; }
 }
 
-/* The hero is a single-fold layout with almost no slack — a third stacked CTA
-   put the last button 6px below the fold at 390x844, the commonest iPhone. The
-   two secondary actions share a row instead, so adding Vote costs no height. */
-.hero-ctas-pair {
-  display: flex;
-  gap: 8px;
-}
-.hero-ctas-pair .cta {
-  flex: 1 1 0;
-  min-width: 0;
-  padding-inline: 10px;
-  white-space: nowrap;
-}
