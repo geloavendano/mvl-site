@@ -135,6 +135,7 @@ window.MVL_DATA = {
       name: 'Extra Strong Sigaw',
       brand: 'Strepsils',
       logo: '/mvl/assets/Sponsor Logos/Co-Presenters/Strepsils.png',
+      logoBg: 'mint',
       tagline: 'You heard them before you even saw them.',
       body: [
         'Every team has that one player. Cheering every point. Calling out from the sidelines. Picking everyone back up. Somehow still yelling in the third set like the day just started.',
@@ -159,6 +160,7 @@ window.MVL_DATA = {
       name: 'Face of the League',
       brand: 'Garnier',
       logo: '/mvl/assets/Sponsor Logos/Co-Presenters/garnier.PNG',
+      logoBg: 'mint',
       tagline: 'Some players just have that main-character energy.',
       body: [
         'You\u2019ve seen them on the court. You\u2019ve probably seen them on your camera roll too.',

@@ -27,6 +27,7 @@ const slot = el('voteSlot');
 const slotPhoto = el('voteSlotPhoto');
 const slotCaption = el('voteSlotCaption');
 const slotBrand = el('voteSlotBrand');
+const copyBrand = el('voteCopyBrand');
 const nextBtn = el('voteNextBtn');
 const backBtn = el('voteBackBtn');
 const startBtn = el('voteStartBtn');
@@ -169,9 +170,17 @@ const paintSlot = (award, pick) => {
   if (award.logo) {
     slotBrand.src = award.logo;
     slotBrand.alt = award.brand ? `${award.brand}` : '';
+    slotBrand.classList.toggle('has-logo-bg', Boolean(award.logoBg));
     slotBrand.hidden = false;
+    copyBrand.src = award.logo;
+    copyBrand.classList.toggle('has-logo-bg', Boolean(award.logoBg));
+    copyBrand.hidden = false;
   } else {
     slotBrand.hidden = true;
+    slotBrand.classList.remove('has-logo-bg');
+    copyBrand.hidden = true;
+    copyBrand.classList.remove('has-logo-bg');
+    copyBrand.removeAttribute('src');
   }
 };
 

@@ -5550,6 +5550,7 @@ body.checkin-complete { overflow: hidden; }
 .vote-rail { display: none; }          /* desktop only — see the query below */
 
 .vote-card { display: grid; gap: 16px; }
+.vote-copy { display: grid; gap: 12px; }
 .vote-brand {
   color: var(--teal);
   font: 800 10px var(--mono);
@@ -5614,6 +5615,21 @@ body.checkin-complete { overflow: hidden; }
   max-width: 78px;
   max-height: 24px;
   object-fit: contain;
+}
+.vote-copy-brand {
+  width: auto;
+  max-width: 78px;
+  max-height: 24px;
+  justify-self: end;
+  object-fit: contain;
+}
+.vote-copy-brand[hidden] { display: none; }
+.vote-slot-brand.has-logo-bg,
+.vote-copy-brand.has-logo-bg {
+  max-height: 18px;
+  padding: 4px 6px;
+  border-radius: 5px;
+  background: var(--mint);
 }
 .vote-slot-clear {
   position: absolute;
@@ -5731,8 +5747,15 @@ body.checkin-complete { overflow: hidden; }
   }
   .vote-copy {
     height: 100%;
-    overflow-y: auto;
+    min-height: 0;
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: 10px;
+    overflow: hidden;
     padding: clamp(18px, 5vw, 24px);
+  }
+  .vote-copy-text {
+    min-height: 0;
+    overflow-y: auto;
     overscroll-behavior: contain;
   }
   .vote-brand { font-size: 9px; }
