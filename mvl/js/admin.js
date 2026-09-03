@@ -987,7 +987,7 @@ raffleBlacklistForm.addEventListener('submit', async (event) => {
     form.elements.note.value = '';
     form.elements.player.value = '';
     await loadRaffleBlacklist();
-    status(formStatus, 'Player added to Raffle Winners.', 'success');
+    status(formStatus, 'Prize recorded under Raffle Winners.', 'success');
   } catch (error) {
     status(formStatus, error.message, 'error');
   } finally {
@@ -1013,12 +1013,12 @@ raffleBlacklistList.addEventListener('click', async (event) => {
     return;
   }
   const removeButton = event.target.closest('[data-raffle-remove]');
-  if (!removeButton || !window.confirm('Remove this player from Raffle Winners?')) return;
+  if (!removeButton || !window.confirm('Remove this raffle prize record?')) return;
   removeButton.disabled = true;
   try {
     await rpc('mvl_admin_remove_raffle_blacklist', { p_blacklist_id: removeButton.dataset.raffleRemove });
     await loadRaffleBlacklist();
-    status(raffleBlacklistForm.querySelector('.form-status'), 'Player removed from Raffle Winners.', 'success');
+    status(raffleBlacklistForm.querySelector('.form-status'), 'Raffle prize record removed.', 'success');
   } catch (error) {
     removeButton.disabled = false;
     status(raffleBlacklistForm.querySelector('.form-status'), error.message, 'error');
@@ -1061,7 +1061,7 @@ raffleWinnerForm.addEventListener('submit', async (event) => {
     await loadRaffleBlacklist();
     raffleDrawDialog.close();
     currentRaffleWinner = null;
-    showAdminToast(`${winnerName} added to Raffle Winners and excluded from future draws.`);
+    showAdminToast(`${winnerName}'s prize was recorded. Previous-winner filters will apply to future draws.`);
   } catch (error) {
     submitButton.disabled = false;
     status(formStatus, error.message, 'error');

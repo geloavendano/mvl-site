@@ -52,7 +52,7 @@
           <div class="admin-form-actions"><div class="admin-raffle-export-actions"><button class="cta cta--secondary" type="submit">Download CSV</button><button id="raffleDrawBtn" class="cta cta--primary" type="button">Draw Winner</button></div><p class="form-status" aria-live="polite"></p></div>
         </form>
         <section class="admin-panel admin-form" aria-labelledby="raffleBlacklistTitle">
-          <div class="admin-panel-head"><div><h2 id="raffleBlacklistTitle">Raffle Winners</h2><p>Previous winners are excluded from future draws and exports. The prize or note is saved with the player.</p></div></div>
+          <div class="admin-panel-head"><div><h2 id="raffleBlacklistTitle">Raffle Winners</h2><p>Each prize is recorded separately. Players with a recorded prize are excluded from draws by default, unless previous winners are included in the raffle filters.</p></div></div>
           <form id="raffleBlacklistForm" class="admin-raffle-blacklist-form">
             <label class="field"><span>Team</span><select id="raffleBlacklistTeam" name="team" required></select></label>
             <label class="field"><span>Player</span><select id="raffleBlacklistPlayer" name="player" required disabled><option value="">Choose a team first</option></select></label>
@@ -187,5 +187,5 @@
     </section>
   </div>
 </dialog>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/mvl/js/supabase-config.js?v=stream-guide"></script><script src="/mvl/js/league-data.js?v=vote-deadline-3"></script><script src="/mvl/js/admin.js?v=voting-switch"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/mvl/js/supabase-config.js?v=stream-guide"></script><script src="/mvl/js/league-data.js?v=vote-deadline-3"></script><script src="/mvl/js/admin.js?v=repeat-raffle-winners"></script>
 </body></html>
