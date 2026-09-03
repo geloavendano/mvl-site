@@ -257,6 +257,41 @@ const initSpecialAwards = () => {
   )).join('');
   specialAwardFilter.disabled = awards.length === 0;
 };
+const renderSpecialAwardTable = (nominees, rankOffset = 0) => `<div class="admin-readiness-table-wrap">
+  <table class="admin-readiness-table admin-award-table">
+    <thead><tr><th scope="col">Rank</th><th scope="col">Player</th><th scope="col">Team</th><th scope="col">Votes</th></tr></thead>
+    <tbody>${nominees.map((nominee, index) => `<tr>
+      <td class="admin-award-rank">${index + rankOffset + 1}</td>
+      <td class="admin-player-name"><strong>${escapeHtml(nominee.playerName || 'Unnamed player')}</strong><span>Jersey #${escapeHtml(nominee.jerseyNumber || '—')}</span></td>
+      <td>${teamNameMarkup(nominee.teamId, nominee.teamName || teams[nominee.teamId]?.name || 'Unknown team')}</td>
+      <td><strong class="admin-award-vote-count">${Number(nominee.voteCount) || 0}</strong></td>
+    </tr>`).join('')}</tbody>
+  </table>
+</div>`;
+const renderSpecialAwardLeader = (nominee, index) => {
+  const team = teams[nominee.teamId];
+  const photo = playerPhotoUrl(nominee.photoUrl);
+  const teamName = nominee.teamName || team?.name || 'Unknown team';
+  const cardStyle = [
+    `--team-a:${team?.grad?.[0] || '#3fe39a'}`,
+    `--team-b:${team?.grad?.[1] || '#25324a'}`,
+    team?.bg ? `--team-art:url('${String(team.bg).replace(/'/g, "\\'")}')` : '',
+  ].filter(Boolean).join(';');
+  const voteCount = Number(nominee.voteCount) || 0;
+  return `<article class="admin-award-leader-card${photo ? ' has-photo' : ''}" style="${escapeHtml(cardStyle)}">
+    <div class="admin-award-leader-visual">
+      ${photo ? `<img class="admin-award-leader-photo" src="${escapeHtml(photo)}" alt="" data-award-player-photo>` : ''}
+      <svg class="admin-award-leader-silhouette" viewBox="0 0 120 140" aria-hidden="true"><path fill="currentColor" d="M60 18a24 24 0 1 1 0 48 24 24 0 0 1 0-48Zm0 58c26 0 47 17 47 38v6H13v-6c0-21 21-38 47-38Z"/></svg>
+      <span class="admin-award-leader-rank">#${index + 1}</span>
+      <div class="admin-award-leader-copy">
+        <span>${escapeHtml(teamName)}</span>
+        <h3>${escapeHtml(nominee.playerName || 'Unnamed player')}</h3>
+        <p>Jersey #${escapeHtml(nominee.jerseyNumber || '—')}</p>
+      </div>
+    </div>
+    <div class="admin-award-leader-tally"><span>${index === 0 ? 'Leading' : `Rank ${index + 1}`}</span><strong>${voteCount} ${voteCount === 1 ? 'vote' : 'votes'}</strong></div>
+  </article>`;
+};
 const renderSpecialAwardCounts = (result) => {
   const nominees = Array.isArray(result?.nominees) ? result.nominees : [];
   const totalVotes = Number(result?.totalVotes) || 0;
@@ -267,15 +302,19 @@ const renderSpecialAwardCounts = (result) => {
     specialAwardResults.innerHTML = '<p class="admin-readiness-empty">No nominated players to show yet.</p>';
     return;
   }
-  specialAwardResults.innerHTML = `<table class="admin-readiness-table admin-award-table">
-    <thead><tr><th scope="col">Rank</th><th scope="col">Player</th><th scope="col">Team</th><th scope="col">Votes</th></tr></thead>
-    <tbody>${nominees.map((nominee, index) => `<tr>
-      <td class="admin-award-rank">${index + 1}</td>
-      <td class="admin-player-name"><strong>${escapeHtml(nominee.playerName || 'Unnamed player')}</strong><span>Jersey #${escapeHtml(nominee.jerseyNumber || '—')}</span></td>
-      <td>${teamNameMarkup(nominee.teamId, nominee.teamName || teams[nominee.teamId]?.name || 'Unknown team')}</td>
-      <td><strong class="admin-award-vote-count">${Number(nominee.voteCount) || 0}</strong></td>
-    </tr>`).join('')}</tbody>
-  </table>`;
+  const leaders = nominees.slice(0, 3);
+  const remaining = nominees.slice(3);
+  specialAwardResults.innerHTML = `<section class="admin-award-leader-section" aria-labelledby="awardLeadersTitle">
+    <h3 id="awardLeadersTitle">Top ${leaders.length}</h3>
+    <div class="admin-award-leaders">${leaders.map(renderSpecialAwardLeader).join('')}</div>
+  </section>
+  ${remaining.length ? `<section class="admin-award-remaining" aria-labelledby="awardRemainingTitle"><h3 id="awardRemainingTitle">Remaining nominees</h3>${renderSpecialAwardTable(remaining, leaders.length)}</section>` : ''}`;
+  specialAwardResults.querySelectorAll('[data-award-player-photo]').forEach((photo) => {
+    photo.addEventListener('error', () => {
+      photo.hidden = true;
+      photo.closest('.admin-award-leader-card')?.classList.remove('has-photo');
+    }, { once: true });
+  });
 };
 const loadSpecialAwardCounts = async (awardId = specialAwardFilter.value) => {
   if (!session?.access_token || !awardId) return;
