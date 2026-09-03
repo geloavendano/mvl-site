@@ -5508,7 +5508,27 @@ body.checkin-complete { overflow: hidden; }
 .admin-raffle-status-toggle:hover { filter: brightness(.96); transform: translateY(-1px); }
 .admin-raffle-status-toggle:focus-visible { outline: 2px solid #475467; outline-offset: 2px; }
 .admin-raffle-status-toggle:disabled { cursor: wait; opacity: .55; transform: none; }
-.admin-raffle-exclude-date { grid-column: 1 / -1; width: min(100%, 340px); }
+.admin-raffle-draw-form { gap: 14px; }
+.admin-raffle-filter-group { display: grid; gap: 12px; padding: 14px; border-radius: 9px; background: #f8fafc; }
+.admin-raffle-filter-head h3, .admin-raffle-record-head h3 { margin: 0; color: #1d2433; font: 700 14px/1.35 Arial, Helvetica, sans-serif; }
+.admin-raffle-filter-head p, .admin-raffle-record-head p { margin-top: 3px; color: #667085; font: 400 11px/1.45 Arial, Helvetica, sans-serif; }
+.admin-raffle-date-range { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.admin-raffle-winner-date-settings { display: grid; gap: 12px; padding: 12px; border-radius: 8px; background: #fff; }
+.admin-raffle-winner-date-settings[hidden] { display: none; }
+.admin-raffle-date-add { display: grid; grid-template-columns: minmax(0, 220px) auto; gap: 8px; align-items: center; }
+.admin-raffle-date-add .cta { min-height: 42px; }
+.admin-raffle-date-list-label { display: block; margin-bottom: 7px; color: #667085; font: 600 11px Arial, Helvetica, sans-serif; }
+.admin-raffle-date-list { display: flex; flex-wrap: wrap; gap: 7px; }
+.admin-raffle-date-chip { display: inline-flex; min-height: 30px; align-items: center; gap: 7px; padding: 5px 6px 5px 10px; border-radius: 999px; background: #eef1f5; color: #344054; font: 600 11px Arial, Helvetica, sans-serif; }
+.admin-raffle-date-chip button { display: grid; width: 20px; height: 20px; place-items: center; border: 0; border-radius: 50%; background: #d0d5dd; color: #344054; cursor: pointer; font: 600 15px/1 Arial, Helvetica, sans-serif; }
+.admin-raffle-date-chip button:hover { background: #bfc5cf; }
+.admin-raffle-date-chip button:focus-visible { outline: 2px solid #475467; outline-offset: 1px; }
+.admin-raffle-date-empty { color: #98a2b3; font: 400 11px Arial, Helvetica, sans-serif; }
+.admin-raffle-draw-actions { display: grid; justify-content: stretch; gap: 8px; }
+.admin-raffle-draw-actions > div { display: flex; flex-wrap: wrap; gap: 8px; }
+.admin-raffle-draw-actions > small { color: #667085; font: 400 10px/1.45 Arial, Helvetica, sans-serif; }
+.admin-raffle-record-head { padding-top: 2px; }
+.admin-raffle-record-list-head { margin-top: 2px; padding-top: 16px; border-top: 1px solid #eaecf0; }
 .admin-raffle-team-exclusions { grid-column: 1 / -1; min-width: 0; margin: -2px 0 0; padding: 14px; border: 1px solid #eaecf0; border-radius: 8px; background: #fff; }
 .admin-raffle-team-exclusions[hidden] { display: none; }
 .admin-raffle-team-exclusions legend { padding: 0 5px; color: #475467; font: 600 11px Arial, Helvetica, sans-serif; }
@@ -5522,6 +5542,8 @@ body.checkin-complete { overflow: hidden; }
   .admin-toast { right: 16px; bottom: 16px; left: 16px; max-width: none; }
   .admin-video-head { align-items: stretch; flex-direction: column; }
   .admin-video-actions { justify-content: space-between; }
+  .admin-raffle-date-range, .admin-raffle-date-add { grid-template-columns: 1fr; }
+  .admin-raffle-date-add .cta { width: 100%; }
 }
 
 }

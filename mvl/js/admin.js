@@ -40,6 +40,11 @@ const raffleDrawBtn = document.getElementById('raffleDrawBtn');
 const raffleExcludeTeamsToggle = document.getElementById('raffleExcludeTeamsToggle');
 const raffleExcludedTeams = document.getElementById('raffleExcludedTeams');
 const raffleExcludedTeamList = document.getElementById('raffleExcludedTeamList');
+const raffleExcludeWinnerDatesToggle = document.getElementById('raffleExcludeWinnerDatesToggle');
+const raffleExcludedWinnerDates = document.getElementById('raffleExcludedWinnerDates');
+const raffleExcludedWinnerDatePicker = document.getElementById('raffleExcludedWinnerDatePicker');
+const raffleAddExcludedWinnerDate = document.getElementById('raffleAddExcludedWinnerDate');
+const raffleExcludedWinnerDateList = document.getElementById('raffleExcludedWinnerDateList');
 const raffleDrawDialog = document.getElementById('raffleDrawDialog');
 const raffleDrawTitle = document.getElementById('raffleDrawTitle');
 const raffleDrawingView = document.getElementById('raffleDrawingView');
@@ -58,6 +63,7 @@ const adminToast = document.getElementById('adminToast');
 let rafflePlayerRequest = 0;
 let raffleDrawToken = 0;
 let specialAwardRequest = 0;
+const excludedRaffleWinnerDates = new Set();
 let raffleSpinFrame = null;
 let currentRaffleWinner = null;
 let adminToastTimer = null;
@@ -92,6 +98,27 @@ const syncRaffleTeamExclusions = () => {
 };
 const selectedRaffleTeamExclusions = () => raffleExcludeTeamsToggle.checked
   ? [...raffleExcludedTeamList.querySelectorAll('input:checked')].map((input) => input.value)
+  : [];
+const renderRaffleWinnerDateExclusions = () => {
+  const dates = [...excludedRaffleWinnerDates].sort();
+  raffleExcludedWinnerDateList.innerHTML = dates.length
+    ? dates.map((date) => `<span class="admin-raffle-date-chip"><span>${escapeHtml(formatReadinessDay(date))}</span><button type="button" data-remove-raffle-winner-date="${escapeHtml(date)}" aria-label="Remove ${escapeHtml(formatReadinessDay(date))}">×</button></span>`).join('')
+    : '<span class="admin-raffle-date-empty">No draw dates selected.</span>';
+};
+const syncRaffleWinnerDateExclusions = () => {
+  const isActive = raffleExcludeWinnerDatesToggle.checked;
+  raffleExcludeWinnerDatesToggle.setAttribute('aria-expanded', String(isActive));
+  raffleExcludedWinnerDates.hidden = !isActive;
+  raffleExcludedWinnerDatePicker.disabled = !isActive;
+  raffleAddExcludedWinnerDate.disabled = !isActive;
+  if (isActive && excludedRaffleWinnerDates.size === 0) {
+    excludedRaffleWinnerDates.add(raffleExcludedWinnerDatePicker.value || manilaDateInput());
+    raffleExcludedWinnerDatePicker.value = '';
+  }
+  renderRaffleWinnerDateExclusions();
+};
+const selectedRaffleWinnerDateExclusions = () => raffleExcludeWinnerDatesToggle.checked
+  ? [...excludedRaffleWinnerDates].sort()
   : [];
 renderRaffleTeamExclusions();
 syncRaffleTeamExclusions();
@@ -951,19 +978,41 @@ raffleExportForm.addEventListener('submit', async (event) => {
   }
 });
 raffleExcludeTeamsToggle.addEventListener('change', syncRaffleTeamExclusions);
+raffleExcludeWinnerDatesToggle.addEventListener('change', syncRaffleWinnerDateExclusions);
+raffleAddExcludedWinnerDate.addEventListener('click', () => {
+  const date = raffleExcludedWinnerDatePicker.value;
+  if (!date) {
+    raffleExcludedWinnerDatePicker.focus();
+    return;
+  }
+  excludedRaffleWinnerDates.add(date);
+  raffleExcludedWinnerDatePicker.value = '';
+  renderRaffleWinnerDateExclusions();
+});
+raffleExcludedWinnerDateList.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-remove-raffle-winner-date]');
+  if (!button) return;
+  excludedRaffleWinnerDates.delete(button.dataset.removeRaffleWinnerDate);
+  if (excludedRaffleWinnerDates.size === 0) {
+    raffleExcludeWinnerDatesToggle.checked = false;
+    syncRaffleWinnerDateExclusions();
+    return;
+  }
+  renderRaffleWinnerDateExclusions();
+});
 raffleDrawBtn.addEventListener('click', async () => {
   if (!raffleExportForm.reportValidity()) return;
   const formStatus = raffleExportForm.querySelector('.form-status');
   status(formStatus, 'Preparing the raffle pool…');
   raffleDrawBtn.disabled = true;
   try {
-    const payload = await rpc('mvl_admin_draw_raffle_winner_with_date_filters', {
+    const payload = await rpc('mvl_admin_draw_raffle_winner_with_multi_date_filters', {
       p_start_date: raffleExportForm.elements.startDate.value,
       p_end_date: raffleExportForm.elements.endDate.value,
       p_furparent_only: raffleExportForm.elements.furparentOnly.checked,
       p_include_previous_winners: raffleExportForm.elements.includePreviousWinners.checked,
       p_excluded_team_ids: selectedRaffleTeamExclusions(),
-      p_excluded_winner_date: raffleExportForm.elements.excludedWinnerDate.value || null,
+      p_excluded_winner_dates: selectedRaffleWinnerDateExclusions(),
     });
     if (!payload.winner || !payload.pool?.length) {
       status(formStatus, 'No eligible check-ins found for this selection.', 'error');
@@ -1265,5 +1314,6 @@ populateScoreboardTeams();
 populateRaffleTeams();
 raffleExportForm.elements.startDate.value = manilaDateInput();
 raffleExportForm.elements.endDate.value = manilaDateInput();
-raffleExportForm.elements.excludedWinnerDate.value = manilaDateInput();
+raffleExcludedWinnerDatePicker.value = manilaDateInput();
+syncRaffleWinnerDateExclusions();
 loadRafflePlayers(raffleBlacklistTeam.value);
