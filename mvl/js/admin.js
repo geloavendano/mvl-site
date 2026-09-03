@@ -957,12 +957,13 @@ raffleDrawBtn.addEventListener('click', async () => {
   status(formStatus, 'Preparing the raffle pool…');
   raffleDrawBtn.disabled = true;
   try {
-    const payload = await rpc('mvl_admin_draw_raffle_winner_with_filters', {
+    const payload = await rpc('mvl_admin_draw_raffle_winner_with_date_filters', {
       p_start_date: raffleExportForm.elements.startDate.value,
       p_end_date: raffleExportForm.elements.endDate.value,
       p_furparent_only: raffleExportForm.elements.furparentOnly.checked,
       p_include_previous_winners: raffleExportForm.elements.includePreviousWinners.checked,
       p_excluded_team_ids: selectedRaffleTeamExclusions(),
+      p_excluded_winner_date: raffleExportForm.elements.excludedWinnerDate.value || null,
     });
     if (!payload.winner || !payload.pool?.length) {
       status(formStatus, 'No eligible check-ins found for this selection.', 'error');
@@ -1264,4 +1265,5 @@ populateScoreboardTeams();
 populateRaffleTeams();
 raffleExportForm.elements.startDate.value = manilaDateInput();
 raffleExportForm.elements.endDate.value = manilaDateInput();
+raffleExportForm.elements.excludedWinnerDate.value = manilaDateInput();
 loadRafflePlayers(raffleBlacklistTeam.value);
