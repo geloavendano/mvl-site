@@ -138,7 +138,8 @@ const teamPlayers = (teamId, award = AWARDS[index]) =>
 // Closing the ballot for real belongs in mvl_submit_award_votes, so a late
 // submission is refused by the server rather than by a hidden button.
 if (VOTING.label) {
-  el('voteDeadlineText').textContent = VOTING.label;
+  el('voteDeadlineLabel').textContent = VOTING.label;
+  el('voteDeadlineWhen').innerHTML = (VOTING.when || []).map(escapeHtml).join('<br>');
   el('voteDeadline').hidden = false;
 }
 

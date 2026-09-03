@@ -119,7 +119,8 @@ window.MVL_DATA = {
   // formatter's.
   voting: {
     closesAt: '2026-09-05T21:00:00+08:00',
-    label: 'Voting ends Saturday, Sep 5, 9PM',
+    label: 'Voting ends',
+    when: ['Saturday · Sep 5', '9:00 PM'],
   },
 
   // Special awards voted on at /mvl/vote. Copy is the client's, verbatim; the

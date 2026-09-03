@@ -5974,35 +5974,14 @@ body.checkin-complete { overflow: hidden; }
   .vote-brand-lockup.is-group .vote-brand-logo { max-height: 11px; }
 }
 
-/* Voting deadline, under the page description. Emphatic without a new type
-   scale: the page's own mono at kicker size, mint on a tinted strip, with the
-   left rule the library note already uses. */
+/* The deadline reuses .draw-day from the raffle mechanics panel; it only needs
+   to sit in the page flow rather than in that panel's grid. */
 .vote-deadline {
-  display: flex;
-  align-items: center;
-  gap: 10px;
   width: fit-content;
   max-width: 100%;
-  margin-top: 18px;
-  padding: 11px 16px;
-  border: 1px solid rgba(124, 245, 180, .34);
-  border-left: 3px solid var(--mint);
-  border-radius: 0 12px 12px 0;
-  background: rgba(124, 245, 180, .1);
-  color: var(--mint);
-  font: 800 11px var(--mono);
-  letter-spacing: 1.4px;
-  line-height: 1.45;
-  text-transform: uppercase;
+  margin-top: 20px;
 }
 .vote-deadline[hidden] { display: none; }
-.vote-deadline-mark {
-  flex: none;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--mint);
-}
 
 /* Shown in place of the ballot when an admin closes voting. */
 .vote-closed-note {
