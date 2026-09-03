@@ -4,7 +4,7 @@
    A dedicated intro leads into one award per screen. Identity comes after the
    picks, then the whole ballot goes up in a single call.
    ========================================================================== */
-const { teams: TEAMS, awards: AWARDS = [] } = window.MVL_DATA;
+const { teams: TEAMS, awards: AWARDS = [], voting: VOTING = {} } = window.MVL_DATA;
 const cfg = window.MVL_SUPABASE || {};
 
 const el = (id) => document.getElementById(id);
@@ -132,6 +132,15 @@ const loadNominees = async () => {
 const eligible = (award) => (award?.newPlayersOnly ? nominees.filter((p) => !p.isRepeat) : nominees);
 const teamPlayers = (teamId, award = AWARDS[index]) =>
   eligible(award).filter((p) => p.teamId === teamId);
+
+// ---- voting window -----------------------------------------------------------
+// Display only: the label says when voting closes, it does not enforce it.
+// Closing the ballot for real belongs in mvl_submit_award_votes, so a late
+// submission is refused by the server rather than by a hidden button.
+if (VOTING.label) {
+  el('voteDeadlineText').textContent = VOTING.label;
+  el('voteDeadline').hidden = false;
+}
 
 // ---- team pickers ------------------------------------------------------------
 // Organizers are valid test voters, but remain excluded from the public nominee

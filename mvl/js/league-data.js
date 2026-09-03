@@ -114,6 +114,14 @@ window.MVL_DATA = {
     ],
   },
 
+  // Voting window for the special awards. Rendered on /mvl/vote; the label is
+  // written out rather than derived so the wording is the client's, not a
+  // formatter's.
+  voting: {
+    closesAt: '2026-09-05T21:00:00+08:00',
+    label: 'Voting ends Saturday, Sep 5, 9PM',
+  },
+
   // Special awards voted on at /mvl/vote. Copy is the client's, verbatim; the
   // brand on each award is the partner presenting it, and its logo sits in the
   // nominee slot the way it would on a poster.

@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/mvl/css/style.css?v=vote-cta">
+<link rel="stylesheet" href="/mvl/css/style.css?v=vote-deadline">
 <script src="/mvl/js/site-config.js?v=cutover-gameday"></script>
 <script src="/mvl/js/analytics.js?v=fg-cluster"></script>
 <script src="/mvl/js/nav.js?v=fg-cluster"></script>
@@ -48,6 +48,10 @@
     <p class="page-lede">
       Four awards, chosen by the people who played the tournament. Pick one player for each &mdash;
       any team, any position. One ballot per player, so make it count.
+    </p>
+    <p class="vote-deadline" id="voteDeadline" hidden>
+      <span class="vote-deadline-mark" aria-hidden="true"></span>
+      <span id="voteDeadlineText"></span>
     </p>
     <button class="cta cta--primary vote-intro-action" type="button" id="voteStartBtn" aria-controls="voteBallot">Next</button>
   </section>
@@ -177,9 +181,9 @@
   </div>
 </footer>
 
-<script src="/mvl/js/league-data.js?v=vote-stars"></script>
+<script src="/mvl/js/league-data.js?v=vote-deadline"></script>
 <script src="/mvl/js/marquee.js?v=fg-cluster"></script>
 <script src="/mvl/js/supabase-config.js?v=fg-cluster"></script>
-<script src="/mvl/js/vote.js?v=photo-260903d"></script>
+<script src="/mvl/js/vote.js?v=vote-deadline"></script>
 </body>
 </html>
