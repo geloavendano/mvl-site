@@ -5504,6 +5504,10 @@ body.checkin-complete { overflow: hidden; }
 .admin-raffle-note-form .cta { min-height: 34px; padding: 7px 12px; }
 .admin-raffle-edit { border: 0; background: none; color: #344054; cursor: pointer; font: 600 12px Arial, Helvetica, sans-serif; }
 .admin-raffle-edit:hover, .admin-raffle-remove:hover { text-decoration: underline; }
+.admin-raffle-status-toggle { border: 0; cursor: pointer; font-family: Arial, Helvetica, sans-serif; transition: filter .15s ease, transform .15s ease; }
+.admin-raffle-status-toggle:hover { filter: brightness(.96); transform: translateY(-1px); }
+.admin-raffle-status-toggle:focus-visible { outline: 2px solid #475467; outline-offset: 2px; }
+.admin-raffle-status-toggle:disabled { cursor: wait; opacity: .55; transform: none; }
 .admin-raffle-team-exclusions { grid-column: 1 / -1; min-width: 0; margin: -2px 0 0; padding: 14px; border: 1px solid #eaecf0; border-radius: 8px; background: #fff; }
 .admin-raffle-team-exclusions[hidden] { display: none; }
 .admin-raffle-team-exclusions legend { padding: 0 5px; color: #475467; font: 600 11px Arial, Helvetica, sans-serif; }

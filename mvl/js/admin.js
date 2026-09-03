@@ -495,13 +495,18 @@ const renderRaffleBlacklist = (entries) => {
     return;
   }
   raffleBlacklistList.innerHTML = `<table class="admin-raffle-table">
-    <thead><tr><th>Player</th><th>Prize / note</th><th>Added</th><th></th></tr></thead>
-    <tbody>${entries.map((entry) => `<tr>
+    <thead><tr><th>Player</th><th>Prize / note</th><th>Status</th><th>Added</th><th></th></tr></thead>
+    <tbody>${entries.map((entry) => {
+      const winnerStatus = entry.status === 'awarded' ? 'awarded' : 'pending';
+      const nextStatus = winnerStatus === 'awarded' ? 'pending' : 'awarded';
+      return `<tr>
       <td><strong>${escapeHtml(entry.playerName)}</strong><span>${teamNameMarkup(entry.teamId, entry.teamName)}${entry.jerseyNumber ? ` · #${escapeHtml(entry.jerseyNumber)}` : ''}</span></td>
       <td class="admin-raffle-note-cell"><p data-raffle-note-text>${escapeHtml(entry.note)}</p><form class="admin-raffle-note-form is-hidden" data-raffle-note-form data-raffle-id="${escapeHtml(entry.id)}"><input name="note" type="text" maxlength="240" value="${escapeHtml(entry.note)}" aria-label="Prize or note for ${escapeHtml(entry.playerName)}" required><div><button class="cta cta--primary" type="submit">Save</button><button class="admin-link" type="button" data-raffle-edit-cancel>Cancel</button></div><p class="form-status" aria-live="polite"></p></form></td>
+      <td><button class="admin-status-badge admin-raffle-status-toggle ${winnerStatus === 'awarded' ? 'is-complete' : 'is-warning'}" type="button" data-raffle-status data-raffle-id="${escapeHtml(entry.id)}" data-next-status="${nextStatus}" aria-pressed="${winnerStatus === 'awarded'}" aria-label="Mark ${escapeHtml(entry.playerName)}'s prize as ${nextStatus}" title="Click to mark as ${nextStatus}">${winnerStatus === 'awarded' ? 'Awarded' : 'Pending'}</button></td>
       <td>${escapeHtml(formatAdminDate(entry.createdAt))}</td>
       <td><div class="admin-raffle-row-actions"><button class="admin-raffle-edit" type="button" data-raffle-edit aria-label="Edit prize or note for ${escapeHtml(entry.playerName)}">Edit note</button><button class="admin-raffle-remove" type="button" data-raffle-remove="${escapeHtml(entry.id)}" aria-label="Remove ${escapeHtml(entry.playerName)} from Raffle Winners">Remove</button></div></td>
-    </tr>`).join('')}</tbody>
+    </tr>`;
+    }).join('')}</tbody>
   </table>`;
 };
 const loadRaffleBlacklist = async () => {
@@ -995,6 +1000,23 @@ raffleBlacklistForm.addEventListener('submit', async (event) => {
   }
 });
 raffleBlacklistList.addEventListener('click', async (event) => {
+  const statusButton = event.target.closest('[data-raffle-status]');
+  if (statusButton) {
+    const nextStatus = statusButton.dataset.nextStatus;
+    statusButton.disabled = true;
+    try {
+      await rpc('mvl_admin_update_raffle_winner_status', {
+        p_blacklist_id: statusButton.dataset.raffleId,
+        p_status: nextStatus,
+      });
+      await loadRaffleBlacklist();
+      showAdminToast(`Raffle prize marked as ${nextStatus}.`);
+    } catch (error) {
+      statusButton.disabled = false;
+      status(raffleBlacklistForm.querySelector('.form-status'), error.message, 'error');
+    }
+    return;
+  }
   const editButton = event.target.closest('[data-raffle-edit]');
   if (editButton) {
     const row = editButton.closest('tr');
