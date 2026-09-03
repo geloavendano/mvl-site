@@ -5977,8 +5977,7 @@ body.checkin-complete { overflow: hidden; }
 /* The deadline reuses .draw-day from the raffle mechanics panel; it only needs
    to sit in the page flow rather than in that panel's grid. */
 .vote-deadline {
-  width: fit-content;
-  max-width: 100%;
+  width: 100%;
   margin-top: 20px;
 }
 .vote-deadline[hidden] { display: none; }
