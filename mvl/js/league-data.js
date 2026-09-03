@@ -114,6 +114,41 @@ window.MVL_DATA = {
     ],
   },
 
+  // Photo galleries. Links are external (Pic-Time), so they live here rather
+  // than in markup — adding one is a single line and the tile turns live.
+  // A tile with no url still renders, marked as not ready yet, so the page is
+  // useful before every gallery exists.
+  photos: {
+    // The headline gallery: everything, all five days.
+    gallery: {
+      url: '',
+      label: 'The full MVL 2026 gallery',
+      note: 'Every game day, every team, in one place.',
+      image: '/mvl/assets/mvl-hero-still.jpg',
+    },
+    // Per game day. `image` is a PLACEHOLDER — team artwork standing in until
+    // real photos are available; swap the path when they are.
+    days: [
+      { day: 1, url: '', image: '/mvl/assets/teams/background/mint-green.webp' },
+      { day: 2, url: '', image: '/mvl/assets/teams/background/violet.webp' },
+      { day: 3, url: '', image: '/mvl/assets/teams/background/blue.webp' },
+      { day: 4, url: '', image: '/mvl/assets/teams/background/orange.webp' },
+      { day: 5, url: '', image: '/mvl/assets/teams/background/pink.webp' },
+    ],
+    // Per team. `image` falls back to the team's roster reveal, which is a real
+    // asset already — replace it with a photo when there is one.
+    teams: [
+      { id: 'metarice-x', url: '' },
+      { id: 'metarice-y', url: '' },
+      { id: 'thurstrap', url: '' },
+      { id: 'gizmo', url: '' },
+      { id: 'gremlins', url: '' },
+      { id: 'ssvc', url: '' },
+      { id: 's24', url: '' },
+      { id: 'secret', url: '' },
+    ],
+  },
+
   // Voting window for the special awards. Rendered on /mvl/vote; the label is
   // written out rather than derived so the wording is the client's, not a
   // formatter's.

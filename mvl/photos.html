@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Schedule &amp; Standings — MVL 2026</title>
-<meta name="description" content="MVL 2026 schedule, standings, set scores, winners, and players of the game.">
+<title>Photos — MVL 2026</title>
+<meta name="description" content="Photo galleries from Metarice Volleyball League 2026 — by game day and by team.">
 <link rel="icon" type="image/svg+xml" href="/mvl/assets/metarice-icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +14,7 @@
 <script src="/mvl/js/analytics.js?v=fg-cluster"></script>
 <script src="/mvl/js/nav.js?v=fg-cluster"></script>
 </head>
-<body class="schedule-page" id="top">
+<body class="photos-page" id="top">
 
 <header class="nav nav--stuck page-nav" id="nav">
   <a class="nav-logo" href="/mvl/index.html" aria-label="MVL 2026 home">
@@ -30,53 +30,39 @@
   </nav>
 </header>
 
-<main>
-  <section class="schedule-hero page-hero">
-    <h1 class="section-title">Schedule &amp; <em>Standings</em></h1>
+<main class="photos-main">
+  <!-- Headline gallery: the whole tournament in one link, given the fold. -->
+  <section class="photos-hero" id="photosHero">
+    <a class="photos-hero-link" id="photosHeroLink" href="#">
+      <img class="photos-hero-img" id="photosHeroImg" src="/mvl/assets/mvl-hero-still.jpg" alt="">
+      <span class="photos-hero-scrim" aria-hidden="true"></span>
+      <span class="photos-hero-copy">
+        <span class="section-kicker section-kicker--teal">MVL 2026 Photos</span>
+        <span class="photos-hero-title" id="photosHeroTitle"></span>
+        <span class="photos-hero-note" id="photosHeroNote"></span>
+        <span class="photos-hero-cta" id="photosHeroCta">Open the gallery <span aria-hidden="true">&rarr;</span></span>
+      </span>
+    </a>
   </section>
 
-  <section class="standings-panel" id="standings" aria-labelledby="standingsTitle">
-    <div class="schedule-section-head">
-      <div>
-        <h2 id="standingsTitle">Team Standings</h2>
-        <p class="schedule-note schedule-note--mobile">Sorted by wins, set ratio, points ratio, then head-to-head.</p>
-      </div>
-      <p class="schedule-note">Sorted by wins, set ratio, points ratio, then head-to-head.</p>
+  <section class="photos-section" aria-labelledby="photosDaysTitle">
+    <div class="photos-section-head">
+      <h2 id="photosDaysTitle">By Game Day</h2>
+      <p class="photos-section-note">Five days at Gameville Ball Park.</p>
     </div>
-    <div class="standings-table-wrap">
-      <table class="standings-table">
-        <thead>
-          <tr>
-            <th>Rank</th>
-            <th>Team</th>
-            <th>Wins</th>
-            <th>Losses</th>
-            <th>Sets</th>
-            <th>Set Ratio</th>
-          </tr>
-        </thead>
-        <tbody id="standingsBody"></tbody>
-      </table>
-    </div>
+    <div class="photos-grid" id="photosDays"></div>
   </section>
 
-  <section class="schedule-board" id="games" aria-labelledby="scheduleTitle">
-    <div class="schedule-section-head">
-      <div>
-        <h2 id="scheduleTitle">Games</h2>
-      </div>
-      <label class="schedule-team-filter">
-        <span>Team Filter</span>
-        <select id="teamFilter" aria-label="Filter games by team"></select>
-      </label>
+  <section class="photos-section" aria-labelledby="photosTeamsTitle">
+    <div class="photos-section-head">
+      <h2 id="photosTeamsTitle">By Team</h2>
+      <p class="photos-section-note">Every roster, every game day.</p>
     </div>
-
-    <div class="day-tabs" id="dayTabs" role="tablist" aria-label="Schedule days"></div>
-    <div class="match-list" id="matchList"></div>
+    <div class="photos-grid photos-grid--teams" id="photosTeams"></div>
   </section>
 </main>
 
-<div class="marquee marquee--footer" aria-label="Tournament sponsors">
+<div class="marquee marquee--footer" aria-label="Sponsors">
   <div class="marquee-track" data-marquee="all"></div>
 </div>
 
@@ -102,6 +88,6 @@
 <script src="/mvl/js/league-data.js?v=photos-2"></script>
 <script src="/mvl/js/marquee.js?v=fg-cluster"></script>
 <script src="/mvl/js/supabase-config.js?v=fg-cluster"></script>
-<script src="/mvl/js/public-data.js?v=voting-switch" data-entry="schedule" data-version="bracket-seeds"></script>
+<script src="/mvl/js/public-data.js?v=voting-switch" data-entry="photos" data-version="photos-1"></script>
 </body>
 </html>
