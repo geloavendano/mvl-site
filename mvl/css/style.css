@@ -6004,3 +6004,18 @@ body.checkin-complete { overflow: hidden; }
   background: var(--mint);
 }
 
+/* Shown in place of the ballot when an admin closes voting. */
+.vote-closed-note {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border: 1px solid rgba(124, 245, 180, .34);
+  border-radius: 12px;
+  background: rgba(124, 245, 180, .07);
+  color: var(--mint);
+  font-size: 14px;
+  line-height: 1.5;
+  max-width: 52ch;
+}
+/* The admin switch sits above the vote counts. */
+.admin-voting-switch .admin-panel-head { align-items: center; }
+.admin-voting-switch #votingSwitchState { margin: 4px 0 0; }

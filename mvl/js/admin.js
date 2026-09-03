@@ -28,6 +28,9 @@ const newScoreboardBtn = document.getElementById('newScoreboardBtn');
 const specialAwardFilter = document.getElementById('specialAwardFilter');
 const specialAwardSummary = document.getElementById('specialAwardSummary');
 const specialAwardResults = document.getElementById('specialAwardResults');
+const votingToggleBtn = document.getElementById('votingToggleBtn');
+const votingSwitchState = document.getElementById('votingSwitchState');
+const votingSwitchStatus = document.getElementById('votingSwitchStatus');
 const raffleExportForm = document.getElementById('raffleExportForm');
 const raffleBlacklistForm = document.getElementById('raffleBlacklistForm');
 const raffleBlacklistTeam = document.getElementById('raffleBlacklistTeam');
@@ -173,6 +176,54 @@ const call = async (path, body, token = session?.access_token) => {
   return json;
 };
 const rpc = (name, body) => call(`/rest/v1/rpc/${name}`, body);
+// ---- voting switch -----------------------------------------------------------
+// The public site reads the same flag to show a closed ballot, but the gate that
+// actually holds is in mvl_submit_award_votes — the ballot RPC is reachable with
+// the anon key, so a client-side check alone would not stop a submission.
+let votingOpen = null;
+
+const paintVotingSwitch = () => {
+  const open = votingOpen !== false;
+  votingSwitchState.textContent = open
+    ? 'The ballot is open. Players can vote at /mvl/vote.'
+    : 'The ballot is closed. Players see a notice instead of the ballot.';
+  votingToggleBtn.textContent = open ? 'Close voting' : 'Open voting';
+  votingToggleBtn.className = `cta ${open ? 'cta--secondary' : 'cta--primary'}`;
+  votingToggleBtn.disabled = false;
+};
+
+const loadVotingSwitch = async () => {
+  try {
+    const data = await fetch(`${cfg.url}/rest/v1/rpc/mvl_get_public_data`, {
+      method: 'POST',
+      headers: { apikey: cfg.anonKey, Authorization: `Bearer ${cfg.anonKey}`, 'Content-Type': 'application/json' },
+      body: '{}',
+    }).then((r) => r.json());
+    votingOpen = data?.voting?.is_open !== false;
+    paintVotingSwitch();
+  } catch (error) {
+    votingSwitchState.textContent = 'Could not read the voting state.';
+    status(votingSwitchStatus, error.message, 'error');
+  }
+};
+
+votingToggleBtn.addEventListener('click', async () => {
+  const next = votingOpen === false;
+  // closing is the destructive direction — it stops players mid-tournament
+  if (!next && !window.confirm('Close voting? Players will no longer be able to submit a ballot.')) return;
+  votingToggleBtn.disabled = true;
+  status(votingSwitchStatus, next ? 'Opening…' : 'Closing…');
+  try {
+    const result = await rpc('mvl_admin_set_award_voting', { p_open: next });
+    votingOpen = result?.is_open !== false;
+    paintVotingSwitch();
+    status(votingSwitchStatus, votingOpen ? 'Voting is open.' : 'Voting is closed.', 'success');
+  } catch (error) {
+    status(votingSwitchStatus, error.message, 'error');
+    paintVotingSwitch();
+  }
+});
+
 const initSpecialAwards = () => {
   specialAwardFilter.innerHTML = awards.map((award) => (
     `<option value="${escapeHtml(award.id)}">${escapeHtml(award.name)}</option>`
@@ -751,7 +802,7 @@ const show = async (activeSession = session) => {
     form.court2Url.value = streams[1]?.youtube_url || '';
     render();
     activateAdminTab(adminTabFromHash());
-    await Promise.all([loadReadiness(), loadScoreboards(), loadRaffleBlacklist(), loadSpecialAwardCounts()]);
+    await Promise.all([loadReadiness(), loadScoreboards(), loadRaffleBlacklist(), loadSpecialAwardCounts(), loadVotingSwitch()]);
     if (request === adminLoadRequest) status(loginStatus, '');
   } catch (error) {
     if (request !== adminLoadRequest || session?.access_token !== accessToken) return;

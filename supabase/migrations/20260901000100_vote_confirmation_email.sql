@@ -67,6 +67,13 @@ begin
   ) x;
 
   return jsonb_build_object(
+    -- When the ballot was cast. The email's idempotency key is built from this
+    -- so a retrying client cannot send twice, while a voter who genuinely casts
+    -- a new ballot (their old one cleared) still gets a fresh confirmation.
+    'cast_at', (
+      select max(v.created_at) from mvl.award_votes v
+      where v.voter_player_id = p_voter_player_id
+    ),
     'voter', jsonb_build_object(
       'display_name', v_voter.display_name,
       'surname',      v_voter.surname,

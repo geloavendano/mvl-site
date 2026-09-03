@@ -62,6 +62,8 @@
     window.MVL_DATA = {
       ...fallback,
       livestream: normalizeLivestream(managed.livestream, fallback.livestream),
+      // bundled voting copy (the deadline label) plus the live open/closed flag
+      voting: { ...fallback.voting, ...(managed.voting || {}) },
       games: normalizeGames(managed.games?.length ? managed.games : fallback.games),
     };
   } catch (error) {

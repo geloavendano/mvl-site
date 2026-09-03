@@ -4,7 +4,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><title>MVL Admin</title>
 <link rel="icon" type="image/svg+xml" href="/mvl/assets/metarice-icon.svg">
-<link rel="stylesheet" href="/mvl/css/style.css?v=vote-deadline">
+<link rel="stylesheet" href="/mvl/css/style.css?v=voting-switch">
 </head>
 <body class="admin-page">
 <header class="admin-topbar"><a href="/mvl/index.html"><img src="/mvl/assets/hero-mvl-2026-logo.png" alt="MVL 2026"></a><button id="signOutBtn" class="admin-link is-hidden" type="button">Sign out</button></header>
@@ -124,6 +124,16 @@
       </section>
     </section>
     <section id="specialAwardsPanel" class="admin-tab-panel" role="tabpanel" aria-labelledby="specialAwardsTab" data-admin-panel="special-awards" hidden>
+      <section class="admin-panel admin-voting-switch" aria-labelledby="votingSwitchTitle">
+        <div class="admin-panel-head">
+          <div>
+            <h2 id="votingSwitchTitle">Voting</h2>
+            <p id="votingSwitchState">Checking whether the ballot is open…</p>
+          </div>
+          <button id="votingToggleBtn" class="cta cta--primary" type="button" disabled>Close voting</button>
+        </div>
+        <p class="form-status" id="votingSwitchStatus"></p>
+      </section>
       <section class="admin-panel admin-awards" aria-labelledby="specialAwardsTitle">
         <div class="admin-panel-head admin-awards-head">
           <div><h2 id="specialAwardsTitle">Special awards vote count</h2><p>Select an award to view every nominated player and their current vote total.</p></div>
@@ -177,5 +187,5 @@
     </section>
   </div>
 </dialog>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/mvl/js/supabase-config.js?v=stream-guide"></script><script src="/mvl/js/league-data.js?v=vote-deadline"></script><script src="/mvl/js/admin.js?v=photo-260903d"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/mvl/js/supabase-config.js?v=stream-guide"></script><script src="/mvl/js/league-data.js?v=vote-deadline"></script><script src="/mvl/js/admin.js?v=voting-switch"></script>
 </body></html>

@@ -100,6 +100,7 @@ type Pick = {
 };
 
 type VotePayload = {
+  cast_at: string | null;
   voter: {
     display_name: string | null;
     surname: string | null;
@@ -361,8 +362,11 @@ Deno.serve(async (req) => {
       headers: {
         Authorization: `Bearer ${resendApiKey}`,
         'Content-Type': 'application/json',
-        // one ballot per voter, so a retrying client cannot send a second copy
-        'Idempotency-Key': `vote-confirmation-${voterPlayerId}`,
+        // Keyed on the ballot, not just the voter: a retrying client repeats the
+        // key and Resend collapses it, while a voter whose ballot was cleared
+        // and re-cast gets a new key and a fresh confirmation. Keying on the
+        // voter alone silently swallowed the second send for 24 hours.
+        'Idempotency-Key': `vote-confirmation-${voterPlayerId}-${payload.cast_at ?? 'na'}`,
       },
       body: JSON.stringify({
         from,

@@ -142,6 +142,28 @@ if (VOTING.label) {
   el('voteDeadline').hidden = false;
 }
 
+// The admin switch, read live. This page carries no public-data.js, so the flag
+// is fetched here rather than merged into MVL_DATA. Display only — a late
+// submission is refused by mvl_submit_award_votes regardless, which is what
+// actually closes the vote; a fetch that fails leaves the ballot open rather
+// than locking people out over a network blip.
+const showVotingClosed = () => {
+  el('voteClosedNote').hidden = false;
+  el('voteStartBtn').hidden = true;
+  el('voteDeadline').hidden = true;
+  ballot.classList.add('is-hidden');
+  identityForm.classList.add('is-hidden');
+};
+
+const loadVotingState = async () => {
+  try {
+    const data = await rpc('mvl_get_public_data', {});
+    if (data?.voting?.is_open === false) showVotingClosed();
+  } catch (error) {
+    console.warn('Could not read the voting state; leaving the ballot open:', error);
+  }
+};
+
 // ---- team pickers ------------------------------------------------------------
 // Organizers are valid test voters, but remain excluded from the public nominee
 // selectors, team pages, standings and schedule.
@@ -476,6 +498,7 @@ identityForm.addEventListener('submit', async (event) => {
 });
 
 // ---- first paint ---------------------------------------------------------------
+loadVotingState();
 loadNominees()
   .then(() => {
     nomineeTeam.disabled = false;
