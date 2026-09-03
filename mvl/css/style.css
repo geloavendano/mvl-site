@@ -6033,75 +6033,12 @@ body.checkin-complete { overflow: hidden; }
 
 /* ==========================================================================
    Photos — /mvl/photos
-   Tiles are the video library card in another shape: an image with the copy
-   over it, so a link reads as a preview rather than a button.
+   The page borrows .videos-feature and .video-library wholesale, so only the
+   tiles are new. A tile is an image with its label over it, so a gallery link
+   reads as a preview rather than a button.
    ========================================================================== */
-.photos-main {
-  position: relative;
-  z-index: 2;
-  width: min(calc(100% - 32px), 1180px);
-  margin: 0 auto;
-  padding: calc(var(--nav-h) + 28px) 0 54px;
-  display: grid;
-  gap: 34px;
-}
+.photos-library-head--second { margin-top: 30px; }
 
-/* Headline gallery, given the fold. */
-.photos-hero-link {
-  position: relative;
-  display: block;
-  overflow: hidden;
-  border-radius: 22px;
-  aspect-ratio: 16 / 10;
-  background: #030711;
-  box-shadow: 0 20px 46px rgba(4, 2, 20, .3);
-}
-.photos-hero-img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.photos-hero-scrim {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(4, 2, 20, .1) 30%, rgba(4, 2, 20, .88) 100%);
-}
-.photos-hero-copy {
-  position: absolute;
-  left: 20px;
-  right: 20px;
-  bottom: 18px;
-  display: grid;
-  gap: 6px;
-}
-.photos-hero-title {
-  font-family: var(--stretch);
-  font-style: italic;
-  font-size: clamp(28px, 6vw, 46px);
-  line-height: .95;
-  text-transform: uppercase;
-  color: #fff;
-}
-.photos-hero-note { color: var(--ink-soft); font-size: 13.5px; }
-.photos-hero-cta {
-  margin-top: 6px;
-  color: var(--mint);
-  font: 800 10px var(--mono);
-  letter-spacing: 1.4px;
-  text-transform: uppercase;
-}
-.photos-hero-link.is-empty { cursor: default; }
-
-.photos-section-head h2 {
-  font-family: var(--stretch);
-  font-style: italic;
-  font-size: clamp(26px, 5vw, 38px);
-  line-height: .95;
-  text-transform: uppercase;
-}
-.photos-section-note {
-  margin-top: 6px;
-  color: var(--ink-muted);
-  font: 700 10px var(--mono);
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
-}
 .photos-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -6156,8 +6093,8 @@ a.photo-tile:focus-visible { outline: 2px solid var(--mint); outline-offset: 3px
   color: var(--mint);
   font-size: 17px;
 }
-/* A tile without a gallery yet still shows the preview, but says so and is not
-   clickable — better than hiding the row or offering a dead link. */
+/* Without a gallery yet the tile still shows its preview, says so, and is a
+   div rather than an anchor — better than hiding the row or a dead link. */
 .photo-tile.is-empty { filter: saturate(.6); }
 .photo-tile-soon {
   position: absolute;
@@ -6171,18 +6108,17 @@ a.photo-tile:focus-visible { outline: 2px solid var(--mint); outline-offset: 3px
   letter-spacing: 1.1px;
   text-transform: uppercase;
 }
+/* The hero button before there is a gallery to open. */
+.cta.is-disabled { opacity: .55; cursor: default; pointer-events: none; }
 
 @media (min-width: 760px) {
-  .photos-main { width: min(calc(100% - 96px), 1180px); padding-top: calc(var(--nav-h) + 44px); }
-  .photos-hero-link { aspect-ratio: 21 / 9; }
-  .photos-hero-copy { left: 30px; right: 30px; bottom: 26px; }
   .photos-grid { gap: 18px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .photos-grid--teams { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
-
 @media (min-width: 1100px) {
   /* Five game days read as one row rather than 3 + 2. */
   .photos-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
   .photos-grid--teams { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
 }
 

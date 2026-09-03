@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/mvl/css/style.css?v=photos-2">
+<link rel="stylesheet" href="/mvl/css/style.css?v=photos-3">
 <script src="/mvl/js/site-config.js?v=cutover-gameday"></script>
 <script src="/mvl/js/analytics.js?v=fg-cluster"></script>
 <script src="/mvl/js/nav.js?v=fg-cluster"></script>
@@ -31,32 +31,36 @@
 </header>
 
 <main class="photos-main">
-  <!-- Headline gallery: the whole tournament in one link, given the fold. -->
-  <section class="photos-hero" id="photosHero">
-    <a class="photos-hero-link" id="photosHeroLink" href="#">
-      <img class="photos-hero-img" id="photosHeroImg" src="/mvl/assets/mvl-hero-still.jpg" alt="">
-      <span class="photos-hero-scrim" aria-hidden="true"></span>
-      <span class="photos-hero-copy">
-        <span class="section-kicker section-kicker--teal">MVL 2026 Photos</span>
-        <span class="photos-hero-title" id="photosHeroTitle"></span>
-        <span class="photos-hero-note" id="photosHeroNote"></span>
-        <span class="photos-hero-cta" id="photosHeroCta">Open the gallery <span aria-hidden="true">&rarr;</span></span>
-      </span>
-    </a>
+  <!-- Same shape as /mvl/videos: a full-bleed feature that runs under the nav,
+       then one panel carrying the galleries. Classes are the videos page's, so
+       the layout and surfaces come from there rather than a second set. -->
+  <section class="videos-feature photos-feature" aria-labelledby="photosHeroTitle">
+    <div class="videos-feature-media">
+      <img id="photosHeroImg" src="/mvl/assets/mvl-hero-still.jpg" alt="">
+    </div>
+    <div class="videos-feature-scrim" aria-hidden="true"></div>
+    <div class="videos-feature-inner">
+      <div class="videos-feature-panel">
+        <p class="videos-feature-label"><span aria-hidden="true"></span>MVL 2026 Photos</p>
+        <h1 class="videos-feature-title" id="photosHeroTitle">See the <em>Season</em></h1>
+        <h2 class="videos-feature-matchup" id="photosHeroLabel"></h2>
+        <p class="videos-feature-result" id="photosHeroNote"></p>
+        <div class="videos-feature-actions">
+          <a class="cta cta--primary" id="photosHeroCta" href="#">Open the gallery</a>
+          <a class="videos-feature-library-link" href="#photosDaysTitle">View galleries <span aria-hidden="true">&darr;</span></a>
+        </div>
+      </div>
+    </div>
   </section>
 
-  <section class="photos-section" aria-labelledby="photosDaysTitle">
-    <div class="photos-section-head">
-      <h2 id="photosDaysTitle">By Game Day</h2>
-      <p class="photos-section-note">Five days at Gameville Ball Park.</p>
+  <section class="video-library photos-library">
+    <div class="video-library-head">
+      <div><h2 id="photosDaysTitle">View by Game Day</h2></div>
     </div>
     <div class="photos-grid" id="photosDays"></div>
-  </section>
 
-  <section class="photos-section" aria-labelledby="photosTeamsTitle">
-    <div class="photos-section-head">
-      <h2 id="photosTeamsTitle">By Team</h2>
-      <p class="photos-section-note">Every roster, every game day.</p>
+    <div class="video-library-head photos-library-head--second">
+      <div><h2 id="photosTeamsTitle">View by Team</h2></div>
     </div>
     <div class="photos-grid photos-grid--teams" id="photosTeams"></div>
   </section>
@@ -85,9 +89,9 @@
   </div>
 </footer>
 
-<script src="/mvl/js/league-data.js?v=photos-2"></script>
+<script src="/mvl/js/league-data.js?v=photos-4"></script>
 <script src="/mvl/js/marquee.js?v=fg-cluster"></script>
 <script src="/mvl/js/supabase-config.js?v=fg-cluster"></script>
-<script src="/mvl/js/public-data.js?v=voting-switch" data-entry="photos" data-version="photos-1"></script>
+<script src="/mvl/js/public-data.js?v=voting-switch" data-entry="photos" data-version="photos-4"></script>
 </body>
 </html>

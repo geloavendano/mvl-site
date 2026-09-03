@@ -126,14 +126,16 @@ window.MVL_DATA = {
       note: 'Every game day, every team, in one place.',
       image: '/mvl/assets/mvl-hero-still.jpg',
     },
-    // Per game day. `image` is a PLACEHOLDER — team artwork standing in until
-    // real photos are available; swap the path when they are.
+    // Per game day. `image` is a PLACEHOLDER and is deliberately the same shot
+    // on every day — swap each for that day's gallery cover when they exist.
+    // (Not the game video thumbnails: those are matchup title cards, so a day
+    // tile would advertise one specific game rather than the day.)
     days: [
-      { day: 1, url: '', image: '/mvl/assets/teams/background/mint-green.webp' },
-      { day: 2, url: '', image: '/mvl/assets/teams/background/violet.webp' },
-      { day: 3, url: '', image: '/mvl/assets/teams/background/blue.webp' },
-      { day: 4, url: '', image: '/mvl/assets/teams/background/orange.webp' },
-      { day: 5, url: '', image: '/mvl/assets/teams/background/pink.webp' },
+      { day: 1, url: '', image: '/mvl/assets/mvl-hero-still.jpg' },
+      { day: 2, url: '', image: '/mvl/assets/mvl-hero-still.jpg' },
+      { day: 3, url: '', image: '/mvl/assets/mvl-hero-still.jpg' },
+      { day: 4, url: '', image: '/mvl/assets/mvl-hero-still.jpg' },
+      { day: 5, url: '', image: '/mvl/assets/mvl-hero-still.jpg' },
     ],
     // Per team. `image` falls back to the team's roster reveal, which is a real
     // asset already — replace it with a photo when there is one.

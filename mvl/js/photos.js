@@ -48,19 +48,20 @@ const tile = ({ url, image, kicker, title, note, wide = false }) => {
 
 // ---- headline gallery ---------------------------------------------------------
 const hero = PHOTOS.gallery || {};
-const heroLink = el('photosHeroLink');
-el('photosHeroTitle').textContent = hero.label || 'MVL 2026 photos';
+const heroCta = el('photosHeroCta');
+el('photosHeroLabel').textContent = hero.label || '';
 el('photosHeroNote').textContent = hero.note || '';
 if (hero.image) el('photosHeroImg').src = hero.image;
 if (hero.url) {
-  heroLink.href = hero.url;
-  heroLink.target = '_blank';
-  heroLink.rel = 'noopener';
+  heroCta.href = hero.url;
+  heroCta.target = '_blank';
+  heroCta.rel = 'noopener';
 } else {
-  // No gallery yet: keep the banner, drop the link rather than offer a dead one.
-  heroLink.removeAttribute('href');
-  heroLink.classList.add('is-empty');
-  el('photosHeroCta').textContent = 'Coming soon';
+  // No gallery yet: keep the banner, but the button must not be a dead link.
+  heroCta.removeAttribute('href');
+  heroCta.classList.add('is-disabled');
+  heroCta.setAttribute('aria-disabled', 'true');
+  heroCta.textContent = 'Gallery coming soon';
 }
 
 // ---- per day ------------------------------------------------------------------
@@ -79,6 +80,5 @@ el('photosTeams').innerHTML = (PHOTOS.teams || []).map((entry) => {
     url: entry.url,
     image: entry.image || `/mvl/assets/teams/roster/${entry.id}.webp`,
     title: team.name,
-    note: team.tag || '',
   });
 }).join('');
