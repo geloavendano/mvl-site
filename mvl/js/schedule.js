@@ -25,10 +25,30 @@ const playerPhotoUrl = (value) => {
   const path = value.split('/').filter(Boolean).map(encodeURIComponent).join('/');
   return withPhotoVersion(`${window.MVL_SUPABASE.url}/storage/v1/object/public/mvl-player-photos/${path}`);
 };
+// A bracket game carries a seed label ("3rd Seed") over a placeholder team id,
+// so until the teams are assigned the card wore whichever team happened to be
+// seeded there when the fixtures were written — colours that had nothing to do
+// with the standings. Resolve the label against the live table instead, and
+// keep the label as the name so nothing reads as confirmed.
+const SEED_LABEL = /^(\d+)(?:st|nd|rd|th)\s+seed$/i;
+
+const seededTeam = (label) => {
+  const match = SEED_LABEL.exec(String(label || '').trim());
+  if (!match) return null;
+  const row = standings[Number(match[1]) - 1];
+  return row ? row.team : null;
+};
+
 const gameTeam = (game, side) => {
   const id = side === 'A' ? game.teamA : game.teamB;
   const label = side === 'A' ? game.teamALabel : game.teamBLabel;
-  return { ...(teamById[id] || { id, grad: ['#4338CA', '#16104A'] }), name: label || teamById[id]?.name || 'TBD' };
+  const fallback = { id, grad: ['#4338CA', '#16104A'] };
+  // A label always wins on the name; the artwork follows the standings when the
+  // label is a seed, and is neutral when it is not ("Winner QF1").
+  if (label) {
+    return { ...(seededTeam(label) || fallback), name: label };
+  }
+  return { ...(teamById[id] || fallback), name: teamById[id]?.name || 'TBD' };
 };
 
 const formatTime = (iso) => new Intl.DateTimeFormat('en-PH', {
@@ -148,7 +168,11 @@ const buildStandings = () => {
 };
 
 const standingsBody = document.getElementById('standingsBody');
-standingsBody.innerHTML = buildStandings().map((row, i) => {
+// Computed once: the table renders from it, and the bracket cards read it to
+// resolve their seed labels.
+const standings = buildStandings();
+
+standingsBody.innerHTML = standings.map((row, i) => {
   const ratio = row.setsLost ? row.setRatio.toFixed(2) : (row.setsWon ? 'MAX' : '-');
   return `
     <tr>

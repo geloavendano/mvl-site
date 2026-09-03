@@ -796,6 +796,13 @@ const render = () => {
     return `<option value="${day}" ${day === activeAdminDay ? 'selected' : ''}>Day ${day} · ${formatAdminDay(first.startsAt)}</option>`;
   }).join('');
   adminDaySummary.textContent = `${dayGames.length} games · ${formatAdminDay(dayGames[0].startsAt)}`;
+  // Nothing is preselected: the placeholder team id is arbitrary, so an admin
+  // should choose deliberately rather than confirm a guess.
+  const teamOptionsMarkup = () => (data.publicData.teams || [])
+    .filter((t) => t.id !== 'organizer')
+    .map((t) => `<option value="${escapeHtml(t.id)}">${escapeHtml(t.name)}</option>`)
+    .join('');
+
   document.getElementById('adminGameList').innerHTML = dayGames.map((g) => {
     const setCount = g.id.startsWith('pre-') ? 3 : 5;
     const videos = gameVideos(g);
@@ -805,6 +812,16 @@ const render = () => {
       <label class="field"><span>Winner</span><select name="winner" required ${g.teamALabel || g.teamBLabel ? 'disabled' : ''}><option value="">Choose winner</option><option value="${g.teamA}" ${g.teamALabel ? '' : `style="color:${adminTeamColor(g.teamA)}"`} ${g.winner === g.teamA ? 'selected' : ''}>${gameTeamName(g, 'A')}</option><option value="${g.teamB}" ${g.teamBLabel ? '' : `style="color:${adminTeamColor(g.teamB)}"`} ${g.winner === g.teamB ? 'selected' : ''}>${gameTeamName(g, 'B')}</option></select></label>
       <label class="field"><span>Player of the Game</span><div class="admin-player-search"><input name="playerLookup" type="text" value="${escapeHtml(g.playerOfGame?.lookupKey || '')}" placeholder="santos-04" autocomplete="off"><button type="button" class="cta cta--secondary" data-find-player>Find</button></div><small>Enter surname and jersey number. Lookup is limited to the selected winner.</small><input name="playerId" type="hidden" value="${escapeHtml(g.playerOfGame?.id || '')}"></label>
     </div>
+    ${g.teamALabel || g.teamBLabel ? `
+    <section class="admin-assign-teams">
+      <div class="admin-video-head"><div><strong>Assign teams</strong><small>This game still shows seed placeholders. Set the two teams to turn it into a real fixture and unlock the result form.</small></div></div>
+      <div class="admin-result-fields">
+        <label class="field"><span>${escapeHtml(gameTeamName(g, 'A'))}</span><select data-assign-a><option value="">Choose team</option>${teamOptionsMarkup()}</select></label>
+        <label class="field"><span>${escapeHtml(gameTeamName(g, 'B'))}</span><select data-assign-b><option value="">Choose team</option>${teamOptionsMarkup()}</select></label>
+      </div>
+      <div class="admin-video-actions"><button type="button" class="cta cta--secondary" data-save-teams>Assign teams</button></div>
+      <p class="form-status" data-assign-status></p>
+    </section>` : ''}
     ${playerPreview(g.playerOfGame)}
     <section class="admin-video-editor">
       <div class="admin-video-head"><div><strong>Game videos</strong><small>Add links before or after the game. Saving here will not change the winner, scores, or game status.</small></div><div class="admin-video-actions"><button type="button" class="admin-link" data-add-video>+ Add video</button><button type="button" class="cta cta--secondary" data-save-videos>Save video links</button></div></div>
@@ -1235,6 +1252,43 @@ adminGameList.addEventListener('click', async (e) => {
     }
     return;
   }
+  const saveTeamsButton = e.target.closest('[data-save-teams]');
+  if (saveTeamsButton) {
+    const form = saveTeamsButton.closest('[data-id]');
+    const section = saveTeamsButton.closest('.admin-assign-teams');
+    const assignStatus = section.querySelector('[data-assign-status]');
+    const gameId = form.dataset.id;
+    const teamA = section.querySelector('[data-assign-a]').value;
+    const teamB = section.querySelector('[data-assign-b]').value;
+
+    if (!teamA || !teamB) {
+      status(assignStatus, 'Choose both teams.', 'error');
+      return;
+    }
+    if (teamA === teamB) {
+      status(assignStatus, 'The two teams must be different.', 'error');
+      return;
+    }
+
+    status(assignStatus, 'Assigning teams…');
+    saveTeamsButton.disabled = true;
+    try {
+      await rpc('mvl_admin_set_game_teams', {
+        p_game_id: gameId,
+        p_team_a_id: teamA,
+        p_team_b_id: teamB,
+      });
+      data = await rpc('mvl_admin_get_dashboard');
+      render();
+      const refreshed = document.querySelector(`[data-id="${gameId}"] .form-status`);
+      status(refreshed, 'Teams assigned. You can record the result now.', 'success');
+    } catch (error) {
+      saveTeamsButton.disabled = false;
+      status(assignStatus, error.message, 'error');
+    }
+    return;
+  }
+
   const addVideoButton = e.target.closest('[data-add-video]');
   if (addVideoButton) {
     addVideoButton.closest('[data-id]').querySelector('[data-video-list]').insertAdjacentHTML('beforeend', videoRow({ label: '' }));
