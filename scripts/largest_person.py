@@ -80,6 +80,25 @@ def fill_enclosed_holes(im: Image.Image) -> Image.Image:
     return im
 
 
+def add_bright_from(im: Image.Image, donor: Image.Image, min_luma: int = 85) -> Image.Image:
+    """Union in only the *bright* parts of a second mask.
+
+    Vision drops what a player is holding, so a volleyball gets sliced away.
+    The older extracted/ cut-outs kept the ball — but they also kept slabs of
+    dark gym background, which is most of what a plain union brings back
+    (52-87% of the added pixels measured under luminance 64). A ball is bright
+    and the background it sits against is not, so gate the union on luminance
+    and the ball returns without the black.
+    """
+    from PIL import ImageChops
+
+    donor = donor.convert("RGBA").resize(im.size, Image.LANCZOS)
+    bright = donor.convert("L").point(lambda v: 255 if v >= min_luma else 0)
+    usable = ImageChops.multiply(donor.getchannel("A"), bright)
+    im.putalpha(ImageChops.lighter(im.getchannel("A"), usable))
+    return im
+
+
 if __name__ == "__main__":
     import sys
     src, dst = sys.argv[1], sys.argv[2]
