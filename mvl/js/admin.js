@@ -1062,16 +1062,17 @@ raffleDrawBtn.addEventListener('click', async () => {
   status(formStatus, 'Preparing the raffle pool…');
   raffleDrawBtn.disabled = true;
   try {
-    const payload = await rpc('mvl_admin_draw_raffle_winner_with_multi_date_filters', {
+    const payload = await rpc('mvl_admin_draw_raffle_winner_with_roster_entries', {
       p_start_date: raffleExportForm.elements.startDate.value,
       p_end_date: raffleExportForm.elements.endDate.value,
       p_furparent_only: raffleExportForm.elements.furparentOnly.checked,
       p_include_previous_winners: raffleExportForm.elements.includePreviousWinners.checked,
       p_excluded_team_ids: selectedRaffleTeamExclusions(),
       p_excluded_winner_dates: selectedRaffleWinnerDateExclusions(),
+      p_include_all_players: raffleExportForm.elements.includeAllPlayers.checked,
     });
     if (!payload.winner || !payload.pool?.length) {
-      status(formStatus, 'No eligible check-ins found for this selection.', 'error');
+      status(formStatus, 'No eligible entries found for this selection.', 'error');
       return;
     }
     status(formStatus, '');

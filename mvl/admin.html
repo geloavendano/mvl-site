@@ -39,11 +39,12 @@
         <form id="raffleExportForm" class="admin-panel admin-form admin-raffle-draw-form">
           <div class="admin-panel-head"><div><h2>Draw setup</h2><p>Define who is eligible, then draw one winner from the resulting pool.</p></div></div>
           <section class="admin-raffle-filter-group" aria-labelledby="raffleEligibleTitle">
-            <div class="admin-raffle-filter-head"><h3 id="raffleEligibleTitle">Eligible check-ins</h3><p>Choose the attendance period and optional furparent requirement.</p></div>
+            <div class="admin-raffle-filter-head"><h3 id="raffleEligibleTitle">Eligible entries</h3><p>Choose the attendance period and optional ways to expand or narrow the draw pool.</p></div>
             <div class="admin-raffle-date-range">
               <label class="field"><span>Check-in start date</span><input id="raffleStartDate" name="startDate" type="date" required></label>
               <label class="field"><span>Check-in end date</span><input id="raffleEndDate" name="endDate" type="date" required></label>
             </div>
+            <label class="admin-checkbox"><input name="includeAllPlayers" type="checkbox"><span><strong>Give every player one roster entry</strong><small>Add one entry for every rostered player, even if they have never checked in. Check-ins in the selected dates remain additional entries.</small></span></label>
             <label class="admin-checkbox"><input name="furparentOnly" type="checkbox"><span><strong>Furparents only</strong><small>Include only players who declared that they have a pet.</small></span></label>
           </section>
           <section class="admin-raffle-filter-group" aria-labelledby="raffleWinnerRulesTitle">
@@ -63,7 +64,7 @@
               <div id="raffleExcludedTeamList" class="admin-raffle-team-list"></div>
             </fieldset>
           </section>
-          <div class="admin-form-actions admin-raffle-draw-actions"><div><button id="raffleDrawBtn" class="cta cta--primary" type="button">Draw winner</button><button class="cta cta--secondary" type="submit">Download check-ins CSV</button></div><small>The draw uses every setting above. The CSV uses the check-in dates and furparent filter and excludes all previous winners.</small><p class="form-status" aria-live="polite"></p></div>
+          <div class="admin-form-actions admin-raffle-draw-actions"><div><button id="raffleDrawBtn" class="cta cta--primary" type="button">Draw winner</button><button class="cta cta--secondary" type="submit">Download check-ins CSV</button></div><small>The draw uses every setting above. The CSV remains a check-in report, using only the date and furparent filters and excluding previous winners.</small><p class="form-status" aria-live="polite"></p></div>
         </form>
         <section class="admin-panel admin-form" aria-labelledby="raffleBlacklistTitle">
           <div class="admin-panel-head"><div><h2 id="raffleBlacklistTitle">Winner &amp; prize records</h2><p>Record each prize separately and track whether it is still pending or has been awarded.</p></div></div>
@@ -203,5 +204,5 @@
     </section>
   </div>
 </dialog>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/mvl/js/supabase-config.js?v=stream-guide"></script><script src="/mvl/js/league-data.js?v=photos-4"></script><script src="/mvl/js/admin.js?v=award-top-three"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/mvl/js/supabase-config.js?v=stream-guide"></script><script src="/mvl/js/league-data.js?v=photos-4"></script><script src="/mvl/js/admin.js?v=raffle-roster-entry"></script>
 </body></html>
