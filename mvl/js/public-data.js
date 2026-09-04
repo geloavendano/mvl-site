@@ -48,17 +48,46 @@
   // stalling the connection) never settles and the page is left showing
   // nothing but its static headings. The abort turns that into the same
   // bundled-data fallback as any other failure.
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 5000);
-  try {
-    const response = await fetch(`${config.url}/rest/v1/rpc/mvl_get_public_data`, {
-      method: 'POST',
-      headers: { apikey: config.anonKey, Authorization: `Bearer ${config.anonKey}`, 'Content-Type': 'application/json' },
-      body: '{}',
-      signal: controller.signal,
-    });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const managed = await response.json();
+  // The bundled data in league-data.js is the pre-tournament fixture list: a
+  // handful of games and no videos at all. Falling straight back to it turns
+  // one slow request into a page that looks like the season never happened —
+  // which is exactly how it looked on a phone. So the last good response is
+  // kept and preferred over the bundle: a device that has loaded the site
+  // before shows the real season even when the request fails.
+  const CACHE_KEY = 'mvl.publicData.v1';
+  const readCache = () => {
+    try {
+      const raw = localStorage.getItem(CACHE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch { return null; }
+  };
+  const writeCache = (payload) => {
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), payload })); }
+    catch { /* private mode or full quota — the page works either way */ }
+  };
+
+  // fetch() has no timeout of its own, so a request that hangs rather than
+  // fails (flaky mobile data, a captive portal, a carrier stalling the
+  // connection) would never settle. One retry: the common failure at a venue
+  // is a single dropped request, not a dead network.
+  const attempt = async (ms) => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), ms);
+    try {
+      const response = await fetch(`${config.url}/rest/v1/rpc/mvl_get_public_data`, {
+        method: 'POST',
+        headers: { apikey: config.anonKey, Authorization: `Bearer ${config.anonKey}`, 'Content-Type': 'application/json' },
+        body: '{}',
+        signal: controller.signal,
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return await response.json();
+    } finally {
+      clearTimeout(timer);
+    }
+  };
+
+  const apply = (managed) => {
     window.MVL_DATA = {
       ...fallback,
       livestream: normalizeLivestream(managed.livestream, fallback.livestream),
@@ -66,16 +95,34 @@
       voting: { ...fallback.voting, ...(managed.voting || {}) },
       games: normalizeGames(managed.games?.length ? managed.games : fallback.games),
     };
+  };
+
+  try {
+    let managed;
+    try {
+      managed = await attempt(6000);
+    } catch (first) {
+      console.warn('MVL data: first attempt failed, retrying', first);
+      managed = await attempt(9000);
+    }
+    apply(managed);
+    writeCache(managed);
   } catch (error) {
-    console.warn('Using bundled MVL data:', error);
-    window.MVL_DATA = {
-      ...fallback,
-      livestream: normalizeLivestream({}, fallback.livestream),
-      games: normalizeGames(fallback.games),
-    };
+    const cached = readCache();
+    if (cached?.payload) {
+      const age = Math.round((Date.now() - (cached.at || 0)) / 60000);
+      console.warn(`MVL data: request failed, using the last good copy (${age} min old)`, error);
+      apply(cached.payload);
+    } else {
+      console.warn('Using bundled MVL data:', error);
+      window.MVL_DATA = {
+        ...fallback,
+        livestream: normalizeLivestream({}, fallback.livestream),
+        games: normalizeGames(fallback.games),
+      };
+    }
   } finally {
     // in `finally` so the page still renders even if the fallback path throws
-    clearTimeout(timeout);
     const script = document.createElement('script');
     script.src = `/mvl/js/${entry}.js${version ? `?v=${encodeURIComponent(version)}` : ''}`;
     document.body.appendChild(script);
