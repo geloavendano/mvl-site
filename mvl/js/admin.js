@@ -650,7 +650,7 @@ const revealRaffleWinner = (winner) => {
   addButton.disabled = false;
   addButton.textContent = 'Add to Raffle Winners';
   if (winner.photoUrl) {
-    raffleWinnerPhoto.src = withPhotoVersion(winner.photoUrl);
+    raffleWinnerPhoto.src = playerPhotoUrl(winner.photoUrl);
     raffleWinnerPhoto.alt = `${winner.playerName}, raffle winner`;
     raffleWinnerPhoto.classList.remove('is-hidden');
     raffleWinnerPhotoFallback.classList.add('is-hidden');
